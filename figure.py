@@ -252,57 +252,53 @@ class Person:
     
     def left_arm(self, colour, angle, part = "981"):
     
-        self.pieces_info["left arm"] = angle
-        
         # Displacement from torso
         displacement = self.matrix * Vector(15, 8, 0)
-        return Piece(colour, self.position + displacement,
-                     self.matrix * Identity().rotate(-10, ZAxis) *
-                     Identity().rotate(angle, XAxis), part)
+        
+        piece = Piece(colour, self.position + displacement,
+                      self.matrix * Identity().rotate(-10, ZAxis) *
+                      Identity().rotate(angle, XAxis), part)
+        
+        self.pieces_info["left arm"] = piece
+        return piece
     
     def left_hand(self, colour, angle, part = "983"):
     
         try:
-            arm_angle = self.pieces_info["left arm"]
+            left_arm = self.pieces_info["left arm"]
         except KeyError:
             return
         
-        # Displacement from torso
-        displacement = self.matrix * Vector(19, 8, 0) + (
-            self.matrix * Identity().rotate(-10, ZAxis) *
-            Identity().rotate(arm_angle, XAxis) * Vector(0, 17, -9)
-            )
-        return Piece(colour, self.position + displacement,
-                     self.matrix * Identity().rotate(-10, ZAxis) *
-                     Identity().rotate(arm_angle + 40, XAxis) *
-                     Identity().rotate(angle, ZAxis), part)
+        # Displacement from left arm
+        displacement = left_arm.position + left_arm.matrix * Vector(4, 17, -9)
+        matrix = left_arm.matrix * Identity().rotate(40, XAxis) * Identity().rotate(angle, ZAxis)
+        
+        return Piece(colour, self.position + displacement, matrix, part)
     
     def right_arm(self, colour, angle, part = "982"):
     
-        self.pieces_info["right arm"] = angle
-        
         # Displacement from torso
         displacement = self.matrix * Vector(-15, 8, 0)
-        return Piece(colour, self.position + displacement,
-                     self.matrix * Identity().rotate(10, ZAxis) *
-                     Identity().rotate(angle, XAxis), part)
+        
+        piece = Piece(colour, self.position + displacement,
+                      self.matrix * Identity().rotate(10, ZAxis) *
+                      Identity().rotate(angle, XAxis), part)
+        
+        self.pieces_info["right arm"] = piece
+        return piece
     
     def right_hand(self, colour, angle, part = "983"):
     
         try:
-            arm_angle = self.pieces_info["right arm"]
+            right_arm = self.pieces_info["right arm"]
         except KeyError:
             return
         
-        # Displacement from torso
-        displacement = self.matrix * Vector(-19, 8, 0) + (
-            self.matrix * Identity().rotate(10, ZAxis) *
-            Identity().rotate(arm_angle, XAxis) * Vector(0, 17, -9)
-            )
-        return Piece(colour, self.position + displacement,
-                     self.matrix * Identity().rotate(10, ZAxis) *
-                     Identity().rotate(arm_angle + 40, XAxis) *
-                     Identity().rotate(angle, ZAxis), part)
+        # Displacement from left arm
+        displacement = right_arm.position + right_arm.matrix * Vector(-4, 17, -9)
+        matrix = right_arm.matrix * Identity().rotate(40, XAxis) * Identity().rotate(angle, ZAxis)
+        
+        return Piece(colour, self.position + displacement, matrix, part)
     
     def left_leg(self, colour, angle, part = "972"):
     
