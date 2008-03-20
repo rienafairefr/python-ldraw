@@ -222,21 +222,45 @@ class Piece:
 
 class Person:
 
-    def __init__(self, position = None, matrix = None):
+    def __init__(self, position = Vector(0, 0, 0), matrix = Identity()):
     
-        self.position = position or Vector(0, 0, 0)
-        self.matrix = matrix or Identity()
+        self.position = position
+        self.matrix = matrix
         self.pieces_info = {}
     
-    def head(self, colour, part = "3626BPS5"):
+    def head(self, colour, angle = 0, part = "3626BPS5"):
     
         # Displacement from torso
         displacement = self.matrix * Vector(0, -24, 0)
-        return Piece(colour, self.position + displacement, self.matrix, part)
+        
+        piece = Piece(colour, self.position + displacement,
+                      self.matrix * Identity().rotate(angle, YAxis), part)
+        
+        self.pieces_info["head"] = piece
+        return piece
+    
+    def hat(self, colour, part = "3901"):
+    
+        try:
+            head = self.pieces_info["head"]
+        except KeyError:
+            return
+        
+        # Displacement from head
+        displacement = head.position + head.matrix * Vector(0, 0, 0)
+        
+        piece = Piece(colour, displacement, head.matrix, part)
+        return piece
     
     def torso(self, colour, part = "973"):
     
         return Piece(colour, self.position, self.matrix, part)
+    
+    def backpack(self, colour, displacement = Vector(0, 0, 0), part = "3838"):
+    
+        # Displacement from torso
+        displacement = self.matrix * displacement
+        return Piece(colour, self.position + displacement, self.matrix, part)
     
     def hips_and_legs(self, colour, part = "970C00"):
     
@@ -250,7 +274,7 @@ class Person:
         displacement = self.matrix * Vector(0, 32, 0)
         return Piece(colour, self.position + displacement, self.matrix, part)
     
-    def left_arm(self, colour, angle, part = "981"):
+    def left_arm(self, colour, angle = 0, part = "981"):
     
         # Displacement from torso
         displacement = self.matrix * Vector(15, 8, 0)
@@ -262,20 +286,40 @@ class Person:
         self.pieces_info["left arm"] = piece
         return piece
     
-    def left_hand(self, colour, angle, part = "983"):
+    def left_hand(self, colour, angle = 0, part = "983"):
     
         try:
             left_arm = self.pieces_info["left arm"]
         except KeyError:
             return
         
-        # Displacement from left arm
+        # Displacement from left hand
         displacement = left_arm.position + left_arm.matrix * Vector(4, 17, -9)
         matrix = left_arm.matrix * Identity().rotate(40, XAxis) * Identity().rotate(angle, ZAxis)
         
-        return Piece(colour, self.position + displacement, matrix, part)
+        piece = Piece(colour, displacement, matrix, part)
+        
+        self.pieces_info["left hand"] = piece
+        return piece
     
-    def right_arm(self, colour, angle, part = "982"):
+    def left_hand_item(self, colour, displacement, angle = 0, part = None):
+    
+        if not part:
+            return
+        
+        try:
+            left_hand = self.pieces_info["left hand"]
+        except KeyError:
+            return
+        
+        # Displacement from left hand
+        displacement = left_hand.position + left_hand.matrix * displacement
+        matrix = left_hand.matrix * Identity().rotate(10, XAxis) * Identity().rotate(angle, YAxis)
+        
+        piece = Piece(colour, displacement, matrix, part)
+        return piece
+    
+    def right_arm(self, colour, angle = 0, part = "982"):
     
         # Displacement from torso
         displacement = self.matrix * Vector(-15, 8, 0)
@@ -287,32 +331,60 @@ class Person:
         self.pieces_info["right arm"] = piece
         return piece
     
-    def right_hand(self, colour, angle, part = "983"):
+    def right_hand(self, colour, angle = 0, part = "983"):
     
         try:
             right_arm = self.pieces_info["right arm"]
         except KeyError:
             return
         
-        # Displacement from left arm
+        # Displacement from right arm
         displacement = right_arm.position + right_arm.matrix * Vector(-4, 17, -9)
         matrix = right_arm.matrix * Identity().rotate(40, XAxis) * Identity().rotate(angle, ZAxis)
         
-        return Piece(colour, self.position + displacement, matrix, part)
+        piece = Piece(colour, displacement, matrix, part)
+        
+        self.pieces_info["right hand"] = piece
+        return piece
     
-    def left_leg(self, colour, angle, part = "972"):
+    def right_hand_item(self, colour, displacement, angle = 0, part = None):
+    
+        if not part:
+            return
+        
+        try:
+            right_hand = self.pieces_info["right hand"]
+        except KeyError:
+            return
+        
+        # Displacement from right hand
+        displacement = right_hand.position + right_hand.matrix * displacement
+        matrix = right_hand.matrix * Identity().rotate(10, XAxis) * Identity().rotate(angle, YAxis)
+        
+        piece = Piece(colour, displacement, matrix, part)
+        return piece
+    
+    def left_leg(self, colour, angle = 0, part = "972"):
     
         # Displacement from torso
         displacement = self.matrix * Vector(0, 44, 0)
-        return Piece(colour, self.position + displacement,
-                     self.matrix * Identity().rotate(angle, XAxis), part)
+        
+        piece = Piece(colour, self.position + displacement,
+                      self.matrix * Identity().rotate(angle, XAxis), part)
+        
+        self.pieces_info["left leg"] = piece
+        return piece
     
-    def right_leg(self, colour, angle, part = "971"):
+    def right_leg(self, colour, angle = 0, part = "971"):
     
         # Displacement from torso
         displacement = self.matrix * Vector(0, 44, 0)
-        return Piece(colour, self.position + displacement,
-                     self.matrix * Identity().rotate(angle, XAxis), part)
+        
+        piece = Piece(colour, self.position + displacement,
+                      self.matrix * Identity().rotate(angle, XAxis), part)
+        
+        self.pieces_info["right leg"] = piece
+        return piece
 
 
 def test():
