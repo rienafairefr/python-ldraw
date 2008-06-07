@@ -3,7 +3,7 @@ __init__.py - Package file for the ldraw Python package.
 
 Copyright (C) 2008 David Boddie <david@boddie.org.uk>
 
-This file is part of the TechWriter Python package.
+This file is part of the ldraw Python package.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
