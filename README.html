@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.4.1: http://docutils.sourceforge.net/" />
+<title>ldraw Python Package</title>
+<meta name="author" content="David Boddie" />
+<meta name="date" content="2008-06-01" />
+</head>
+
+<body>
+<h1>ldraw Python Package</h1>
+<table frame="void" rules="none">
+<col />
+<col />
+<tbody valign="top">
+<tr><th>Author:</th>
+<td><a href="mailto:david&#64;boddie.org.uk">David Boddie</a></td></tr>
+<tr><th>Date:</th>
+<td>2008-07-13</td></tr>
+<tr><th>Version:</th>
+<td>0.11</td></tr>
+</tbody>
+</table>
+<p><em>Note: This text is marked up using reStructuredText formatting. It should be
+readable in a text editor but can be processed to produce versions of this
+document in other formats.</em></p>
+<div>
+<p><a name="contents">Contents</a></p>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#part-descriptions">Part Descriptions</a></li>
+<li><a href="#license">License</a></li>
+<li><a href="#trademarks">Trademarks</a></li>
+</ul>
+</div>
+<div>
+<h1><a name="introduction">Introduction</a></h1>
+<p><a href="http://www.ldraw.org/">LDraw</a> is a standard format used by CAD applications that create LEGO models
+and scenes.</p>
+<p>The <cite>ldraw</cite> package provides facilities to allow users to create LDraw scene
+descriptions using the <a href="http://www.python.org/">Python</a> programming language. Pieces are specified by
+their positions, orientations and other properties in normal executable Python
+scripts which are run to create model files.</p>
+</div>
+<div>
+<h1><a name="installation">Installation</a></h1>
+<p>To install the package alongside other packages and modules in your Python
+installation, unpack the contents of the archive. At the command line, enter
+the directory containing the <tt><span>setup.py</span></tt> script and install it by typing the
+following:</p>
+<pre>
+python setup.py install
+</pre>
+<p>You may need to become the root user or administrator to do this.</p>
+</div>
+<div>
+<h1><a name="examples">Examples</a></h1>
+<p>A number of examples are provided in the <cite>examples</cite> directory. When run, each
+of these will write model information to the console. To create a model file
+from an example, redirect its output to a file.</p>
+</div>
+<div>
+<h1><a name="part-descriptions">Part Descriptions</a></h1>
+<p>This package does not include a list of parts derived from those supplied in
+the official LDraw archive, so users will have to download and consult this
+list separately. However, once the user has obtained this file, it is possible
+to use the <cite>ldraw.parts</cite> module to create a parts database from within a scene
+script in the following way:</p>
+<pre>
+from ldraw.parts import Parts
+parts = Parts(&quot;parts.lst&quot;) # parts.lst is supplied with LDraw
+</pre>
+<p>Figure-specific parts can then be accessed using the relevant dictionary
+attributes of the <cite>parts</cite> instance. For example:</p>
+<pre>
+cowboy_hat = parts.Hats[&quot;Hat Cowboy&quot;]
+head = parts.Heads[&quot;Head with Solid Stud&quot;]
+</pre>
+</div>
+<div>
+<h1><a name="license">License</a></h1>
+<p>The contents of this package are licensed under the GNU General Public License
+(version 3 or later):</p>
+<pre>
+ldraw, a Python package for creating LDraw format files.
+Copyright (C) 2008 David Boddie &lt;david&#64;boddie.org.uk&gt;
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+</pre>
+</div>
+<div>
+<h1><a name="trademarks">Trademarks</a></h1>
+<p>LDraw is a trademark of the Estate of James Jessiman. LEGO is a registered
+trademark of the LEGO Group.</p>
+</div>
+</body>
+</html>
