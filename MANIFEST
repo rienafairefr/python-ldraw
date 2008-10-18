@@ -1,0 +1,15 @@
+COPYING
+examples/brothers.py
+examples/diver.py
+examples/figures.py
+examples/moon_landing.py
+ldraw/colours.py
+ldraw/figure.py
+ldraw/geometry.py
+ldraw/__init__.py
+ldraw/parts.py
+ldraw/pieces.py
+MANIFEST
+README.txt
+README.html
+setup.py
