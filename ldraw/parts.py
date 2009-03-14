@@ -36,6 +36,7 @@ class Parts:
         self.path = None
         self.parts_dir = None
         self.parts = {}
+        self.colours = {}
         
         self.Hats = {}
         self.Heads = {}
@@ -108,9 +109,13 @@ class Parts:
         self.path = path
         directory = os.path.split(self.path)[0]
         for item in os.listdir(directory):
-            if item.lower() == "parts":
+            if item.lower() == "parts" and \
+                os.path.isdir(os.path.join(directory, item)):
+            
                 self.parts_dir = os.path.join(directory, item)
-                break
+            
+            elif item.lower() == "ldconfig" + os.extsep + "ldr":
+                self._load_colours(os.path.join(directory, item))
     
     def part(self, description = None, code = None):
     
@@ -130,9 +135,8 @@ class Parts:
     
     def _load_part(self, code):
     
-        path_stem = os.path.join(self.parts_dir, code)
-        paths = (path_stem + os.extsep + "dat",
-                 path_stem + os.extsep + "DAT")
+        paths = (os.path.join(self.parts_dir, code.lower()) + os.extsep + "dat",
+                 os.path.join(self.parts_dir, code.upper()) + os.extsep + "DAT")
         
         for path in paths:
             part = Part(path)
@@ -140,6 +144,27 @@ class Parts:
                 return part
         
         return None
+    
+    def _load_colours(self, path):
+    
+        try:
+            colours_part = Part(path)
+        except PartError:
+            return
+        
+        for obj in colours_part.objects:
+        
+            if isinstance(obj, MetaCommand) and obj.text.startswith("!COLOUR"):
+            
+                pieces = obj.text.split()
+                try:
+                    name = pieces[1]
+                    code = int(pieces[pieces.index("CODE") + 1])
+                    value = pieces[pieces.index("VALUE") + 1]
+                    self.colours[name] = value
+                    self.colours[code] = value
+                except (ValueError, IndexError):
+                    pass
 
 
 class Part:
@@ -158,15 +183,19 @@ class Part:
     
     def load(self, path):
     
+        self.path = path
+        
         try:
             lines = open(path).readlines()
         except IOError:
-            return
+            raise PartError, "Failed to read part file: %s" % path
         
         objects = []
-        number = 1
+        number = 0
         for line in lines:
         
+            number += 1
+            
             pieces = line.split()
             if not pieces:
                 objects.append(BlankLine)
@@ -175,12 +204,10 @@ class Part:
             try:
                 handler = self._handlers[pieces[0]]
             except KeyError:
-                raise PartError, "Unknown command (%s) at line %i" % (pieces[0], number)
+                raise PartError, "Unknown command (%s) in %s at line %i" % (path, pieces[0], number)
             
             objects.append(handler(pieces[1:], number))
-            number += 1
         
-        self.path = path
         self.objects = objects
     
     def _comment_or_meta(self, pieces, line):
@@ -195,7 +222,7 @@ class Part:
     def _subfile(self, pieces, line):
     
         if len(pieces) != 14:
-            raise PartError, "Invalid part data at line %i" % line
+            raise PartError, "Invalid part data in %s at line %i" % (self.path, line)
         
         colour = int(pieces[0])
         position = map(float, pieces[1:4])
@@ -211,7 +238,7 @@ class Part:
     def _line(self, pieces, line):
     
         if len(pieces) != 7:
-            raise PartError, "Invalid line data at line %i" % line
+            raise PartError, "Invalid line data in %s at line %i" % (self.path, line)
         
         colour = int(pieces[0])
         p1 = map(float, pieces[1:4])
@@ -222,7 +249,7 @@ class Part:
     def _triangle(self, pieces, line):
     
         if len(pieces) != 10:
-            raise PartError, "Invalid triangle data at line %i" % line
+            raise PartError, "Invalid triangle data in %s at line %i" % (self.path, line)
         
         colour = int(pieces[0])
         p1 = map(float, pieces[1:4])
@@ -234,7 +261,7 @@ class Part:
     def _quadrilateral(self, pieces, line):
     
         if len(pieces) != 13:
-            raise PartError, "Invalid quadrilateral data at line %i" % line
+            raise PartError, "Invalid quadrilateral data in %s at line %i" % (self.path, line)
         
         colour = int(pieces[0])
         p1 = map(float, pieces[1:4])
@@ -247,8 +274,8 @@ class Part:
     
     def _optional_line(self, pieces, line):
     
-        if len(pieces) != 7:
-            raise PartError, "Invalid line data at line %i" % line
+        if len(pieces) != 13:
+            raise PartError, "Invalid line data in %s at line %i" % (self.path, line)
         
         colour = int(pieces[0])
         p1 = map(float, pieces[1:4])
