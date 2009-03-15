@@ -38,6 +38,7 @@ class Parts:
         self.parts_subdirs = {}
         self.parts = {}
         self.colours = {}
+        self.alpha_values = {}
         
         self.Hats = {}
         self.Heads = {}
@@ -214,7 +215,15 @@ class Parts:
                     self.colours[name] = value
                     self.colours[code] = value
                 except (ValueError, IndexError):
-                    pass
+                    continue
+                
+                try:
+                    alpha_at = pieces.index("ALPHA")
+                    alpha = int(pieces[alpha_at + 1])
+                    self.alpha_values[name] = alpha
+                    self.alpha_values[code] = alpha
+                except (IndexError, ValueError):
+                    continue
     
     def _load_primitives(self, path):
     
