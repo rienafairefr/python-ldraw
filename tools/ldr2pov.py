@@ -104,29 +104,6 @@ class Writer:
             "}\n\n" % (position.x, -position.y, position.z,
                        red, green, blue)
             )
-    
-    def _order_points(self, points):
-    
-        edges = []
-        for i in range(1, len(points)):
-            edge = points[i] - points[0]
-            edges.append((edge/abs(edge), points[i]))
-    
-        normals = []
-        reference_edge, reference_point = edges[0]
-        for i in range(1, len(edges)):
-            edge, point = edges[i]
-            normal = edge.cross(reference_edge)
-            normals.append((normal, point))
-        
-        new_points = [(0, reference_point)]
-        reference_normal = normals[0][0]
-        reference_normal = reference_normal/abs(reference_normal)
-        for normal, point in normals:
-            new_points.append((normal.dot(reference_normal), point))
-        
-        new_points.sort()
-        return [points[0]] + map(lambda (value, point): point, new_points)
 
 
 if __name__ == "__main__":
