@@ -26,6 +26,7 @@ import cmdsyntax
 from ldraw.geometry import Identity, Vector
 from ldraw.parts import Part, Parts, PartError, Quadrilateral, Triangle
 from ldraw.pieces import Piece
+from ldraw import __version__
 
 
 class Writer:
@@ -129,12 +130,19 @@ class Writer:
 
 if __name__ == "__main__":
 
-    syntax = "<LDraw parts file> <LDraw file> <POV-Ray file> <camera position> [--sky <sky color>]"
+    syntax = "<LDraw parts file> <LDraw file> <POV-Ray file> <camera position> [--sky <sky colour>]"
     syntax_obj = cmdsyntax.Syntax(syntax)
     matches = syntax_obj.get_args(sys.argv[1:])
     
     if len(matches) != 1:
-        sys.stderr.write("Usage: %s %s\n" % (sys.argv[0], syntax))
+        sys.stderr.write("Usage: %s %s\n\n" % (sys.argv[0], syntax))
+        sys.stderr.write("ldr2pov.py (ldraw package version %s)\n" % __version__)
+        sys.stderr.write("Converts the LDraw file to a POV-Ray file.\n\n"
+                         "The camera position is a single x,y,z argument where each coordinate\n"
+                         "should be specified as a floating point number.\n"
+                         "The optional sky colour is a single red,green,blue argument where\n"
+                         "each component should be specified as a floating point number between\n"
+                         "0.0 and 1.0 inclusive.\n\n")
         sys.exit(1)
     
     match = matches[0]
@@ -185,7 +193,7 @@ if __name__ == "__main__":
             "  {\n"
             "    rgb <%s>\n"
             "  }\n"
-            "}\n" % match["sky color"]
+            "}\n" % match["sky colour"]
             )
     
     pov_file.close()
