@@ -59,3 +59,5 @@ print
 
 print Piece(Grey, Vector(0, 72, 0), Identity(), "3867")
 print Piece(Grey, Vector(60, 72, -60), Identity(), "52")
+
+# Camera should be at 160.0,-80.0,-240.0 in LDraw coordinates.
