@@ -98,33 +98,42 @@ class Writer:
         
         return red, green, blue
     
-    def _write_triangle(self, v1, v2, v3, colour):
+    def _alpha_from_colour(self, colour):
+    
+        return self.parts.alpha_values.get(colour, 0) / 255.0
+    
+    def _colour_string(self, colour):
     
         red, green, blue = self._rgb_from_colour(colour)
+        alpha = self._alpha_from_colour(colour)
+        if alpha:
+            return "rgbt <%1.1f, %1.1f, %1.1f, %1.1f>" % (red, green, blue, alpha)
+        else:
+            return "rgb <%1.1f, %1.1f, %1.1f>" % (red, green, blue)
         
+    def _write_triangle(self, v1, v2, v3, colour):
+    
         self.pov_file.write(
             "triangle\n"
             "{\n"
             "  <%1.3f, %1.3f, %1.3f>, <%1.3f, %1.3f, %1.3f>, <%1.3f, %1.3f, %1.3f>\n"
             "  pigment\n"
             "  {\n"
-            "    color rgb <%1.1f, %1.1f, %1.1f>\n"
+            "    color %s\n"
             "  }\n"
             "}\n\n" % (v1.x, -v1.y, v1.z,
                        v2.x, -v2.y, v2.z,
                        v3.x, -v3.y, v3.z,
-                       red, green, blue)
+                       self._colour_string(colour))
             )
     
     def _write_light_source(self, position, colour):
     
-        red, green, blue = self._rgb_from_colour(colour)
-        
         self.pov_file.write(
             "light_source {\n"
-            "  <%1.3f, %1.3f, %1.3f>, rgb <%1.1f, %1.1f, %1.1f>\n"
+            "  <%1.3f, %1.3f, %1.3f>, %s\n"
             "}\n\n" % (position.x, -position.y, position.z,
-                       red, green, blue)
+                       self._colour_string(colour))
             )
 
 
