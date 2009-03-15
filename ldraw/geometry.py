@@ -191,6 +191,20 @@ class Vector:
     
         return (self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5
     
+    def __rmul__(self, other):
+    
+        if isinstance(other, float) or isinstance(other, int):
+            return Vector(self.x * other, self.y * other, self.z * other)
+        
+        raise ValueError, "Cannot multiply %s with %s" % (self.__class__, type(other))
+    
+    def __div__(self, other):
+    
+        if isinstance(other, float) or isinstance(other, int):
+            return Vector(self.x / other, self.y / other, self.z / other)
+        
+        raise ValueError, "Cannot divide %s with %s" % (self.__class__, type(other))
+    
     def copy(self):
     
         """vector = copy(self)
@@ -200,3 +214,13 @@ class Vector:
         """
         
         return Vector(self.x, self.y, self.z)
+    
+    def cross(self, other):
+    
+        return Vector(self.y * other.z - self.z * other.y,
+                      self.z * other.x - self.x * other.z,
+                      self.x * other.y - self.y * other.x)
+    
+    def dot(self, other):
+    
+        return self.x * other.x + self.y * other.y + self.z * other.z
