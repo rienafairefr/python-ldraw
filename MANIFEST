@@ -13,3 +13,4 @@ MANIFEST
 README.txt
 README.html
 setup.py
+tools/ldr2pov.py
