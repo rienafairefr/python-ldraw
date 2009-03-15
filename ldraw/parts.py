@@ -34,7 +34,8 @@ class Parts:
     def __init__(self, path):
     
         self.path = None
-        self.parts_dir = None
+        self.parts_dirs = []
+        self.parts_subdirs = {}
         self.parts = {}
         self.colours = {}
         
@@ -101,21 +102,34 @@ class Parts:
                         section[description] = code
                         break
         except IOError:
-            return
+            raise PartError, "Failed to load parts file: %s" % path
         
-        # If we successfully loaded the file then record the path and look for
+        # If we successfully loaded the files then record the path and look for
         # part files.
         
         self.path = path
         directory = os.path.split(self.path)[0]
+        primitives_path = None
+        
         for item in os.listdir(directory):
-            if item.lower() == "parts" and \
-                os.path.isdir(os.path.join(directory, item)):
+            obj = os.path.join(directory, item)
+            if item.lower() == "parts" and os.path.isdir(obj):
             
-                self.parts_dir = os.path.join(directory, item)
+                self.parts_dirs.append(obj)
+                self._find_parts_subdirs(obj)
+            
+            elif item.lower() == "p" and os.path.isdir(obj):
+            
+                self.parts_dirs.append(obj)
+                self._find_parts_subdirs(obj)
             
             elif item.lower() == "ldconfig" + os.extsep + "ldr":
-                self._load_colours(os.path.join(directory, item))
+            
+                self._load_colours(obj)
+            
+            elif item.lower() == "p" + os.extsep + "lst" and os.path.isfile(obj):
+            
+                self._load_primitives(obj)
     
     def part(self, description = None, code = None):
     
@@ -133,14 +147,50 @@ class Parts:
         
         return self._load_part(code)
     
+    def _find_parts_subdirs(self, directory):
+    
+        for item in os.listdir(directory):
+        
+            obj = os.path.join(directory, item)
+            
+            if os.path.isdir(obj):
+                self.parts_subdirs[item] = obj
+                self.parts_subdirs[item.lower()] = obj
+                self.parts_subdirs[item.upper()] = obj
+    
     def _load_part(self, code):
     
-        paths = (os.path.join(self.parts_dir, code.lower()) + os.extsep + "dat",
-                 os.path.join(self.parts_dir, code.upper()) + os.extsep + "DAT")
+        code = code.replace("\\", os.sep)
+        code = code.replace("/", os.sep)
+        
+        if os.sep in code:
+        
+            pieces = code.split(os.sep)
+            if len(pieces) != 2:
+                return None
+            
+            try:
+                parts_dirs = [self.parts_subdirs[pieces[0]]]
+            except KeyError:
+                return None
+            
+            code = pieces[1]
+        
+        else:
+            parts_dirs = self.parts_dirs
+        
+        paths = []
+        for parts_dir in parts_dirs:
+        
+            paths.append(os.path.join(parts_dir, code.lower()) + os.extsep + "dat")
+            paths.append(os.path.join(parts_dir, code.upper()) + os.extsep + "DAT")
         
         for path in paths:
-            part = Part(path)
-            if part:
+            try:
+                part = Part(path)
+            except PartError:
+                continue
+            else:
                 return part
         
         return None
@@ -165,6 +215,23 @@ class Parts:
                     self.colours[code] = value
                 except (ValueError, IndexError):
                     pass
+    
+    def _load_primitives(self, path):
+    
+        try:
+            f = open(path)
+            for line in f.readlines():
+            
+                pieces = line.split(".DAT")
+                if len(pieces) != 2:
+                    break
+                
+                code = pieces[0]
+                description = pieces[1].strip()
+                self.parts[description] = code
+        
+        except IOError:
+            raise PartError, "Failed to load primitives file: %s" % path
 
 
 class Part:
