@@ -36,6 +36,8 @@ class Writer:
         self.parts = parts
         self.pov_file = pov_file
         self.lights = []
+        self.minimum = Vector(0, 0, 0)
+        self.maximum = Vector(0, 0, 0)
     
     def write(self, model, current_colour = 15, current_matrix = Identity(),
               current_position = Vector(0, 0, 0)):
@@ -113,6 +115,13 @@ class Writer:
         
     def _write_triangle(self, v1, v2, v3, colour):
     
+        self.minimum = Vector(min(self.minimum.x, v1.x, v2.x, v3.x),
+                              min(self.minimum.y, -v1.y, -v2.y, -v3.y),
+                              min(self.minimum.z, v1.z, v2.z, v3.z))
+        self.maximum = Vector(max(self.maximum.x, v1.x, v2.x, v3.x),
+                              max(self.maximum.y, -v1.y, -v2.y, -v3.y),
+                              max(self.maximum.z, v1.z, v2.z, v3.z))
+        
         self.pov_file.write(
             "triangle\n"
             "{\n"
@@ -177,14 +186,20 @@ if __name__ == "__main__":
     
         pov_file.write(
             "light_source {\n"
-            "  <0.0, 50.0, -100.0>, rgb <1.0, 1.0, 1.0>\n"
+            "  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>\n"
             "}\n\n"
             "light_source {\n"
-            "  <50.0, 50.0, -100.0>, rgb <1.0, 1.0, 1.0>\n"
+            "  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>\n"
             "}\n\n"
             "light_source {\n"
-            "  <-50.0, 50.0, -100.0>, rgb <1.0, 1.0, 1.0>\n"
+            "  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>\n"
             "}\n\n"
+            "light_source {\n"
+            "  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>\n"
+            "}\n\n" % (writer.minimum.x - 50.0, writer.maximum.y + 100.0, writer.minimum.z - 50.0,
+                       writer.maximum.x + 50.0, writer.maximum.y + 100.0, writer.minimum.z - 50.0,
+                       writer.minimum.x - 50.0, writer.maximum.y + 100.0, writer.maximum.z + 50.0,
+                       writer.maximum.x + 50.0, writer.maximum.y + 100.0, writer.maximum.z + 50.0)
             )
     
     pov_file.write(
