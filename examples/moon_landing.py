@@ -58,8 +58,8 @@ print Piece(Grey, Vector(0, -8, -60), Identity(), "3022", rover)
 print Piece(Grey, Vector(0, -16, -60), Identity(), "3022", rover)
 print Piece(Grey, Vector(0, -24, -90), Identity(), "3004P90", rover)
 print Piece(Grey, Vector(-10, -32, -90), Identity(), "3957", rover)
-print Piece(Colour(34), Vector(10, -48, -90), Identity(), "3062A", rover)
-print Piece(Colour(15), Vector(10, -48, -90), Identity(), "LIGHT", rover)
+print Piece(TransGreen, Vector(10, -48, -90), Identity(), "3062A", rover)
+print Piece(Green, Vector(10, -52, -90), Identity(), "LIGHT", rover)
 
 
 # Duplicate the rover with a different position and orientation.
