@@ -44,7 +44,8 @@ class Writer:
                 p1 = current_matrix * obj.p1 + current_position
                 p2 = current_matrix * obj.p2 + current_position
                 p3 = current_matrix * obj.p3 + current_position
-                self._write_triangle(p1, p2, p3, colour)
+                if abs((p3 - p1).cross(p2 - p1)) != 0:
+                    self._write_triangle(p1, p2, p3, colour)
             
             elif isinstance(obj, Quadrilateral):
             
@@ -53,9 +54,10 @@ class Writer:
                 p2 = current_matrix * obj.p2 + current_position
                 p3 = current_matrix * obj.p3 + current_position
                 p4 = current_matrix * obj.p4 + current_position
-                points = self._order_points([p1, p2, p3, p4])
-                self._write_triangle(points[0], points[1], points[2], colour)
-                self._write_triangle(points[2], points[3], points[0], colour)
+                if abs((p3 - p1).cross(p2 - p1)) != 0:
+                    self._write_triangle(p1, p2, p3, colour)
+                if abs((p3 - p1).cross(p4 - p1)) != 0:
+                    self._write_triangle(p3, p4, p1, colour)
     
     def _current_colour(self, colour, current_colour):
     
