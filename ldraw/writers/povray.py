@@ -20,11 +20,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from ldraw.geometry import Identity, Vector
-from ldraw.parts import Quadrilateral, Triangle
+from ldraw.parts import Parts, Quadrilateral, Triangle
 from ldraw.pieces import Piece
 
 class POVRayWriter:
 
+    ColourAttributes = {
+        "CHROME": ("metallic 1.0", "specular 0.8", "brilliance 3", "diffuse 0.6"),
+        "PEARLESCENT": ("diffuse 0.7", "specular 0.8"),
+        "RUBBER": ("diffuse 1.0",),
+        "MATTE_METALLIC": ("metallic 0.5", "roughness 0.2"),
+        "METAL": ("metallic 0.8", "specular 0.8", "reflection 0.5")
+        }
+    
     def __init__(self, parts, pov_file):
     
         self.parts = parts
@@ -106,7 +114,16 @@ class POVRayWriter:
             return "rgbt <%1.1f, %1.1f, %1.1f, %1.1f>" % (red, green, blue, alpha)
         else:
             return "rgb <%1.1f, %1.1f, %1.1f>" % (red, green, blue)
-        
+    
+    def _finish_string(self, colour):
+    
+        attributes = self.parts.colour_attributes.get(colour, [])
+        if attributes:
+            attributes = POVRayWriter.ColourAttributes.get(attributes[0], [])
+            return "\n    ".join(attributes)
+        else:
+            return ""
+    
     def _write_triangle(self, v1, v2, v3, colour):
     
         self.minimum = Vector(min(self.minimum.x, v1.x, v2.x, v3.x),
@@ -124,10 +141,15 @@ class POVRayWriter:
             "  {\n"
             "    color %s\n"
             "  }\n"
+            "  finish\n"
+            "  {\n"
+            "    %s\n"
+            "  }\n"
             "}\n\n" % (v1.x, -v1.y, v1.z,
                        v2.x, -v2.y, v2.z,
                        v3.x, -v3.y, v3.z,
-                       self._colour_string(colour))
+                       self._colour_string(colour),
+                       self._finish_string(colour))
             )
     
     def _write_light_source(self, position, colour):
