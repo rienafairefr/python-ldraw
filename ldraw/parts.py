@@ -31,6 +31,9 @@ class PartError(Exception):
 
 class Parts:
 
+    ColourAttributes = ("CHROME", "PEARLESCENT", "RUBBER", "MATTE_METALLIC",
+                        "METAL")
+    
     def __init__(self, path):
     
         self.path = None
@@ -39,6 +42,7 @@ class Parts:
         self.parts = {}
         self.colours = {}
         self.alpha_values = {}
+        self.colour_attributes = {}
         
         self.Hats = {}
         self.Heads = {}
@@ -223,7 +227,14 @@ class Parts:
                     self.alpha_values[name] = alpha
                     self.alpha_values[code] = alpha
                 except (IndexError, ValueError):
-                    continue
+                    pass
+                
+                self.colour_attributes[name] = []
+                self.colour_attributes[code] = []
+                for attribute in Parts.ColourAttributes:
+                    if attribute in pieces:
+                        self.colour_attributes[name].append(attribute)
+                        self.colour_attributes[code].append(attribute)
     
     def _load_primitives(self, path):
     
