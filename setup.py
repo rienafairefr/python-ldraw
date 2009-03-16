@@ -11,6 +11,7 @@ setup(
     author_email = "david@boddie.org.uk",
     url          = "http://www.boddie.org.uk/david/Projects/Python/ldraw/",
     version      = ldraw.__version__,
-    packages     = ["ldraw"],
+    packages     = ["ldraw",
+                    "ldraw/writers"],
     scripts      = ["tools/ldr2pov.py"]
     )
