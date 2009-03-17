@@ -135,6 +135,10 @@ class Matrix:
             raise MatrixError, "Invalid axis specified."
         
         return self * rotation
+    
+    def scale(self, sx, sy, sz):
+    
+        return Matrix([[sx, 0, 0], [0, sy, 0], [0, 0, sz]]) * self
 
 
 def Identity():
