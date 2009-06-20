@@ -57,20 +57,6 @@ class POVRayWriter:
                     
                     matrix = obj.matrix
                     
-                    if level == 0:
-                    
-                        bbox = self._bounding_box(part)
-                        if bbox:
-                            xp, yp, zp = bbox
-                            width = (xp[1] - xp[0]) or 1.0
-                            height = (yp[1] - yp[0]) or 1.0
-                            depth = (zp[1] - zp[0]) or 1.0
-                            matrix = matrix.scale(
-                                (width - 0.5)/width,
-                                (height - 0.5)/height,
-                                (depth - 0.5)/depth
-                                )
-                    
                     self.write(part, colour, current_matrix * matrix,
                                current_position + current_matrix * obj.position,
                                level + 1)
