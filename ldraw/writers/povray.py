@@ -40,9 +40,10 @@ class POVRayWriter:
         self.lights = []
         self.minimum = Vector(0, 0, 0)
         self.maximum = Vector(0, 0, 0)
+        self.bbox_cache = {}
     
     def write(self, model, current_colour = 15, current_matrix = Identity(),
-              current_position = Vector(0, 0, 0)):
+              current_position = Vector(0, 0, 0), level = 0):
     
         for obj in model.objects:
         
@@ -53,8 +54,26 @@ class POVRayWriter:
                 part = self.parts.part(code = obj.part)
                 if part:
                     self.pov_file.write("// Part %s\n\n" % obj.part)
-                    self.write(part, colour, current_matrix * obj.matrix,
-                               current_position + current_matrix * obj.position)
+                    
+                    matrix = obj.matrix
+                    
+                    if level == 0:
+                    
+                        bbox = self._bounding_box(part)
+                        if bbox:
+                            xp, yp, zp = bbox
+                            width = (xp[1] - xp[0]) or 1.0
+                            height = (yp[1] - yp[0]) or 1.0
+                            depth = (zp[1] - zp[0]) or 1.0
+                            matrix = matrix.scale(
+                                (width - 0.5)/width,
+                                (height - 0.5)/height,
+                                (depth - 0.5)/depth
+                                )
+                    
+                    self.write(part, colour, current_matrix * matrix,
+                               current_position + current_matrix * obj.position,
+                               level + 1)
                 else:
                     sys.stderr.write("Part not found: %s\n" % obj.part)
                 
@@ -160,3 +179,35 @@ class POVRayWriter:
             "}\n\n" % (position.x, -position.y, position.z,
                        self._colour_string(colour))
             )
+    
+    def _bounding_box(self, part):
+    
+        if self.bbox_cache.has_key(part):
+            return self.bbox_cache[part]
+        
+        x = []
+        y = []
+        z = []
+        
+        for obj in part.objects:
+        
+            if isinstance(obj, Triangle):
+                x.append(min(obj.p1.x, obj.p2.x, obj.p3.x))
+                x.append(max(obj.p1.x, obj.p2.x, obj.p3.x))
+                y.append(min(obj.p1.y, obj.p2.y, obj.p3.y))
+                y.append(max(obj.p1.y, obj.p2.y, obj.p3.y))
+                z.append(min(obj.p1.z, obj.p2.z, obj.p3.z))
+                z.append(max(obj.p1.z, obj.p2.z, obj.p3.z))
+            
+            elif isinstance(obj, Quadrilateral):
+                x.append(min(obj.p1.x, obj.p2.x, obj.p3.x, obj.p4.x))
+                x.append(max(obj.p1.x, obj.p2.x, obj.p3.x, obj.p4.x))
+                y.append(min(obj.p1.y, obj.p2.y, obj.p3.y, obj.p4.y))
+                y.append(max(obj.p1.y, obj.p2.y, obj.p3.y, obj.p4.y))
+                z.append(min(obj.p1.z, obj.p2.z, obj.p3.z, obj.p4.z))
+                z.append(max(obj.p1.z, obj.p2.z, obj.p3.z, obj.p4.z))
+        
+        if x:
+            return (min(x), max(x)), (min(y), max(y)), (min(z), max(z))
+        else:
+            return None

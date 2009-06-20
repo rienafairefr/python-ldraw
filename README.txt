@@ -65,6 +65,41 @@ attributes of the `parts` instance. For example::
   cowboy_hat = parts.Hats["Hat Cowboy"]
   head = parts.Heads["Head with Solid Stud"]
 
+Although this makes it easier to refer to parts, you can still refer to them
+using their part numbers. For example::
+
+  figure = Person()
+  print figure.head(Yellow, 35)
+  print figure.hat(Black, "3901")  # Hair Male
+
+This can be useful if you want to refer unambiguously to a specific part.
+
+
+Writers and Tools
+-----------------
+
+The `ldraw.writers` package aims to provide a set of classes that write out
+LDraw descriptions in other file formats. Currently, it contains the `povray`
+module which provides a class for writing out LDraw descriptions as POV-Ray
+scenes.
+
+The `ldr2pov.py` tool, supplied in the `tools` directory, uses the `povray`
+module to allow LDraw (`.ldr`) files to be conveniently converted to POV-Ray
+(`.pov`) scene files. Note that, since the LDraw format does not include
+information about camera locations, it is necessary to pass this information
+on the command line.
+
+For example, on a GNU/Linux system, we can execute command lines like these
+to take the `figures.py` example file, create an LDraw model file (`temp.ldr`),
+and convert that to a POV-Ray scene file (`temp.pov`)::
+
+  python examples/figures.py > temp.ldr
+  ldr2pov.py /path/to/parts.lst models/figures.ldr temp.pov 160.0,80.0,-240.0
+  povray +Itemp.pov +FN16 +Otemp.png +Q6
+
+Finally, POV-Ray is used to process the scene description and create a PNG
+image file (`temp.png`).
+
 
 License
 -------
