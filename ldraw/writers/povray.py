@@ -43,7 +43,7 @@ class POVRayWriter:
         self.bbox_cache = {}
     
     def write(self, model, current_colour = 15, current_matrix = Identity(),
-              current_position = Vector(0, 0, 0), level = 0):
+              current_position = Vector(0, 0, 0)):
     
         for obj in model.objects:
         
@@ -58,8 +58,7 @@ class POVRayWriter:
                     matrix = obj.matrix
                     
                     self.write(part, colour, current_matrix * matrix,
-                               current_position + current_matrix * obj.position,
-                               level + 1)
+                               current_position + current_matrix * obj.position)
                 else:
                     sys.stderr.write("Part not found: %s\n" % obj.part)
                 
