@@ -30,7 +30,7 @@ from ldraw import __version__
 
 if __name__ == "__main__":
 
-    syntax = "<LDraw parts file> <LDraw file> <POV-Ray file> <camera position> [--sky <sky colour>]"
+    syntax = "<LDraw parts file> <LDraw file> <POV-Ray file> <camera position> [<look at position>] [--sky <sky colour>]"
     syntax_obj = cmdsyntax.Syntax(syntax)
     matches = syntax_obj.get_args(sys.argv[1:])
     
@@ -39,6 +39,8 @@ if __name__ == "__main__":
         sys.stderr.write("ldr2pov.py (ldraw package version %s)\n" % __version__)
         sys.stderr.write("Converts the LDraw file to a POV-Ray file.\n\n"
                          "The camera position is a single x,y,z argument where each coordinate\n"
+                         "should be specified as a floating point number.\n"
+                         "The look at position is a single x,y,z argument where each coordinate\n"
                          "should be specified as a floating point number.\n"
                          "The optional sky colour is a single red,green,blue argument where\n"
                          "each component should be specified as a floating point number between\n"
@@ -50,6 +52,7 @@ if __name__ == "__main__":
     ldraw_path = match["LDraw file"]
     pov_path = match["POV-Ray file"]
     camera_position = match["camera position"]
+    look_at_position = match.get("look at position", "0.0,0.0,0.0")
     
     parts = Parts(parts_path)
     
@@ -87,8 +90,9 @@ if __name__ == "__main__":
     pov_file.write(
         "camera {\n"
         "  location <%s>\n"
-        "  look_at <0.0, 0.0, 0.0>\n"
-        "}\n" % ", ".join(camera_position.split(","))
+        "  look_at <%s>\n"
+        "}\n" % (", ".join(camera_position.split(",")),
+                 ", ".join(look_at_position.split(",")))
         )
     
     if match.has_key("sky"):

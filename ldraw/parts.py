@@ -51,6 +51,7 @@ class Parts:
         self.Legs = {}
         self.Arms = {}
         self.Hands = {}
+        self.Accessories = {}
         
         self.sections = {
             "Cap":    self.Hats,
@@ -106,6 +107,18 @@ class Parts:
                             
                         section[description] = code
                         break
+                else:
+                
+                    # The accessories are those Minifig items which do not fall into any
+                    # of the above categories.
+                    if description.startswith("Minifig "):
+                    
+                        description = description[8:]
+                        if description.startswith("(") and description.endswith(")"):
+                            description = description[1:-1]
+                        
+                        self.Accessories[description] = code
+        
         except IOError:
             raise PartError, "Failed to load parts file: %s" % path
         
