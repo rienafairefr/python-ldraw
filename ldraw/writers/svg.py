@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from ldraw.geometry import Identity, Vector
-from ldraw.parts import Parts, Quadrilateral, Triangle
+from ldraw.parts import Parts, Quadrilateral, Triangle, Line
 from ldraw.pieces import Piece
 
 class SVGWriter:
@@ -43,7 +43,7 @@ class SVGWriter:
         self.camera_position = camera_position
         self.axes = axes
     
-    def write(self, model, svg_file, width, height, stroke_colour = "none", stroke_width = None, background_colour = None):
+    def write(self, model, svg_file, width, height, stroke_colour = None, stroke_width = None, background_colour = None):
     
         svg_file.write('<?xml version="1.0" standalone="no"?>\n'
                             '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"\n'
@@ -53,8 +53,8 @@ class SVGWriter:
         self._sort_polygons(polygons)
         polygons = self._project_polygons(width, height, polygons)
         
-        svg_file.write('<svg width="%.3fcm" height="%.3fcm" ' % (width, height))
-        svg_file.write('viewbox="%.3f %.3f %.3f %.3f" '
+        svg_file.write('<svg width="%.6fcm" height="%.6fcm" ' % (width, height))
+        svg_file.write('viewBox="%.6f %.6f %.6f %.6f" '
                             'xmlns="http://www.w3.org/2000/svg" '
                             'version="1.1">\n' % (0.0, 0.0, width, height))
         
@@ -64,23 +64,48 @@ class SVGWriter:
         if background_colour is not None:
         
             svg_file.write('<polygon fill="%s" ' % background_colour)
-            svg_file.write('points="%.3f,%.3f %.3f,%.3f %.3f,%.3f %.3f,%.3f" />' % (
+            svg_file.write('points="%.6f,%.6f %.6f,%.6f %.6f,%.6f %.6f,%.6f" />\n' % (
                 0.0, 0.0, width, 0.0, width, height, 0.0, height))
+        
+        current_colour = None
         
         for points, colour in polygons:
         
-            svg_file.write('<polygon fill="%s" ' % self.parts.colours.get(colour, "#ffffff"))
-            svg_file.write('stroke="%s" ' % stroke_colour)
-            if stroke_colour and stroke_colour != "none":
+            rgb = self.parts.colours.get(colour, "#ffffff")
+            if current_colour != rgb:
+                if current_colour is not None:
+                    svg_file.write('</g>\n')
+                
+                svg_file.write('<g>\n')
+                current_colour = rgb
+            
+            if len(points) == 2:
+            
+                svg_file.write('<line stroke="%s" ' % rgb)
                 svg_file.write('stroke-width="%s" ' % stroke_width)
-            svg_file.write('opacity="%.3f" ' % self._opacity_from_colour(colour))
-            svg_file.write('points="')
+                svg_file.write('opacity="%.6f" ' % self._opacity_from_colour(colour))
+                svg_file.write('x1="%.6f" y1="%.6f" ' % (points[0][0] + width/2.0, height/2.0 - points[0][1]))
+                svg_file.write('x2="%.6f" y2="%.6f" ' % (points[1][0] + width/2.0, height/2.0 - points[1][1]))
+                svg_file.write('/>\n')
             
-            for x, y in points:
+            else:
             
-                svg_file.write('%.3f,%.3f ' % (x + width/2.0, y + height/2.0))
-            
-            svg_file.write('" />\n')
+                svg_file.write('<polygon fill="%s" ' % rgb)
+                if stroke_colour:
+                    svg_file.write('stroke="%s" ' % stroke_colour)
+                else:
+                    svg_file.write('stroke="%s" ' % rgb)
+                svg_file.write('stroke-width="%s" ' % stroke_width)
+                svg_file.write('opacity="%.6f" ' % self._opacity_from_colour(colour))
+                svg_file.write('points="')
+                
+                for x, y in points:
+                    svg_file.write('%.6f,%.6f ' % (x + width/2.0, height/2.0 - y))
+                
+                svg_file.write('" />\n')
+        
+        if current_colour is not None:
+            svg_file.write("</g>\n")
         
         svg_file.write("</svg>\n")
         svg_file.close()
@@ -109,6 +134,9 @@ class SVGWriter:
         
             if isinstance(obj, Piece):
             
+                if obj.part == "LIGHT":
+                    continue
+                
                 colour = self._current_colour(obj.colour, current_colour)
                 part = self.parts.part(code = obj.part)
                 
@@ -119,6 +147,20 @@ class SVGWriter:
                         current_position + current_matrix * obj.position)
                 else:
                     sys.stderr.write("Part not found: %s\n" % obj.part)
+            
+            elif isinstance(obj, Line):
+            
+                p1 = current_matrix * obj.p1 + current_position - c
+                p2 = current_matrix * obj.p2 + current_position - c
+                
+                r1 = Vector(p1.dot(x), p1.dot(y), p1.dot(z))
+                r2 = Vector(p2.dot(x), p2.dot(y), p2.dot(z))
+                
+                if r1.z >= 0 or r2.z >= 0:
+                    continue
+                
+                colour = self._current_colour(obj.colour, current_colour)
+                polygons.append((min(r1.z, r2.z), (r1, r2), colour))
             
             elif isinstance(obj, Triangle):
             
@@ -133,9 +175,11 @@ class SVGWriter:
                 r2 = Vector(p2.dot(x), p2.dot(y), p2.dot(z))
                 r3 = Vector(p3.dot(x), p3.dot(y), p3.dot(z))
                 
-                if r1.z < 0 and r2.z < 0 and r3.z < 0:
-                    colour = self._current_colour(obj.colour, current_colour)
-                    polygons.append((min(r1.z, r2.z, r3.z), (r1, r2, r3), colour))
+                if r1.z >= 0 or r2.z >= 0 or r3.z >= 0:
+                    continue
+                
+                colour = self._current_colour(obj.colour, current_colour)
+                polygons.append((min(r1.z, r2.z, r3.z), (r1, r2, r3), colour))
             
             elif isinstance(obj, Quadrilateral):
             
@@ -154,9 +198,11 @@ class SVGWriter:
                 r3 = Vector(p3.dot(x), p3.dot(y), p3.dot(z))
                 r4 = Vector(p4.dot(x), p4.dot(y), p4.dot(z))
                 
-                if r1.z < 0 and r2.z < 0 and r3.z < 0 and r4.z < 0:
-                    colour = self._current_colour(obj.colour, current_colour)
-                    polygons.append((min(r1.z, r2.z, r3.z, r4.z), (r1, r2, r3, r4), colour))
+                if r1.z >= 0 or r2.z >= 0 or r3.z >= 0 or r4.z >= 0:
+                    continue
+                
+                colour = self._current_colour(obj.colour, current_colour)
+                polygons.append((min(r1.z, r2.z, r3.z, r4.z), (r1, r2, r3, r4), colour))
         
         return polygons
     
