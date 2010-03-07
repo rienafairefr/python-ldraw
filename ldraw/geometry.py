@@ -156,6 +156,10 @@ class Vector:
     
         return "<Vector: (%f, %f, %f)>" % (self.x, self.y, self.z)
     
+    def __hash__(self):
+    
+        return hash((self.x, self.y, self.z))
+    
     def __add__(self, other):
     
         x = self.x + other.x
@@ -189,7 +193,7 @@ class Vector:
     
         # This next expression will only return zero (equals) if all
         # expressions are false.
-        return self.x == other.x or self.y == other.y or self.z == other.z
+        return self.x != other.x or self.y != other.y or self.z != other.z
     
     def __abs__(self):
     
