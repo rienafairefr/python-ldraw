@@ -30,11 +30,12 @@ from PyQt4.QtGui import QBrush, QColor, QImage, QPainter, QPainterPath, QPen, QP
 
 class Polygon:
 
-    def __init__(self, zmin, points, colour):
+    def __init__(self, zmin, points, colour, piece):
     
         self.zmin = zmin
         self.points = points
         self.colour = colour
+        self.piece = piece
     
     def __lt__(self, other):
     
@@ -86,9 +87,9 @@ class SVGWriter:
         
         new_shapes = {}
         
-        for points, colour in shapes:
+        for points, polygon in shapes:
         
-            rgb = self.parts.colours.get(colour, "#ffffff")
+            rgb = self.parts.colours.get(polygon.colour, "#ffffff")
             
             new_points = []
             for x, y in points:
@@ -109,34 +110,44 @@ class SVGWriter:
             path = path.united(new_path)
             path = path.simplified()
             
-            colour_path = new_shapes.get(colour, QPainterPath())
-            new_shapes[colour] = colour_path.united(remaining)
+            piece_dict = new_shapes.setdefault(polygon.piece, {})
+            colour_path = piece_dict.get(polygon.colour, QPainterPath())
+            piece_dict[polygon.colour] = colour_path.united(remaining)
         
-        for colour, colour_path in new_shapes.items():
+        for piece, piece_dict in new_shapes.items():
         
-            rgb = self.parts.colours.get(colour, "#ffffff")
+            svg_file.write('<g>\n')
             
-            shape = '<path style="fill:%s; opacity:%f" d="' % (
-                rgb, self._opacity_from_colour(colour))
+            for colour, colour_path in piece_dict.items():
             
-            i = 0
-            in_path = False
-            while i < colour_path.elementCount():
-                p = colour_path.elementAt(i)
-                if p.type == QPainterPath.MoveToElement:
-                    if in_path:
-                        shape += 'Z '
-                    shape += 'M %.6f %.6f ' % (p.x, p.y)
-                    in_path = True
-                elif p.type == QPainterPath.LineToElement:
-                    shape += 'L %.6f %.6f ' % (p.x, p.y)
-                i += 1
+                if colour_path.isEmpty():
+                    continue
+                
+                rgb = self.parts.colours.get(colour, "#ffffff")
+                
+                shape = '<path style="fill:%s; opacity:%f" d="' % (
+                    rgb, self._opacity_from_colour(colour))
+                
+                i = 0
+                in_path = False
+                while i < colour_path.elementCount():
+                    p = colour_path.elementAt(i)
+                    if p.type == QPainterPath.MoveToElement:
+                        if in_path:
+                            shape += 'Z '
+                        shape += 'M %.6f %.6f ' % (p.x, p.y)
+                        in_path = True
+                    elif p.type == QPainterPath.LineToElement:
+                        shape += 'L %.6f %.6f ' % (p.x, p.y)
+                    i += 1
+                
+                if in_path:
+                    shape += 'Z'
+                shape += '" />\n'
+                
+                svg_file.write(shape)
             
-            if in_path:
-                shape += 'Z'
-            shape += '" />\n'
-            
-            svg_file.write(shape)
+            svg_file.write('</g>\n')
         
         svg_file.write("</svg>\n")
         svg_file.close()
@@ -152,7 +163,7 @@ class SVGWriter:
     
         return self.parts.alpha_values.get(colour, 255) / 255.0
     
-    def _polygons_from_objects(self, model, current_colour = 15, current_matrix = Identity(),
+    def _polygons_from_objects(self, model, top_level_piece = None, current_colour = 15, current_matrix = Identity(),
                                current_position = Vector(0, 0, 0)):
     
         # Extract polygons from objects, filtering out those behind the camera.
@@ -174,7 +185,8 @@ class SVGWriter:
                 if part:
                     matrix = obj.matrix
                     polygons += self._polygons_from_objects(
-                        part, colour, current_matrix * matrix,
+                        part, top_level_piece or obj, colour,
+                        current_matrix * matrix,
                         current_position + current_matrix * obj.position)
                 else:
                     sys.stderr.write("Part not found: %s\n" % obj.part)
@@ -191,7 +203,7 @@ class SVGWriter:
                     continue
                 
                 colour = self._current_colour(obj.colour, current_colour)
-                polygons.append(Polygon(min(r1.z, r2.z), [r1, r2], colour))
+                polygons.append(Polygon(min(r1.z, r2.z), [r1, r2], colour, top_level_piece))
             
             elif isinstance(obj, Triangle):
             
@@ -210,7 +222,7 @@ class SVGWriter:
                     continue
                 
                 colour = self._current_colour(obj.colour, current_colour)
-                polygons.append(Polygon(min(r1.z, r2.z, r3.z), [r1, r2, r3], colour))
+                polygons.append(Polygon(min(r1.z, r2.z, r3.z), [r1, r2, r3], colour, top_level_piece))
             
             elif isinstance(obj, Quadrilateral):
             
@@ -233,7 +245,7 @@ class SVGWriter:
                     continue
                 
                 colour = self._current_colour(obj.colour, current_colour)
-                polygons.append(Polygon(min(r1.z, r2.z, r3.z, r4.z), [r1, r2, r3, r4], colour))
+                polygons.append(Polygon(min(r1.z, r2.z, r3.z, r4.z), [r1, r2, r3, r4], colour, top_level_piece))
         
         return polygons
     
@@ -260,7 +272,7 @@ class SVGWriter:
                 new_points.append((w * (point.x/(w + a * -point.z)),
                                    h * (point.y/(h + b * -point.z))))
             
-            new_polygons.append((new_points, polygon.colour))
+            new_polygons.append((new_points, polygon))
         
         return new_polygons
     
