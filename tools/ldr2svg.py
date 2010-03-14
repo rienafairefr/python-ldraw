@@ -25,7 +25,13 @@ import sys
 import cmdsyntax
 from ldraw.geometry import Vector
 from ldraw.parts import Part, Parts, PartError
-from ldraw.writers.qtsvg import SVGWriter
+
+try:
+    from ldraw.writers.qtsvg import SVGWriter
+    writer = True
+except ImportError:
+    writer = False
+
 from ldraw import __version__
 
 
@@ -35,7 +41,7 @@ if __name__ == "__main__":
     syntax_obj = cmdsyntax.Syntax(syntax)
     matches = syntax_obj.get_args(sys.argv[1:])
     
-    if len(matches) != 1:
+    if len(matches) != 1 or not writer:
         sys.stderr.write("Usage: %s %s\n\n" % (sys.argv[0], syntax))
         sys.stderr.write("ldr2svg.py (ldraw package version %s)\n" % __version__)
         sys.stderr.write("Converts the LDraw file to a SVG file.\n\n"
@@ -44,7 +50,8 @@ if __name__ == "__main__":
                          "The camera and look-at positions are x,y,z argument in LDraw scene coordinates\n"
                          "where each coordinate should be specified as a floating point number.\n\n"
                          "The optional sky background colour is an SVG colour, either specified as\n"
-                         "#rrggbb or as a named colour.\n\n")
+                         "#rrggbb or as a named colour.\n\n"
+                         "This tool requires PyQt4, built against Qt 4.4 or higher.\n\n")
         sys.exit(1)
     
     match = matches[0]

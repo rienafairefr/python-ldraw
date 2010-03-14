@@ -25,8 +25,12 @@ from ldraw.pieces import Piece
 
 from ldraw.writers.svgtools import Poly2
 
-from PyQt4.QtCore import QPointF, Qt
+from PyQt4.QtCore import QPointF, Qt, QT_VERSION
 from PyQt4.QtGui import QBrush, QColor, QImage, QPainter, QPainterPath, QPen, QPolygonF
+
+if QT_VERSION < 0x40400:
+
+    raise ImportError, "This module requires PyQt4, built against Qt 4.4 or higher."
 
 class Polygon:
 
