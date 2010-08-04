@@ -139,6 +139,17 @@ class Matrix:
     def scale(self, sx, sy, sz):
     
         return Matrix([[sx, 0, 0], [0, sy, 0], [0, 0, sz]]) * self
+    
+    def transpose(self):
+    
+        r = self.rows
+        return Matrix([[r[0][0], r[1][0], r[2][0]],
+                       [r[0][1], r[1][1], r[2][1]],
+                       [r[0][2], r[1][2], r[2][2]]])
+    
+    def flatten(self):
+    
+        return tuple(reduce(lambda x,y: x + y, self.rows))
 
 
 def Identity():

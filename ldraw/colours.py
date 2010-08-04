@@ -22,6 +22,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class Colour:
     def __init__(self, value):
         self.value = value
+    def __eq__(self, other):
+        if isinstance(other, Colour):
+            return self.value == other.value
+        else:
+            return self.value == other
+    def __hash__(self):
+        return hash(self.value)
 
 Black = Colour(0)
 Blue = Colour(1)
