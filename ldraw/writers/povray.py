@@ -72,16 +72,15 @@ class POVRayWriter:
                     self.pov_file.write("object {\n" + self._object_name(obj.part) + "\n")
                     self._write_colour(obj.colour, 2)
                     
-                    m = obj.matrix.copy()
-                    m = m.transpose()
+                    m = obj.matrix.transpose()
                     m.rows[0][1] = -m.rows[0][1]
                     m.rows[1][1] = -m.rows[1][1]
                     m.rows[2][1] = -m.rows[2][1]
                     self.pov_file.write(
-                        "  matrix <%1.3f, %1.3f, %1.3f,\n"
-                        "          %1.3f, %1.3f, %1.3f,\n"
-                        "          %1.3f, %1.3f, %1.3f,\n"
-                        "          %1.3f, %1.3f, %1.3f>\n" % (
+                        "  matrix <%1.9f, %1.9f, %1.9f,\n"
+                        "          %1.9f, %1.9f, %1.9f,\n"
+                        "          %1.9f, %1.9f, %1.9f,\n"
+                        "          %1.9f, %1.9f, %1.9f>\n" % (
                         m.flatten() + (obj.position.x, -obj.position.y, obj.position.z))
                         )
                     
@@ -91,7 +90,7 @@ class POVRayWriter:
                 
                     self.pov_file.write(
                         "light_source {\n"
-                        "  <%1.3f, %1.3f, %1.3f>, %s\n"
+                        "  <%1.9f, %1.9f, %1.9f>, %s\n"
                         "}\n\n" % (obj.position.x, -obj.position.y, obj.position.z,
                                    self._colour_string(obj.colour))
                         )
@@ -152,9 +151,9 @@ class POVRayWriter:
         
         lines = ["triangle",
                  "{",
-                 "  <%1.3f, %1.3f, %1.3f>, "
-                 "<%1.3f, %1.3f, %1.3f>, "
-                 "<%1.3f, %1.3f, %1.3f>\n" % (
+                 "  <%1.9f, %1.9f, %1.9f>, "
+                 "<%1.9f, %1.9f, %1.9f>, "
+                 "<%1.9f, %1.9f, %1.9f>\n" % (
                      v1.x, v1.y, v1.z,
                      v2.x, v2.y, v2.z,
                      v3.x, v3.y, v3.z)]
@@ -176,7 +175,8 @@ class POVRayWriter:
         
         for obj in definition:
         
-            if isinstance(obj, Piece) and objects.has_key(obj.part):
+            if isinstance(obj, Piece) and objects.has_key(obj.part) and \
+                obj.matrix.det() != 0.0:
             
                 # Refer to the object for the other piece.
                 self.pov_file.write(
@@ -184,13 +184,12 @@ class POVRayWriter:
                     "    " + self._object_name(obj.part) + "\n"
                     )
                 # Apply a transformation for this particular piece.
-                m = obj.matrix.copy()
-                m = m.transpose()
+                m = obj.matrix.transpose()
                 self.pov_file.write(
-                    "    matrix <%1.3f, %1.3f, %1.3f,\n"
-                    "            %1.3f, %1.3f, %1.3f,\n"
-                    "            %1.3f, %1.3f, %1.3f,\n"
-                    "            %1.3f, %1.3f, %1.3f>\n" % (
+                    "    matrix <%1.9f, %1.9f, %1.9f,\n"
+                    "            %1.9f, %1.9f, %1.9f,\n"
+                    "            %1.9f, %1.9f, %1.9f,\n"
+                    "            %1.9f, %1.9f, %1.9f>\n" % (
                     m.flatten() + (obj.position.x, obj.position.y, obj.position.z))
                     )
                 
