@@ -147,6 +147,13 @@ class Matrix:
                        [r[0][1], r[1][1], r[2][1]],
                        [r[0][2], r[1][2], r[2][2]]])
     
+    def det(self):
+    
+        r = self.rows
+        return r[0][0]*(r[1][1]*r[2][2] - r[1][2]*r[2][1]) + \
+               r[0][1]*(r[1][2]*r[2][0] - r[1][0]*r[2][2]) + \
+               r[0][2]*(r[1][0]*r[2][1] - r[1][1]*r[2][0])
+    
     def flatten(self):
     
         return tuple(reduce(lambda x,y: x + y, self.rows))
