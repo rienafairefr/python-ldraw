@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from ldraw.geometry import Identity, Vector
 from ldraw.parts import Parts, Quadrilateral, Triangle
 from ldraw.pieces import Piece
+from ldraw.colours import Current
 
 class POVRayWriter:
 
@@ -42,59 +43,71 @@ class POVRayWriter:
         self.maximum = Vector(0, 0, 0)
         self.bbox_cache = {}
     
-    def write(self, model, current_colour = 15, current_matrix = Identity(),
-              current_position = Vector(0, 0, 0)):
+    def write(self, model):
     
+        # Define objects for the pieces first.
+        objects = {}
+        ordered_objects = []
+        
         for obj in model.objects:
         
             if isinstance(obj, Piece):
             
-                colour = self._current_colour(obj.colour, current_colour)
+                ordered_objects += self._create_piece_objects(obj, objects)
+        
+        # Write the objects.
+        
+        for part in ordered_objects:
+        
+            self._write_object_definition(part, objects)
+        
+        # Write the pieces using the objects.
+        
+        for obj in model.objects:
+        
+            if isinstance(obj, Piece):
+            
+                if objects.has_key(obj.part):
                 
-                part = self.parts.part(code = obj.part)
-                if part:
-                    self.pov_file.write("// Part %s\n\n" % obj.part)
+                    self.pov_file.write("object {\n" + self._object_name(obj.part) + "\n")
+                    self._write_colour(obj.colour, 2)
                     
-                    matrix = obj.matrix
+                    m = obj.matrix.copy()
+                    m = m.transpose()
+                    m.rows[0][1] = -m.rows[0][1]
+                    m.rows[1][1] = -m.rows[1][1]
+                    m.rows[2][1] = -m.rows[2][1]
+                    self.pov_file.write(
+                        "  matrix <%1.3f, %1.3f, %1.3f,\n"
+                        "          %1.3f, %1.3f, %1.3f,\n"
+                        "          %1.3f, %1.3f, %1.3f,\n"
+                        "          %1.3f, %1.3f, %1.3f>\n" % (
+                        m.flatten() + (obj.position.x, -obj.position.y, obj.position.z))
+                        )
                     
-                    self.write(part, colour, current_matrix * matrix,
-                               current_position + current_matrix * obj.position)
-                else:
-                    sys.stderr.write("Part not found: %s\n" % obj.part)
+                    self.pov_file.write("}\n\n")
                 
-                if obj.part == "LIGHT":
+                elif obj.part == "LIGHT":
                 
-                    position = current_matrix * obj.position + current_position
-                    self._write_light_source(position, colour)
+                    self.pov_file.write(
+                        "light_source {\n"
+                        "  <%1.3f, %1.3f, %1.3f>, %s\n"
+                        "}\n\n" % (obj.position.x, -obj.position.y, obj.position.z,
+                                   self._colour_string(obj.colour))
+                        )
                     self.lights.append(obj)
             
             elif isinstance(obj, Triangle):
             
-                colour = self._current_colour(obj.colour, current_colour)
-                p1 = current_matrix * obj.p1 + current_position
-                p2 = current_matrix * obj.p2 + current_position
-                p3 = current_matrix * obj.p3 + current_position
-                if abs((p3 - p1).cross(p2 - p1)) != 0:
-                    self._write_triangle(p1, p2, p3, colour)
+                if abs((obj.p3 - obj.p1).cross(obj.p2 - obj.p1)) != 0:
+                    self._write_triangle(obj.p1, obj.p2, obj.p3, obj.colour, indent = 2)
             
             elif isinstance(obj, Quadrilateral):
             
-                colour = self._current_colour(obj.colour, current_colour)
-                p1 = current_matrix * obj.p1 + current_position
-                p2 = current_matrix * obj.p2 + current_position
-                p3 = current_matrix * obj.p3 + current_position
-                p4 = current_matrix * obj.p4 + current_position
-                if abs((p3 - p1).cross(p2 - p1)) != 0:
-                    self._write_triangle(p1, p2, p3, colour)
-                if abs((p3 - p1).cross(p4 - p1)) != 0:
-                    self._write_triangle(p3, p4, p1, colour)
-    
-    def _current_colour(self, colour, current_colour):
-    
-        if colour.value == 16:
-            return current_colour
-        else:
-            return colour.value
+                if abs((obj.p3 - obj.p1).cross(obj.p2 - obj.p1)) != 0:
+                    self._write_triangle(obj.p1, obj.p2, obj.p3, obj.colour, indent = 2)
+                if abs((obj.p3 - obj.p1).cross(obj.p4 - obj.p1)) != 0:
+                    self._write_triangle(obj.p3, obj.p4, obj.p1, obj.colour, indent = 2)
     
     def _rgb_from_colour(self, colour):
     
@@ -128,7 +141,7 @@ class POVRayWriter:
         else:
             return ""
     
-    def _write_triangle(self, v1, v2, v3, colour):
+    def _write_triangle(self, v1, v2, v3, colour, indent = 0):
     
         self.minimum = Vector(min(self.minimum.x, v1.x, v2.x, v3.x),
                               min(self.minimum.y, -v1.y, -v2.y, -v3.y),
@@ -137,62 +150,115 @@ class POVRayWriter:
                               max(self.maximum.y, -v1.y, -v2.y, -v3.y),
                               max(self.maximum.z, v1.z, v2.z, v3.z))
         
-        self.pov_file.write(
-            "triangle\n"
-            "{\n"
-            "  <%1.3f, %1.3f, %1.3f>, <%1.3f, %1.3f, %1.3f>, <%1.3f, %1.3f, %1.3f>\n"
-            "  pigment\n"
-            "  {\n"
-            "    color %s\n"
-            "  }\n"
-            "  finish\n"
-            "  {\n"
-            "    %s\n"
-            "  }\n"
-            "}\n\n" % (v1.x, -v1.y, v1.z,
-                       v2.x, -v2.y, v2.z,
-                       v3.x, -v3.y, v3.z,
-                       self._colour_string(colour),
-                       self._finish_string(colour))
-            )
-    
-    def _write_light_source(self, position, colour):
-    
-        self.pov_file.write(
-            "light_source {\n"
-            "  <%1.3f, %1.3f, %1.3f>, %s\n"
-            "}\n\n" % (position.x, -position.y, position.z,
-                       self._colour_string(colour))
-            )
-    
-    def _bounding_box(self, part):
-    
-        if self.bbox_cache.has_key(part):
-            return self.bbox_cache[part]
+        lines = ["triangle",
+                 "{",
+                 "  <%1.3f, %1.3f, %1.3f>, "
+                 "<%1.3f, %1.3f, %1.3f>, "
+                 "<%1.3f, %1.3f, %1.3f>\n" % (
+                     v1.x, v1.y, v1.z,
+                     v2.x, v2.y, v2.z,
+                     v3.x, v3.y, v3.z)]
         
-        x = []
-        y = []
-        z = []
+        self.pov_file.write("\n".join(map(lambda x: indent*" " + x, lines)))
+        self._write_colour(colour, indent + 2)
+        self.pov_file.write(" "*indent + "}\n\n")
+    
+    def _write_object_definition(self, part, objects):
+    
+        self.pov_file.write("// Part %s\n\n" % part)
+        
+        definition = objects[part]
+        
+        if len(definition) > 1:
+            self.pov_file.write("#declare "+self._object_name(part)+" = union {\n")
+        else:
+            self.pov_file.write("#declare "+self._object_name(part)+" = object {\n")
+        
+        for obj in definition:
+        
+            if isinstance(obj, Piece) and objects.has_key(obj.part):
+            
+                # Refer to the object for the other piece.
+                self.pov_file.write(
+                    "  object {\n"
+                    "    " + self._object_name(obj.part) + "\n"
+                    )
+                # Apply a transformation for this particular piece.
+                m = obj.matrix.copy()
+                m = m.transpose()
+                self.pov_file.write(
+                    "    matrix <%1.3f, %1.3f, %1.3f,\n"
+                    "            %1.3f, %1.3f, %1.3f,\n"
+                    "            %1.3f, %1.3f, %1.3f,\n"
+                    "            %1.3f, %1.3f, %1.3f>\n" % (
+                    m.flatten() + (obj.position.x, obj.position.y, obj.position.z))
+                    )
+                
+                self.pov_file.write("  }\n")
+            
+            elif isinstance(obj, Triangle):
+            
+                if abs((obj.p3 - obj.p1).cross(obj.p2 - obj.p1)) != 0:
+                    self._write_triangle(obj.p1, obj.p2, obj.p3, obj.colour, indent = 2)
+        
+        self.pov_file.write("}\n\n")
+    
+    def _write_colour(self, colour, indent):
+    
+        if colour == Current:
+            return
+        
+        self.pov_file.write(indent * " ")
+        self.pov_file.write("pigment { color %s }\n" % self._colour_string(colour))
+        
+        finish = self._finish_string(colour)
+        if finish.strip():
+            self.pov_file.write(indent * " ")
+            self.pov_file.write("finish { %s }\n" % finish)
+    
+    def _create_piece_objects(self, this_obj, objects):
+    
+        if objects.has_key(this_obj.part):
+            return []
+        
+        part = self.parts.part(code = this_obj.part)
+        if not part:
+            sys.stderr.write("Part not found: %s\n" % this_obj.part)
+            return []
+        
+        definition = []
+        ordered_objects = []
         
         for obj in part.objects:
         
-            if isinstance(obj, Triangle):
-                x.append(min(obj.p1.x, obj.p2.x, obj.p3.x))
-                x.append(max(obj.p1.x, obj.p2.x, obj.p3.x))
-                y.append(min(obj.p1.y, obj.p2.y, obj.p3.y))
-                y.append(max(obj.p1.y, obj.p2.y, obj.p3.y))
-                z.append(min(obj.p1.z, obj.p2.z, obj.p3.z))
-                z.append(max(obj.p1.z, obj.p2.z, obj.p3.z))
+            if isinstance(obj, Piece):
+            
+                # Define this piece, too.
+                ordered_objects += self._create_piece_objects(obj, objects)
+                
+                # Record the object as part of the piece's definition.
+                definition.append(obj)
+            
+            elif isinstance(obj, Triangle):
+            
+                # Record the object as part of the piece's definition.
+                definition.append(obj)
             
             elif isinstance(obj, Quadrilateral):
-                x.append(min(obj.p1.x, obj.p2.x, obj.p3.x, obj.p4.x))
-                x.append(max(obj.p1.x, obj.p2.x, obj.p3.x, obj.p4.x))
-                y.append(min(obj.p1.y, obj.p2.y, obj.p3.y, obj.p4.y))
-                y.append(max(obj.p1.y, obj.p2.y, obj.p3.y, obj.p4.y))
-                z.append(min(obj.p1.z, obj.p2.z, obj.p3.z, obj.p4.z))
-                z.append(max(obj.p1.z, obj.p2.z, obj.p3.z, obj.p4.z))
+            
+                # Split the quadrilateral into two triangles.
+                triangle1 = Triangle(obj.colour, obj.p1, obj.p2, obj.p3)
+                triangle2 = Triangle(obj.colour, obj.p3, obj.p4, obj.p1)
+                definition.append(triangle1)
+                definition.append(triangle2)
         
-        if x:
-            return (min(x), max(x)), (min(y), max(y)), (min(z), max(z))
-        else:
-            return None
+        if definition:
+            objects[this_obj.part] = definition
+            ordered_objects.append(this_obj.part)
+        
+        return ordered_objects
+    
+    def _object_name(self, part):
+    
+        # Replace forbidden characters to produce a valid object name.
+        return "part" + part.replace("-", "_").replace("\\", "_")
