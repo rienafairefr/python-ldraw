@@ -62,6 +62,9 @@ class POVRayWriter:
             self._write_object_definition(part, objects)
         
         # Write the pieces using the objects.
+        self.pov_file.write(
+            "#declare scene = union {\n"
+            )
         
         for obj in model.objects:
         
@@ -73,15 +76,12 @@ class POVRayWriter:
                     self._write_colour(obj.colour, 2)
                     
                     m = obj.matrix.transpose()
-                    m.rows[0][1] = -m.rows[0][1]
-                    m.rows[1][1] = -m.rows[1][1]
-                    m.rows[2][1] = -m.rows[2][1]
                     self.pov_file.write(
-                        "  matrix <%1.9f, %1.9f, %1.9f,\n"
-                        "          %1.9f, %1.9f, %1.9f,\n"
-                        "          %1.9f, %1.9f, %1.9f,\n"
-                        "          %1.9f, %1.9f, %1.9f>\n" % (
-                        m.flatten() + (obj.position.x, -obj.position.y, obj.position.z))
+                        "  matrix <%1.3f, %1.3f, %1.3f,\n"
+                        "          %1.3f, %1.3f, %1.3f,\n"
+                        "          %1.3f, %1.3f, %1.3f,\n"
+                        "          %1.3f, %1.3f, %1.3f>\n" % (
+                        m.flatten() + (obj.position.x, obj.position.y, obj.position.z))
                         )
                     
                     self.pov_file.write("}\n\n")
@@ -90,8 +90,8 @@ class POVRayWriter:
                 
                     self.pov_file.write(
                         "light_source {\n"
-                        "  <%1.9f, %1.9f, %1.9f>, %s\n"
-                        "}\n\n" % (obj.position.x, -obj.position.y, obj.position.z,
+                        "  <%1.3f, %1.3f, %1.3f>, %s\n"
+                        "}\n\n" % (obj.position.x, obj.position.y, obj.position.z,
                                    self._colour_string(obj.colour))
                         )
                     self.lights.append(obj)
@@ -107,6 +107,17 @@ class POVRayWriter:
                     self._write_triangle(obj.p1, obj.p2, obj.p3, obj.colour, indent = 2)
                 if abs((obj.p3 - obj.p1).cross(obj.p4 - obj.p1)) != 0:
                     self._write_triangle(obj.p3, obj.p4, obj.p1, obj.colour, indent = 2)
+        
+        self.pov_file.write("}\n")
+        self.pov_file.write(
+            "object {\n"
+            "  scene\n"
+            "  matrix <1.0, 0.0, 0.0,\n"
+            "          0.0, -1.0, 0.0,\n"
+            "          0.0, 0.0, 1.0,\n"
+            "          0.0, 0.0, 0.0>\n"
+            "}\n"
+            )
     
     def _rgb_from_colour(self, colour):
     
@@ -151,9 +162,9 @@ class POVRayWriter:
         
         lines = ["triangle",
                  "{",
-                 "  <%1.9f, %1.9f, %1.9f>, "
-                 "<%1.9f, %1.9f, %1.9f>, "
-                 "<%1.9f, %1.9f, %1.9f>\n" % (
+                 "  <%1.3f, %1.3f, %1.3f>, "
+                 "<%1.3f, %1.3f, %1.3f>, "
+                 "<%1.3f, %1.3f, %1.3f>\n" % (
                      v1.x, v1.y, v1.z,
                      v2.x, v2.y, v2.z,
                      v3.x, v3.y, v3.z)]
@@ -186,13 +197,14 @@ class POVRayWriter:
                 # Apply a transformation for this particular piece.
                 m = obj.matrix.transpose()
                 self.pov_file.write(
-                    "    matrix <%1.9f, %1.9f, %1.9f,\n"
-                    "            %1.9f, %1.9f, %1.9f,\n"
-                    "            %1.9f, %1.9f, %1.9f,\n"
-                    "            %1.9f, %1.9f, %1.9f>\n" % (
+                    "    matrix <%1.3f, %1.3f, %1.3f,\n"
+                    "            %1.3f, %1.3f, %1.3f,\n"
+                    "            %1.3f, %1.3f, %1.3f,\n"
+                    "            %1.3f, %1.3f, %1.3f>\n" % (
                     m.flatten() + (obj.position.x, obj.position.y, obj.position.z))
                     )
                 
+                self._write_colour(obj.colour, 2)
                 self.pov_file.write("  }\n")
             
             elif isinstance(obj, Triangle):
