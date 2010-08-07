@@ -3,8 +3,8 @@ ldraw Python Package
 ====================
 
 :Author: `David Boddie`_
-:Date: 2008-07-13
-:Version: 0.11
+:Date: 2010-08-07
+:Version: 0.25
 
 *Note: This text is marked up using reStructuredText formatting. It should be
 readable in a text editor but can be processed to produce versions of this
