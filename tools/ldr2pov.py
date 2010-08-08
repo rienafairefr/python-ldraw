@@ -107,3 +107,8 @@ if __name__ == "__main__":
             )
     
     pov_file.close()
+    
+    for message, part in writer.warnings.keys():
+        sys.stderr.write((message+"\n") % part)
+    
+    sys.exit()

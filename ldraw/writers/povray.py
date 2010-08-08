@@ -45,6 +45,8 @@ class POVRayWriter:
     
     def write(self, model):
     
+        self.warnings = {}
+        
         # Define objects for the pieces first.
         objects = {}
         ordered_objects = []
@@ -55,11 +57,12 @@ class POVRayWriter:
             
                 ordered_objects += self._create_piece_objects(obj, objects)
         
-        # Write the objects.
+        # Write the objects, discarding any that are invalid in any way.
         
         for part in ordered_objects:
         
-            self._write_object_definition(part, objects)
+            if not self._write_object_definition(part, objects):
+                del objects[part]
         
         # Write the pieces using the objects.
         self.pov_file.write(
@@ -175,19 +178,53 @@ class POVRayWriter:
     
     def _write_object_definition(self, part, objects):
     
-        self.pov_file.write("// Part %s\n\n" % part)
-        
         definition = objects[part]
+        
+        # Examine the constituent objects, keeping only those that refer to
+        # known pieces and that are described using non-singular matrices.
+        
+        allowed = []
+        for obj in definition:
+            
+            if isinstance(obj, Piece):
+                if not objects.has_key(obj.part):
+                    self.warnings[("Discarding reference to %s", obj.part)] = None
+                    continue
+                
+                # POV-Ray does not like matrices with zero diagonal elements.
+                elements = []
+                if obj.matrix.rows[0][0] == 0.0:
+                    obj.matrix.rows[0][0] = 0.001
+                    elements.append("x")
+                if obj.matrix.rows[1][1] == 0.0:
+                    obj.matrix.rows[1][1] = 0.001
+                    elements.append("y")
+                if obj.matrix.rows[2][2] == 0.0:
+                    obj.matrix.rows[2][2] = 0.001
+                    elements.append("z")
+                
+                if elements:
+                    self.warnings[("Correcting diagonal matrix elements for %s.", obj.part)] = None
+                
+                if obj.matrix.det() == 0.0:
+                    self.warnings[("Discarding %s with singular matrix.", obj.part)] = None
+                    continue
+            
+            allowed.append(obj)
+        
+        if not allowed:
+            return False
+        
+        self.pov_file.write("// Part %s\n\n" % part)
         
         if len(definition) > 1:
             self.pov_file.write("#declare "+self._object_name(part)+" = union {\n")
         else:
             self.pov_file.write("#declare "+self._object_name(part)+" = object {\n")
         
-        for obj in definition:
+        for obj in allowed:
         
-            if isinstance(obj, Piece) and objects.has_key(obj.part) and \
-                obj.matrix.det() != 0.0:
+            if isinstance(obj, Piece):
             
                 # Refer to the object for the other piece.
                 self.pov_file.write(
@@ -213,6 +250,7 @@ class POVRayWriter:
                     self._write_triangle(obj.p1, obj.p2, obj.p3, obj.colour, indent = 2)
         
         self.pov_file.write("}\n\n")
+        return True
     
     def _write_colour(self, colour, indent):
     
@@ -272,4 +310,4 @@ class POVRayWriter:
     def _object_name(self, part):
     
         # Replace forbidden characters to produce a valid object name.
-        return "part" + part.replace("-", "_").replace("\\", "_")
+        return "part" + part.replace("-", "_").replace("\\", "_").replace("#", "_")
