@@ -71,7 +71,7 @@ class PNGWriter:
             stroke_pen.setColor(QColor(stroke_colour))
         
         if background_colour is not None:
-            image.fill(QColor(background_colour))
+            image.fill(QColor(background_colour).rgb())
         
         current_colour = None
         current_alpha = None
