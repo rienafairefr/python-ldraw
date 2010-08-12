@@ -40,7 +40,7 @@ if __name__ == "__main__":
     if len(matches) != 1:
         sys.stderr.write("Usage: %s %s\n\n" % (sys.argv[0], syntax))
         sys.stderr.write("ldr2png.py (ldraw package version %s)\n" % __version__)
-        sys.stderr.write("Converts the LDraw file to a SVG file.\n\n"
+        sys.stderr.write("Converts the LDraw file to a PNG file.\n\n"
                          "The viewport size is specified as a pair of floating point numbers representing\n"
                          "lengths in LDraw scene coordinates separated by an \"x\" character.\n\n"
                          "The camera and look-at positions are x,y,z argument in LDraw scene coordinates\n"
