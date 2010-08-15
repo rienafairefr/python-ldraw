@@ -26,7 +26,8 @@ from ldraw.pieces import Piece
 import Numeric
 
 from PyQt4.QtCore import QPointF, Qt
-from PyQt4.QtGui import QBrush, QColor, QImage, QPainter, QPen, QPolygonF
+from PyQt4.QtGui import QBrush, QColor, QImage, QPainter, QPen, QPolygonF, \
+                        qRed, qGreen, qBlue, qRgb
 
 class Polygon:
 
@@ -34,28 +35,27 @@ class Polygon:
     
         self.points = points
         colour = QColor(rgb)
+        self.red = colour.red()
+        self.green = colour.green()
+        self.blue = colour.blue()
         colour.setAlphaF(alpha)
+        self.alpha = alpha
         self.rgba = colour.rgb()
         self.projected = []
     
-    def project(self, width, height):
+    def project(self, distance):
     
-        # vx' = width + az
-        # vy' = height + bz
-        
-        a = 0.5
-        b = 0.5
-        w = width/2.0
-        h = height/2.0
+        # px/c = x/(c + z)
+        # px = c * x / (c + z)
         
         for point in self.points:
         
             self.projected.append(
-                (w * (point.x/(w + a * -point.z)),
-                 h * (point.y/(h + b * -point.z)))
+                ((distance * point.x)/(distance + -point.z),
+                 (distance * point.y)/(distance + -point.z))
                 )
     
-    def render(self, image, depth, viewport_scale):
+    def render(self, image, depth, viewport_scale, stroke_colour):
     
         # Sort the edges of the polygon by their minimum projected y
         # coordinates, discarding horizontal edges.
@@ -69,14 +69,14 @@ class Polygon:
         for i in range(l):
         
             pxa, pya = self.projected[i]
-            pxa = width/2 + (pxa * viewport_scale[0])
-            pya = height/2 - (pya * viewport_scale[1])
+            pxa = width/2 + (pxa * viewport_scale)
+            pya = height/2 - (pya * viewport_scale)
             za = -self.points[i].z
             
             j = (i + 1) % l
             pxb, pyb = self.projected[j]
-            pxb = width/2 + (pxb * viewport_scale[0])
-            pyb = height/2 - (pyb * viewport_scale[1])
+            pxb = width/2 + (pxb * viewport_scale)
+            pyb = height/2 - (pyb * viewport_scale)
             zb = -self.points[j].z
             
             # Append the starting and finishing y coordinates, the starting
@@ -91,7 +91,6 @@ class Polygon:
                               zb, (za - zb)/(pya - pyb)))
         
         if not edges:
-            #print "Discarding", self.projected
             return
         
         edges.sort()
@@ -188,10 +187,30 @@ class Polygon:
                 
                 if 0 < sz <= depth[int(sx)][int(py)]:
                 
-                    depth[int(sx)][int(py)] = sz
-                    image.setPixel(sx, py, self.rgba)
+                    if self.alpha < 1.0:
+                    
+                        pixel = image.pixel(sx, py)
+                        dr = qRed(pixel)
+                        dg = qGreen(pixel)
+                        db = qBlue(pixel)
+                        r = (1 - self.alpha)*dr + self.alpha*self.red
+                        g = (1 - self.alpha)*dg + self.alpha*self.green
+                        b = (1 - self.alpha)*db + self.alpha*self.blue
+                        image.setPixel(sx, py, qRgb(r, g, b))
+                    
+                    else:
+                        depth[int(sx)][int(py)] = sz
+                        image.setPixel(sx, py, self.rgba)
                 
                 sx += 1
+            
+            if stroke_colour:
+            
+                if 0 <= sx1 < width and 0 < sz1 <= depth[int(sx1)][int(py)]:
+                    image.setPixel(sx1, py, stroke_colour)
+                
+                if 0 <= sx2 < width and 0 < sz2 <= depth[int(sx2)][int(py)]:
+                    image.setPixel(sx2, py, stroke_colour)
             
             py += 1
 
@@ -208,7 +227,7 @@ class PNGWriter:
         self.camera_position = camera_position
         self.axes = axes
     
-    def write(self, model, png_path, viewport_size, image_size, stroke_colour = None, stroke_width = None, background_colour = None):
+    def write(self, model, png_path, distance, image_size, stroke_colour = None, background_colour = None):
     
         image = QImage(image_size[0], image_size[1], QImage.Format_RGB16)
         depth = Numeric.empty((image_size[0], image_size[1]), "f")
@@ -217,7 +236,7 @@ class PNGWriter:
         polygons = self._polygons_from_objects(model)
         
         if stroke_colour:
-            stroke_pen.setColor(QColor(stroke_colour))
+            stroke_colour = QColor(stroke_colour).rgb()
         
         if background_colour is not None:
             image.fill(QColor(background_colour).rgb())
@@ -225,13 +244,25 @@ class PNGWriter:
         current_colour = None
         current_alpha = None
         
-        viewport_scale = (image_size[0] / viewport_size[0],
-                          image_size[1] / viewport_size[1])
+        viewport_scale = min(float(image_size[0]), float(image_size[1]))
+        
+        # Draw opaque polygons first.
         
         for polygon in polygons:
         
-            polygon.project(viewport_size[0], viewport_size[1])
-            polygon.render(image, depth, viewport_scale)
+            if polygon.alpha == 1.0:
+            
+                polygon.project(distance)
+                polygon.render(image, depth, viewport_scale, stroke_colour)
+        
+        # Draw translucent polygons last.
+        
+        for polygon in polygons:
+        
+            if polygon.alpha < 1.0:
+            
+                polygon.project(distance)
+                polygon.render(image, depth, viewport_scale, stroke_colour)
         
         image.save(png_path)
     
@@ -287,7 +318,7 @@ class PNGWriter:
             #    colour = self._current_colour(obj.colour, current_colour)
             #    rgb = self.parts.colours.get(colour, "#ffffff")
             #    alpha = self._opacity_from_colour(colour)
-            #    polygons.append(Polygon([r1, r2], rgb, alpha))
+            #    polygons.append(Polygon([r1, r2, r2, r1], rgb, alpha))
             
             elif isinstance(obj, Triangle):
             

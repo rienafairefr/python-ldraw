@@ -33,7 +33,7 @@ from PyQt4.QtGui import QApplication
 
 if __name__ == "__main__":
 
-    syntax = "<LDraw parts file> <LDraw file> <PNG file> <viewport size> <image size> <camera position> [<look-at position>] [--stroke-colour <stroke colour>] [--stroke-width <stroke width>] [--sky <background colour>]"
+    syntax = "<LDraw parts file> <LDraw file> <PNG file> <image size> <camera position> [<look-at position>] [--distance <eye to viewport distance>] [--stroke-colour <stroke colour>] [--sky <background colour>]"
     syntax_obj = cmdsyntax.Syntax(syntax)
     matches = syntax_obj.get_args(sys.argv[1:])
     
@@ -41,11 +41,11 @@ if __name__ == "__main__":
         sys.stderr.write("Usage: %s %s\n\n" % (sys.argv[0], syntax))
         sys.stderr.write("ldr2png.py (ldraw package version %s)\n" % __version__)
         sys.stderr.write("Converts the LDraw file to a PNG file.\n\n"
-                         "The viewport size is specified as a pair of floating point numbers representing\n"
-                         "lengths in LDraw scene coordinates separated by an \"x\" character.\n\n"
                          "The camera and look-at positions are x,y,z argument in LDraw scene coordinates\n"
                          "where each coordinate should be specified as a floating point number.\n\n"
-                         "The optional sky background colour is an PNG colour, either specified as\n"
+                         "The eye to viewport distance is specified as a floating point number representing\n"
+                         "a length in LDraw scene coordinates. Its default value is 1.0.\n\n"
+                         "The optional sky background and stroke colours are PNG colours, either specified as\n"
                          "#rrggbb or as a named colour.\n\n")
         sys.exit(1)
     
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     parts_path = match["LDraw parts file"]
     ldraw_path = match["LDraw file"]
     png_path = match["PNG file"]
-    viewport_size = map(float, match["viewport size"].split("x"))
+    distance = float(match.get("eye to viewport distance", 1.0))
     image_size = map(int, match["image size"].split("x"))
     camera_position = Vector(*map(float, match["camera position"].split(",")))
     look_at_position = Vector(*map(float, match.get("look-at position", "0.0,0.0,0.0").split(",")))
@@ -69,17 +69,12 @@ if __name__ == "__main__":
     if match.has_key("sky"):
         background_colour = match["background colour"]
     else:
-        background_colour = None
+        background_colour = "#000000"
     
     try:
         stroke_colour = match["stroke colour"]
     except KeyError:
         stroke_colour = None
-    
-    try:
-        stroke_width = float(match["stroke width"])
-    except KeyError:
-        stroke_width = None
     
     if camera_position == look_at_position:
         sys.stderr.write("Camera and look-at positions are the same.\n")
@@ -100,8 +95,8 @@ if __name__ == "__main__":
     y_axis = z_axis.cross(x_axis)
     
     writer = PNGWriter(camera_position, (x_axis, y_axis, z_axis), parts)
-    writer.write(model, png_path, viewport_size, image_size,
+    writer.write(model, png_path, distance, image_size,
                  background_colour = background_colour,
-                 stroke_colour = stroke_colour, stroke_width = stroke_width)
+                 stroke_colour = stroke_colour)
     
     sys.exit()
