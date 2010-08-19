@@ -5,7 +5,7 @@ from distutils.core import setup
 import ldraw
 
 setup(
-    name         = "ldraw",
+    name         = "python-ldraw",
     description  = "A package for creating LDraw format files.",
     author       = "David Boddie",
     author_email = "david@boddie.org.uk",
