@@ -1,5 +1,5 @@
 """
-png.py - An PNG writer for the ldraw Python package.
+png.py - A PNG writer for the ldraw Python package.
 
 Copyright (C) 2010 David Boddie <david@boddie.org.uk>
 
