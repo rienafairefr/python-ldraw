@@ -41,7 +41,9 @@ if __name__ == "__main__":
         sys.stderr.write("Usage: %s %s\n\n" % (sys.argv[0], syntax))
         sys.stderr.write("ldr2png.py (ldraw package version %s)\n" % __version__)
         sys.stderr.write("Converts the LDraw file to a PNG file.\n\n"
-                         "The camera and look-at positions are x,y,z argument in LDraw scene coordinates\n"
+                         "The image size must be specified in the format <width>x<height> where the width\n"
+                         "and height are measured in pixels.\n\n"
+                         "The camera and look-at positions are x,y,z arguments in LDraw scene coordinates\n"
                          "where each coordinate should be specified as a floating point number.\n\n"
                          "The eye to viewport distance is specified as a floating point number representing\n"
                          "a length in LDraw scene coordinates. Its default value is 1.0.\n\n"
@@ -54,7 +56,17 @@ if __name__ == "__main__":
     ldraw_path = match["LDraw file"]
     png_path = match["PNG file"]
     distance = float(match.get("eye to viewport distance", 1.0))
-    image_size = map(int, match["image size"].split("x"))
+    
+    image_dimensions = match["image size"].split("x")
+    if len(image_dimensions) != 2:
+        sys.stderr.write("Incorrect number of values specified for the image size: %s\n" % match["image size"])
+        sys.exit(1)
+    try:
+        image_size = map(int, image_dimensions)
+    except ValueError:
+        sys.stderr.write("Non-integer value specified for the image size: %s\n" % match["image size"])
+        sys.exit(1)
+    
     camera_position = Vector(*map(float, match["camera position"].split(",")))
     look_at_position = Vector(*map(float, match.get("look-at position", "0.0,0.0,0.0").split(",")))
     
