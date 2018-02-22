@@ -1,3 +1,9 @@
+This repo is a git copy of the repository at
+https://anonscm.debian.org/hg/python-ldraw/main
+
+It will not try to stay updated with the upstream repo of the original author, David Boddie
+The goal is to see what might be done, the original repo hasn't been updated since 2011
+
 ====================
 ldraw Python Package
 ====================
