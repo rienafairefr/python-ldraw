@@ -4,18 +4,13 @@ https://anonscm.debian.org/hg/python-ldraw/main
 It will not try to stay updated with the upstream repo of the original author, David Boddie
 The goal is to see what might be done, the original repo hasn't been updated since 2011
 
-====================
-ldraw Python Package
-====================
+======================
+pyldraw Python Package
+======================
 
-:Author: `David Boddie`_
-:Date: 2010-08-20
-:Version: 0.26
-
-*Note: This text is marked up using reStructuredText formatting. It should be
-readable in a text editor but can be processed to produce versions of this
-document in other formats.*
-
+:Author: `Matthieu Berthomé, code originally from David Boddie`_
+:Date: 2018-02-22
+:Version: 0.3
 
 .. contents::
 
@@ -89,9 +84,9 @@ LDraw descriptions in other file formats. Currently, it contains the `povray`
 module which provides a class for writing out LDraw descriptions as POV-Ray
 scenes.
 
-The `ldr2pov.py` tool, supplied in the `tools` directory, uses the `povray`
-module to allow LDraw (`.ldr`) files to be conveniently converted to POV-Ray
-(`.pov`) scene files. Note that, since the LDraw format does not include
+The `ldr2pov` tool, uses the `povray` module to allow LDraw (`.ldr`) files
+to be conveniently converted to POV-Ray (`.pov`) scene files.
+Note that, since the LDraw format does not include
 information about camera locations, it is necessary to pass this information
 on the command line.
 
@@ -100,7 +95,7 @@ to take the `figures.py` example file, create an LDraw model file (`temp.ldr`),
 and convert that to a POV-Ray scene file (`temp.pov`)::
 
   python examples/figures.py > temp.ldr
-  ldr2pov.py /path/to/parts.lst models/figures.ldr temp.pov 160.0,80.0,-240.0
+  ldr2pov /path/to/parts.lst models/figures.ldr temp.pov 160.0,80.0,-240.0
   povray +Itemp.pov +FN16 +Otemp.png +Q6
 
 Finally, POV-Ray is used to process the scene description and create a PNG

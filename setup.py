@@ -10,6 +10,7 @@ import ldraw
 setup(
     name="pyldraw",
     description="A package for working with LDraw format files.",
+    long_description=open('README.rst').read(),
     author="Matthieu Berthomé; David Boddie",
     author_email="rienairefr@gmail.com; david@boddie.org.uk",
     version=ldraw.__version__,
