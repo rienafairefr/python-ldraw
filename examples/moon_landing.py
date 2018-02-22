@@ -36,42 +36,60 @@ print figure.left_leg(White, 0)
 print figure.right_leg(White, 0)
 print figure.left_arm(White, -45)
 print figure.left_hand(White, 0)
-print figure.left_hand_item(Grey, Vector(0, -11, -12), 0, "3959") # Torch
+print figure.left_hand_item(Grey, Vector(0, -11, -12), 0, "3959")  # Torch
 print figure.right_arm(White, 0)
 print figure.right_hand(White, 0)
 print
 
 rover = Group(Vector(80, 48, 20), Identity())
-print Piece(Grey, Vector(0, 0, 0), Identity(), "122C01", rover)
-print Piece(Black, Vector(30, 6, 0), Identity().rotate(90, YAxis), "3641", rover)
-print Piece(Black, Vector(-30, 6, 0), Identity().rotate(90, YAxis), "3641", rover)
-print Piece(Grey, Vector(0, 0, -80), Identity(), "122C01", rover)
-print Piece(Black, Vector(30, 6, -80), Identity().rotate(90, YAxis), "3641", rover)
-print Piece(Black, Vector(-30, 6, -80), Identity().rotate(90, YAxis), "3641", rover)
+print Piece(Grey, Vector(0, 0, 0),
+            Identity(), "122C01", rover)
+print Piece(Black, Vector(30, 6, 0),
+            Identity().rotate(90, YAxis), "3641", rover)
+print Piece(Black, Vector(-30, 6, 0),
+            Identity().rotate(90, YAxis), "3641", rover)
+print Piece(Grey, Vector(0, 0, -80),
+            Identity(), "122C01", rover)
+print Piece(Black, Vector(30, 6, -80),
+            Identity().rotate(90, YAxis), "3641", rover)
+print Piece(Black, Vector(-30, 6, -80),
+            Identity().rotate(90, YAxis), "3641", rover)
 
-print Piece(Grey, Vector(0, 0, -40), Identity(), "3022", rover)
+print Piece(Grey, Vector(0, 0, -40),
+            Identity(), "3022", rover)
 
-print Piece(Grey, Vector(0, -24, -10), Identity().rotate(180, YAxis), "3039", rover)
-print Piece(Grey, Vector(0, -32, -10), Identity().rotate(180, YAxis), "3829", rover)
-print Piece(Grey, Vector(0, -24, -60), Identity().rotate(180, YAxis), "4079", rover)
-print Piece(Grey, Vector(0, -8, -60), Identity(), "3022", rover)
-print Piece(Grey, Vector(0, -16, -60), Identity(), "3022", rover)
-print Piece(Grey, Vector(0, -24, -90), Identity(), "3004P90", rover)
-print Piece(Grey, Vector(-10, -32, -90), Identity(), "3957", rover)
-print Piece(TransGreen, Vector(10, -48, -90), Identity(), "3062A", rover)
-print Piece(Green, Vector(10, -52, -90), Identity(), "LIGHT", rover)
-
+print Piece(Grey, Vector(0, -24, -10),
+            Identity().rotate(180, YAxis), "3039", rover)
+print Piece(Grey, Vector(0, -32, -10),
+            Identity().rotate(180, YAxis), "3829", rover)
+print Piece(Grey, Vector(0, -24, -60),
+            Identity().rotate(180, YAxis), "4079", rover)
+print Piece(Grey, Vector(0, -8, -60),
+            Identity(), "3022", rover)
+print Piece(Grey, Vector(0, -16, -60),
+            Identity(), "3022", rover)
+print Piece(Grey, Vector(0, -24, -90),
+            Identity(), "3004P90", rover)
+print Piece(Grey, Vector(-10, -32, -90),
+            Identity(), "3957", rover)
+print Piece(TransGreen, Vector(10, -48, -90),
+            Identity(), "3062A", rover)
+print Piece(Green, Vector(10, -52, -90),
+            Identity(), "LIGHT", rover)
 
 # Duplicate the rover with a different position and orientation.
 
 rover.position = Vector(-85, 45, 115)
-rover.matrix = Identity().rotate(-190, YAxis).rotate(-20, XAxis).rotate(-6, ZAxis)
+rover.matrix = Identity().rotate(-190, YAxis) \
+    .rotate(-20, XAxis) \
+    .rotate(-6, ZAxis)
 for piece in rover.pieces:
     print piece
 
 # Add a seated figure to the rover.
 
-figure = Person(Vector(0, -76, -50), Identity().rotate(180, YAxis), group = rover)
+figure = Person(Vector(0, -76, -50),
+                Identity().rotate(180, YAxis), group=rover)
 print figure.head(Yellow, 0)
 print figure.hat(Red, "193B")
 print figure.torso(Red, "973P90")
@@ -85,7 +103,9 @@ print figure.right_arm(Red, -35)
 print figure.right_hand(Red, 0)
 print
 
-#print Piece(Grey, Vector(0, 72, 0), Identity(), "3867")
-print Piece(Colour(15), Vector(200, -300, -400), Identity(), "LIGHT")
-print Piece(Grey, Vector(0, 72, 0), Identity(), "3947")
-#print Piece(Grey, Vector(60, 72, -60), Identity(), "52")
+# print Piece(Grey, Vector(0, 72, 0), Identity(), "3867")
+print Piece(Colour(15), Vector(200, -300, -400),
+            Identity(), "LIGHT")
+print Piece(Grey, Vector(0, 72, 0),
+            Identity(), "3947")
+# print Piece(Grey, Vector(60, 72, -60), Identity(), "52")

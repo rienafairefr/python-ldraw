@@ -28,35 +28,36 @@ from ldraw.pieces import *
 colours = [VioletBlue, Blue, LightBlue, LightGreen, Green, Yellow,
            Orange, Red, Magenta, Purple]
 
-def draw_mandelbrot(x1, z1, x2, z2, r1, i1, r2, i2):
 
+def draw_mandelbrot(x1, z1, x2, z2, r1, i1, r2, i2):
     y = 0
     z = z1
     while z <= z2:
-    
-        i = i1 + (z - z1) * (i2 - i1)/(z2 - z1)
-        
+
+        i = i1 + (z - z1) * (i2 - i1) / (z2 - z1)
+
         x = x1
         while x <= x2:
-        
-            r = r1 + (x - x1) * (r2 - r1)/(x2 - x1)
-            
+
+            r = r1 + (x - x1) * (r2 - r1) / (x2 - x1)
+
             ci = r + i * 1j
             c = ci
             count = 0
             while count < 10 and abs(c) <= 2:
                 c = c * c + ci
                 count += 1
-            
+
             if count == 10:
                 colour = Black
             else:
                 colour = colours[count]
-            
+
             print Piece(colour, Vector(x * 20, y, z * 20), Identity(), "3005")
             x += 1
-        
+
         z += 1
+
 
 draw_mandelbrot(-16, -12, 16, 12, -2.4, -1.2, 0.8, 1.2)
 

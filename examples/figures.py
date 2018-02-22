@@ -36,13 +36,15 @@ print figure.left_leg(White, 0)
 print figure.right_leg(White, 0)
 print figure.left_arm(White, -45)
 print figure.left_hand(White, 0)
-print figure.left_hand_item(Grey, Vector(0, -11, -12), 0, "3959") # Torch
+print figure.left_hand_item(Grey,
+                            Vector(0, -11, -12), 0, "3959")  # Torch
 print figure.right_arm(White, 0)
 print figure.right_hand(White, 0)
-print figure.right_hand_item(Grey, Vector(0, -23, -12), 90, "4479") # Metal detector
-print
+print figure.right_hand_item(Grey,
+                             Vector(0, -23, -12), 90, "4479")  # Metal detector
 
-figure = Person(Vector(97.5, 0, 57.5), Identity().rotate(45, YAxis))
+figure = Person(Vector(97.5, 0, 57.5),
+                Identity().rotate(45, YAxis))
 print figure.head(Yellow, -15)
 print figure.hat(Red, "193B")
 print figure.torso(Red, "973P90")
@@ -54,7 +56,7 @@ print figure.left_arm(Red, -45)
 print figure.left_hand(Red, 0)
 print figure.right_arm(Red, -30)
 print figure.right_hand(Red, 0)
-print figure.right_hand_item(Grey, Vector(0, -11, -12), 0, "3959") # Torch
+print figure.right_hand_item(Grey, Vector(0, -11, -12), 0, "3959")  # Torch
 print
 
 print Piece(Grey, Vector(0, 72, 0), Identity(), "3867")

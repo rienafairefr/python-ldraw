@@ -28,15 +28,16 @@ from ldraw.pieces import Group, Piece
 
 group = Group(Vector(0, 0, 0), Identity())
 
-figure = Person(group = group)
+figure = Person(group=group)
 print figure.head(Yellow)
-print figure.hat(Green, "4485") # Cap
+print figure.hat(Green, "4485")  # Cap
 print figure.torso(Red, "973")  # Torso
 print figure.left_arm(Red)
 print figure.left_hand(Yellow)
 print figure.right_arm(Red, -60)
 print figure.right_hand(Yellow, -10)
-print figure.right_hand_item(Black, Vector(0, -1, -10), 0, "30132") # Gun Revolver
+print figure.right_hand_item(Black,
+                             Vector(0, -1, -10), 0, "30132")  # Gun Revolver
 print figure.hips(Blue)
 print figure.left_leg(Blue)
 print figure.right_leg(Blue, -30)
