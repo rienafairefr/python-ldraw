@@ -1,17 +1,25 @@
 #! /usr/bin/env python
+# coding=utf-8
 
 from distutils.core import setup
+
+from setuptools import find_packages
 
 import ldraw
 
 setup(
-    name         = "python-ldraw",
-    description  = "A package for creating LDraw format files.",
-    author       = "David Boddie",
-    author_email = "david@boddie.org.uk",
-    url          = "http://www.boddie.org.uk/david/Projects/Python/ldraw/",
-    version      = ldraw.__version__,
-    packages     = ["ldraw",
-                    "ldraw/writers"],
-    scripts      = ["tools/ldr2pov.py"]
-    )
+    name="pyldraw",
+    description="A package for working with LDraw format files.",
+    author="Matthieu Berthomé; David Boddie",
+    author_email="rienairefr@gmail.com; david@boddie.org.uk",
+    version=ldraw.__version__,
+    packages=find_packages(),
+    entry_points={
+        'console_scripts': [
+            'ldr2inv = ldraw_tools.ldr2inv:main',
+            'ldr2png = ldraw_tools.ldr2png:main',
+            'ldr2pov = ldraw_tools.ldr2pov:main',
+            'ldr2svg = ldraw_tools.ldr2svg:main',
+        ],
+    },
+)

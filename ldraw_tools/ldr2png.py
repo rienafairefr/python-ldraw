@@ -20,7 +20,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+import argparse
 import sys
 import cmdsyntax
 from ldraw.geometry import Vector
@@ -32,15 +32,9 @@ from PyQt4.QtGui import QApplication
 
 
 if __name__ == "__main__":
+    #"<LDraw parts file> <LDraw file> <PNG file> <image size> <camera position> [<look-at position>] [--distance <eye to viewport distance>] [--stroke-colour <stroke colour>] [--sky <background colour>]"
 
-    syntax = "<LDraw parts file> <LDraw file> <PNG file> <image size> <camera position> [<look-at position>] [--distance <eye to viewport distance>] [--stroke-colour <stroke colour>] [--sky <background colour>]"
-    syntax_obj = cmdsyntax.Syntax(syntax)
-    matches = syntax_obj.get_args(sys.argv[1:])
-    
-    if len(matches) != 1:
-        sys.stderr.write("Usage: %s %s\n\n" % (sys.argv[0], syntax))
-        sys.stderr.write("ldr2png.py (ldraw package version %s)\n" % __version__)
-        sys.stderr.write("Converts the LDraw file to a PNG file.\n\n"
+    parser = argparse.ArgumentParser(description="Converts the LDraw file to a PNG file.\n\n"
                          "The image size must be specified in the format <width>x<height> where the width\n"
                          "and height are measured in pixels.\n\n"
                          "The camera and look-at positions are x,y,z arguments in LDraw scene coordinates\n"
@@ -49,26 +43,42 @@ if __name__ == "__main__":
                          "a length in LDraw scene coordinates. Its default value is 1.0.\n\n"
                          "The optional sky background and stroke colours are PNG colours, either specified as\n"
                          "#rrggbb or as a named colour.\n\n")
-        sys.exit(1)
+    parser.add_argument('ldraw_parts_file')
+    parser.add_argument('ldraw_file')
+    parser.add_argument('png_file')
+    parser.add_argument('image_size')
+    parser.add_argument('camera_position')
+    parser.add_argument('look_at_position', required=False, default="0,0,0")
+    parser.add_argument('--distance', type=float, default=1.0)
+    parser.add_argument('--stroke-colour', dest='stroke_colour')
+    parser.add_argument('--sky')
+
+    args = parser.parse_args()
+
+    parts_path = args.ldraw_parts_file
+    ldraw_path = args.ldraw_file
+    inventory_path = args.output
+
+
+    syntax_obj = cmdsyntax.Syntax(syntax)
+
+    parts_path = args.ldraw_parts_file
+    ldraw_path = args.ldraw_file
+    png_path = args.png_file
+    distance = args.distance
     
-    match = matches[0]
-    parts_path = match["LDraw parts file"]
-    ldraw_path = match["LDraw file"]
-    png_path = match["PNG file"]
-    distance = float(match.get("eye to viewport distance", 1.0))
-    
-    image_dimensions = match["image size"].split("x")
+    image_dimensions = args.image_size.split("x")
     if len(image_dimensions) != 2:
-        sys.stderr.write("Incorrect number of values specified for the image size: %s\n" % match["image size"])
+        sys.stderr.write("Incorrect number of values specified for the image size: %s\n" % args.image_size)
         sys.exit(1)
     try:
         image_size = map(int, image_dimensions)
     except ValueError:
-        sys.stderr.write("Non-integer value specified for the image size: %s\n" % match["image size"])
+        sys.stderr.write("Non-integer value specified for the image size: %s\n" % args.image_size)
         sys.exit(1)
     
-    camera_position = Vector(*map(float, match["camera position"].split(",")))
-    look_at_position = Vector(*map(float, match.get("look-at position", "0.0,0.0,0.0").split(",")))
+    camera_position = Vector(*map(float, args.camera_position.split(",")))
+    look_at_position = Vector(*map(float, args.look_at_position.split(",")))
     
     parts = Parts(parts_path)
     
@@ -78,13 +88,13 @@ if __name__ == "__main__":
         sys.stderr.write("Failed to read LDraw file: %s\n" % ldraw_path)
         sys.exit(1)
     
-    if match.has_key("sky"):
-        background_colour = match["background colour"]
+    if args.sky:
+        background_colour = args.sky
     else:
         background_colour = "#000000"
     
     try:
-        stroke_colour = match["stroke colour"]
+        stroke_colour = args.stroke_colour
     except KeyError:
         stroke_colour = None
     

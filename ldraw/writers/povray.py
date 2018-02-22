@@ -19,10 +19,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from ldraw.geometry import Identity, Vector
-from ldraw.parts import Parts, Quadrilateral, Triangle
-from ldraw.pieces import Piece
 from ldraw.colours import Current
+from ldraw.geometry import Vector
+from ldraw.parts import Quadrilateral, Triangle
+from ldraw.pieces import Piece
+
 
 class POVRayWriter:
 
