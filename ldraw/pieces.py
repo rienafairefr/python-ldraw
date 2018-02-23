@@ -24,9 +24,7 @@ from geometry import Identity, Vector
 
 
 class Piece:
-
     def __init__(self, colour, position, matrix, part, group=None):
-
         self.position = position
         self.colour = colour
         self.matrix = matrix
@@ -36,16 +34,13 @@ class Piece:
             group.add_piece(self)
 
     def __repr__(self):
-
         if self.group:
             position = self.group.position + self.group.matrix * self.position
             matrix = self.group.matrix * self.matrix
         else:
             position = self.position
             matrix = self.matrix
-
         tup = tuple(reduce(lambda row1, row2: row1 + row2, matrix.rows))
-
         return ("1 %i " % self.colour.value) + \
                ("%f " * 3) % (position.x, position.y, position.z) + \
                ("%f " * 9) % tup + \
