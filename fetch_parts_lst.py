@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-from urllib import urlretrieve
 import zipfile
 import os
 import io
 
-from subprocess import check_call, CalledProcessError
+from subprocess import check_call
 
+from ldraw.compat import urlretrieve
 
 url = 'http://www.ldraw.org/library/updates/complete.zip'
 
