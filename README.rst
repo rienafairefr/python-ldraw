@@ -1,3 +1,8 @@
+.. image:: https://coveralls.io/repos/github/rienafairefr/python-ldraw/badge.svg?branch=master
+:target: https://coveralls.io/github/rienafairefr/python-ldraw?branch=master
+.. image:: https://travis-ci.org/rienafairefr/python-ldraw.svg?branch=master
+    :target: https://travis-ci.org/rienafairefr/python-ldraw
+
 This repo is a git copy of the repository at
 https://anonscm.debian.org/hg/python-ldraw/main
 
