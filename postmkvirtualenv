@@ -15,6 +15,11 @@ lib_system_path=$(${var[-1]} -c "$get_python_lib_cmd")
 for lib in ${libs[@]}
 do
     echo "lib in system: "$lib_system_path/$lib
+
+    if [ ! -d "$lib_system_path/$lib" ]; then
+      echo "lib in system doesnt exit !"
+      exit -1
+    fi
     echo "link in virtualenv: "$lib_virtualenv_path/$lib
     ln -s $lib_system_path/$lib $lib_virtualenv_path/$lib
 done
