@@ -21,9 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import re
-from colours import Colour
-from geometry import Matrix, Vector
-from pieces import Piece
+from ldraw.colours import Colour
+from ldraw.geometry import Matrix, Vector
+from ldraw.pieces import Piece
 import codecs
 
 
