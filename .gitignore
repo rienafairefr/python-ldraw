@@ -6,3 +6,4 @@ tmp/
 \.pytest_cache/
 \.coverage
 \.tox
+tmp/
