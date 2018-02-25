@@ -5,8 +5,6 @@ apt:
   - dos2unix
 python:
 - 2.7
-- 3.4
-- 3.5
 install:
 - PACKAGE_VERSION=`python setup.py --version`
 - TAG_NAME=v$PACKAGE_VERSION
