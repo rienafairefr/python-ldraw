@@ -19,22 +19,22 @@ def tool_test(func, suffix):
 
 
 def test_ldr2inv():
-    tool_test(lambda(f): ldr2inv(PARTS_PATH, INPUT_PATH, f), '.inv')
+    tool_test(lambda f: ldr2inv(PARTS_PATH, INPUT_PATH, f), '.inv')
 
 
 def test_ldr2png():
-    tool_test(lambda(f): ldr2png(PARTS_PATH, INPUT_PATH, f,
+    tool_test(lambda f: ldr2png(PARTS_PATH, INPUT_PATH, f,
             50, '800x800', '100,100,100', '0,0,0',
             '#123456', '#FF0000'),'.png')
 
 
 def test_ldr2pov():
-    tool_test(lambda(f): ldr2pov(PARTS_PATH, INPUT_PATH, f,
+    tool_test(lambda f: ldr2pov(PARTS_PATH, INPUT_PATH, f,
             '100,100,100', '0,0,0',
             '#123456'), '.pov')
 
 
 def test_ldr2svg():
-    tool_test(lambda(f): ldr2svg(PARTS_PATH, INPUT_PATH, f,
+    tool_test(lambda f: ldr2svg(PARTS_PATH, INPUT_PATH, f,
             '800x800','100,100,100', '0,0,0',
             '#123456'), '.svg')
