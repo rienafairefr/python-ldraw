@@ -5,3 +5,4 @@ complete.zip
 tmp/
 \.pytest_cache/
 \.coverage
+\.tox

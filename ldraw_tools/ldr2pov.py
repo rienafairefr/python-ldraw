@@ -46,13 +46,13 @@ def main():
 
     args = parser.parse_args()
 
-    parts_path = args.ldraw_parts_file
-    ldraw_path = args.ldraw_file
-    pov_path = args.pov_file
-    camera_position = args.camera_position
-    look_at_position = args.look_at_position
+    ldr2pov(args.ldraw_parts_file, args.ldraw_file, args.pov_file,
+            args.camera_position, args.look_at_position, args.sky)
 
-    parts = Parts(parts_path)
+
+def ldr2pov(ldraw_parts_path, ldraw_path, pov_path,
+            camera_position, look_at_position, sky):
+    parts = Parts(ldraw_parts_path)
 
     try:
         model = Part(ldraw_path)
@@ -92,14 +92,14 @@ def main():
                      ", ".join(look_at_position.split(",")))
         )
 
-        if args.sky:
+        if sky:
             pov_file.write(
                 "sky_sphere {\n"
                 "  pigment\n"
                 "  {\n"
                 "    rgb <%s>\n"
                 "  }\n"
-                "}\n" % args.sky
+                "}\n" % sky
             )
 
     for message, part in writer.warnings.keys():

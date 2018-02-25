@@ -20,10 +20,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+import codecs
 import sys
 import argparse
 from ldraw.parts import Comment, Part, Parts, PartError
+from ldraw.pieces import Piece
 
 
 def main():
@@ -34,10 +35,10 @@ def main():
 
     args = parser.parse_args()
 
-    parts_path = args.ldraw_parts_file
-    ldraw_path = args.ldraw_file
-    inventory_path = args.output
+    ldr2inv(args.ldraw_parts_file, args.ldraw_file, args.output)
 
+
+def ldr2inv(parts_path, ldraw_path, inventory_path):
     parts = Parts(parts_path)
 
     try:
@@ -50,41 +51,36 @@ def main():
     length = 0
 
     for obj in model.objects:
-
-        if obj.part == "LIGHT":
+        if not isinstance(obj, Piece):
             continue
 
         name = ""
-        for component in parts.part(code=obj.part).objects:
+        subpart = parts.part(code=obj.part)
+        if subpart:
+            for component in subpart.objects:
+                if isinstance(component, Comment):
+                    name = component.text
+                    break
+            else:
+                sys.stderr.write("No name information for part: %s\n" % obj.text)
 
-            if isinstance(component, Comment):
-                name = component.text
-                break
-        else:
-            sys.stderr.write("No name information for part: %s\n" % obj.part)
-
-        inventory[name] = inventory.get(name, 0) + 1
-        length = max(len(name), length)
+            inventory[name] = inventory.get(name, 0) + 1
+            length = max(len(name), length)
 
     length += (4 - (length % 4))
 
     try:
-        f = open(inventory_path, "w")
+        with codecs.open(inventory_path, 'w', encoding='utf-8') as f:
+            items = inventory.items()
+            items.sort()
 
-        items = inventory.items()
-        items.sort()
-
-        for name, number in items:
-            padding = " " * (length - len(name))
-            f.write("%s%s%i\n" % (name, padding, number))
-
-        f.close()
+            for name, number in items:
+                padding = " " * (length - len(name))
+                f.write("%s%s%i\n" % (name, padding, number))
 
     except IOError:
         sys.stderr.write("Failed to write inventory file: %s\n" % inventory_path)
         sys.exit(1)
-
-    sys.exit()
 
 
 if __name__ == "__main__":

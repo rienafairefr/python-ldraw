@@ -24,4 +24,5 @@ setup(
             'ldr2svg = ldraw_tools.ldr2svg:main',
         ],
     },
+    install_requires=['numpy']
 )

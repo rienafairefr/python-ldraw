@@ -50,13 +50,15 @@ def main():
     parser.add_argument('--sky')
 
     args = parser.parse_args()
+    ldr2svg(args.ldraw_parts_file, args.ldraw_file, args.svg_file,
+            args.viewport_size, args.camera_position, args.look_at_position, args.sky)
 
-    parts_path = args.ldraw_parts_file
-    ldraw_path = args.ldraw_file
-    svg_path = args.svg_file
-    viewport_size = map(float, args.viewport_size.split("x"))
-    camera_position = Vector(*map(float, args.camera_position.split(",")))
-    look_at_position = Vector(*map(float, args.look_at_position.split(",")))
+
+def ldr2svg(parts_path, ldraw_path, svg_path,
+            viewport_size, camera_position, look_at_position, background_colour):
+    viewport_size = map(float, viewport_size.split("x"))
+    camera_position = Vector(*map(float, camera_position.split(",")))
+    look_at_position = Vector(*map(float, look_at_position.split(",")))
 
     parts = Parts(parts_path)
 
@@ -65,11 +67,6 @@ def main():
     except PartError:
         sys.stderr.write("Failed to read LDraw file: %s\n" % ldraw_path)
         sys.exit(1)
-
-    if args.sky:
-        background_colour = args.sky
-    else:
-        background_colour = None
 
     if camera_position == look_at_position:
         sys.stderr.write("Camera and look-at positions are the same.\n")

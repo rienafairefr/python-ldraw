@@ -22,15 +22,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import argparse
 import sys
-import cmdsyntax
 from ldraw.geometry import Vector
 from ldraw.parts import Part, Parts, PartError
 from ldraw.writers.png import PNGWriter
-from ldraw import __version__
 
-from PyQt4.QtGui import QApplication
 
-if __name__ == "__main__":
+def main():
     # "<LDraw parts file> <LDraw file> <PNG file> <image size> <camera position> [<look-at position>] [--distance <eye to viewport distance>] [--stroke-colour <stroke colour>] [--sky <background colour>]"
 
     parser = argparse.ArgumentParser(description="Converts the LDraw file to a PNG file.\n\n"
@@ -54,29 +51,27 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    parts_path = args.ldraw_parts_file
-    ldraw_path = args.ldraw_file
-    inventory_path = args.output
+    ldr2png(args.ldraw_parts_file, args.ldraw_file, args.png_file,
+            args.distance, args.image_size, args.camera_position, args.look_at_position,
+            args.sky, args.stroke_colour)
 
-    syntax_obj = cmdsyntax.Syntax(syntax)
 
-    parts_path = args.ldraw_parts_file
-    ldraw_path = args.ldraw_file
-    png_path = args.png_file
-    distance = args.distance
+def ldr2png(parts_path, ldraw_path, png_path,
+            distance, image_size, camera_position, look_at_position,
+            sky, stroke_colour):
 
-    image_dimensions = args.image_size.split("x")
+    image_dimensions = image_size.split("x")
     if len(image_dimensions) != 2:
-        sys.stderr.write("Incorrect number of values specified for the image size: %s\n" % args.image_size)
+        sys.stderr.write("Incorrect number of values specified for the image size: %s\n" % image_size)
         sys.exit(1)
     try:
         image_size = map(int, image_dimensions)
     except ValueError:
-        sys.stderr.write("Non-integer value specified for the image size: %s\n" % args.image_size)
+        sys.stderr.write("Non-integer value specified for the image size: %s\n" % image_size)
         sys.exit(1)
 
-    camera_position = Vector(*map(float, args.camera_position.split(",")))
-    look_at_position = Vector(*map(float, args.look_at_position.split(",")))
+    camera_position = Vector(*map(float, camera_position.split(",")))
+    look_at_position = Vector(*map(float, look_at_position.split(",")))
 
     parts = Parts(parts_path)
 
@@ -86,15 +81,10 @@ if __name__ == "__main__":
         sys.stderr.write("Failed to read LDraw file: %s\n" % ldraw_path)
         sys.exit(1)
 
-    if args.sky:
-        background_colour = args.sky
+    if sky:
+        background_colour = sky
     else:
         background_colour = "#000000"
-
-    try:
-        stroke_colour = args.stroke_colour
-    except KeyError:
-        stroke_colour = None
 
     if camera_position == look_at_position:
         sys.stderr.write("Camera and look-at positions are the same.\n")
@@ -118,4 +108,6 @@ if __name__ == "__main__":
                  background_colour=background_colour,
                  stroke_colour=stroke_colour)
 
-    sys.exit()
+
+if __name__ == "__main__":
+    main()
