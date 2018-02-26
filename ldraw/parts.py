@@ -34,7 +34,7 @@ class PartError(Exception):
 DOT_DAT = re.compile(r"\.DAT", flags=re.IGNORECASE)
 
 
-class Parts:
+class Parts(object):
     ColourAttributes = ("CHROME", "PEARLESCENT", "RUBBER", "MATTE_METALLIC",
                         "METAL")
 
@@ -213,7 +213,7 @@ class Parts:
             raise PartError("Failed to load primitives file: %s" % path)
 
 
-class Part:
+class Part(object):
     def __init__(self, path):
         self._handlers = {
             "0": self._comment_or_meta,
@@ -311,24 +311,24 @@ class BlankLine:
     pass
 
 
-class Comment:
+class Comment(object):
     def __init__(self, text):
         self.text = text
 
 
-class MetaCommand:
+class MetaCommand(object):
     def __init__(self, text):
         self.text = text
 
 
-class Line:
+class Line(object):
     def __init__(self, colour, p1, p2):
         self.colour = colour
         self.p1 = p1
         self.p2 = p2
 
 
-class Triangle:
+class Triangle(object):
     def __init__(self, colour, p1, p2, p3):
         self.colour = colour
         self.p1 = p1
@@ -336,7 +336,7 @@ class Triangle:
         self.p3 = p3
 
 
-class Quadrilateral:
+class Quadrilateral(object):
     def __init__(self, colour, p1, p2, p3, p4):
         self.colour = colour
         self.p1 = p1
@@ -345,7 +345,7 @@ class Quadrilateral:
         self.p4 = p4
 
 
-class OptionalLine:
+class OptionalLine(object):
     def __init__(self, colour, p1, p2, p3, p4):
         self.colour = colour
         self.p1 = p1
