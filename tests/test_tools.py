@@ -1,10 +1,9 @@
-import codecs
 import tempfile
 
-from ldraw_tools.ldr2inv import ldr2inv
-from ldraw_tools.ldr2png import ldr2png
-from ldraw_tools.ldr2pov import ldr2pov
-from ldraw_tools.ldr2svg import ldr2svg
+from ldraw.tools.ldr2inv import ldr2inv
+from ldraw.tools.ldr2png import ldr2png
+from ldraw.tools.ldr2pov import ldr2pov
+from ldraw.tools.ldr2svg import ldr2svg
 
 PARTS_PATH = 'tmp/ldraw/parts.lst'
 INPUT_PATH = 'tests/test_data/car.ldr'

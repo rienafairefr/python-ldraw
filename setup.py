@@ -18,10 +18,10 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'ldr2inv = ldraw_tools.ldr2inv:main',
-            'ldr2png = ldraw_tools.ldr2png:main',
-            'ldr2pov = ldraw_tools.ldr2pov:main',
-            'ldr2svg = ldraw_tools.ldr2svg:main',
+            'ldr2inv = ldraw.tools.ldr2inv:main',
+            'ldr2png = ldraw.tools.ldr2png:main',
+            'ldr2pov = ldraw.tools.ldr2pov:main',
+            'ldr2svg = ldraw.tools.ldr2svg:main',
         ],
     },
     install_requires=['numpy']
