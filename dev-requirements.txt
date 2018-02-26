@@ -3,3 +3,10 @@ pytest
 coveralls
 pytest-cov
 mock
+PyYaml
+appdirs
+pymklist
+pystache
+attrdict
+inflect
+progress

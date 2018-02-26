@@ -34,6 +34,7 @@ setup(
         'attrdict',
         'inflect',
         'progress',
-        'PyYaml'
+        'PyYaml',
+        'Pillow'
     ]
 )

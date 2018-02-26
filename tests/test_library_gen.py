@@ -40,15 +40,13 @@ def test_library_gen_import(mocked_library_path):
 
     assert library.__all__ == ['colours']
 
-    from ldraw.library.parts import *
-
     assert library.parts.__all__ == ['others']
 
-    from ldraw.library.parts.others import *
+    from ldraw.library.parts.others import Brick2X4
 
     assert Brick2X4 == "3001"
 
-    from ldraw.library.colours import *
+    from ldraw.library.colours import ColoursByCode, ColoursByName, Reddish_Gold
 
     expected_color = Colour(189, "Reddish_Gold", "#AC8247", 255, ['PEARLESCENT'])
 

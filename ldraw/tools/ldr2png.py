@@ -22,6 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import argparse
 
+from PIL import ImageColor
+
 from ldraw.tools import (widthxheight, vector_position, get_model,
                          get_coordinate_system, verify_camera_look_at)
 from ldraw.writers.png import PNGWriter, PNGArgs
@@ -52,8 +54,8 @@ The optional sky background and stroke colours are PNG colours, either specified
     parser.add_argument('camera_position', type=vector_position)
     parser.add_argument('look_at_position', required=False, default=vector_position('0,0,0'))
     parser.add_argument('--distance', type=float, default=1.0)
-    parser.add_argument('--stroke-colour', dest='stroke_colour')
-    parser.add_argument('--sky', default='#000000')
+    parser.add_argument('--stroke-colour', dest='stroke_colour', type=ImageColor.getrgb)
+    parser.add_argument('--sky', default=ImageColor.getrgb('#000000'), type=ImageColor.getrgb)
 
     args = parser.parse_args()
 

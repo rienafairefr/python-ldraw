@@ -46,10 +46,7 @@ is still a work in progress. You can always specify parts by their LDraw code::
 Compatibility
 -------------
 
-Be warned that some parts of the library (only some ldr2*** tools and maybe others) require a working PyQt4/SIP installation, and for now
-have only been tested on Python 2.7.
-
-The other parts seem to work fine on Python 3.4+
+For now this has only been tested on Python 2.7.
 
 Installation
 ------------

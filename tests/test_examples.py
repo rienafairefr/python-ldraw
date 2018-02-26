@@ -1,13 +1,13 @@
 import contextlib
 import glob
 import os
-import StringIO
 import sys
 import tempfile
 
 import mock
 import pytest
 
+from ldraw.compat import StringIO, do_execfile
 
 @pytest.fixture
 def mocked_parts_lst():
@@ -21,7 +21,7 @@ def mocked_parts_lst():
 def stdoutIO(stdout=None):
     old = sys.stdout
     if stdout is None:
-        stdout = StringIO.StringIO()
+        stdout = StringIO()
     sys.stdout = stdout
     yield stdout
     sys.stdout = old
@@ -38,7 +38,7 @@ def exec_example(name, save=False):
 
     import ldraw.library
     with stdoutIO() as s:
-        execfile(script_file, d, d)
+        do_execfile(script_file, d, d)
     content = s.getvalue()
     expected_path = os.path.join('tests', 'test_data', 'examples', '%s.ldr' % name)
     # uncomment to save

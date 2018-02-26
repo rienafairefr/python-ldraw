@@ -41,8 +41,6 @@ where each coordinate should be specified as a floating point number.
 The optional sky background colour is an SVG colour, either specified as
 #rrggbb or as a named colour.
 
-This tool requires PyQt4, built against Qt 4.4 or higher.
-
 """
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('ldraw_file')
@@ -52,7 +50,6 @@ This tool requires PyQt4, built against Qt 4.4 or higher.
     parser.add_argument('look_at_position', type=vector_position,
                         required=False, default=vector_position("0,0,0"))
     parser.add_argument('--sky')
-    parser.add_argument('--qt', default=True)
 
     args = parser.parse_args()
     svg_args = SVGArgs(args.viewport_size[0],
@@ -60,10 +57,10 @@ This tool requires PyQt4, built against Qt 4.4 or higher.
                        background_colour=args.background_colour)
 
     ldr2svg(args.ldraw_file, args.svg_file,
-            args.camera_position, args.look_at_position, args.qt, svg_args)
+            args.camera_position, args.look_at_position, svg_args)
 
 
-def ldr2svg(ldraw_path, svg_path, camera_position, look_at_position, use_qt, svg_args): # pylint: disable=too-many-arguments
+def ldr2svg(ldraw_path, svg_path, camera_position, look_at_position, svg_args): # pylint: disable=too-many-arguments
     """ ldr2svg actual implementation """
     verify_camera_look_at(camera_position, look_at_position)
 
@@ -72,12 +69,8 @@ def ldr2svg(ldraw_path, svg_path, camera_position, look_at_position, use_qt, svg
     system = get_coordinate_system(camera_position, look_at_position)
 
     with open(svg_path, "w") as svg_file:
-        if use_qt:
-            from ldraw.writers.qtsvg import QTSVGWriter
-            writer = QTSVGWriter(camera_position, system, parts)
-        else:
-            from ldraw.writers.svg import SVGWriter
-            writer = SVGWriter(camera_position, system, parts)
+        from ldraw.writers.svg import SVGWriter
+        writer = SVGWriter(camera_position, system, parts)
         writer.write(model, svg_file, svg_args)
 
 

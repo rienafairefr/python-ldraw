@@ -110,8 +110,8 @@ def generate_section(parts, parts_dir, section_name, section_parts):
     progress_bar.finish()
     parts_list = [x for x in parts_list if x != {}]
     if section_name == 'others':
-        parts_list.sort(key=lambda r: r.get('category'))
-        for name, grouped in itertools.groupby(parts_list, key=lambda r: r.get('category')):
+        parts_list.sort(key=lambda r: r.get('category', 'others'))
+        for name, grouped in itertools.groupby(parts_list, key=lambda r: r.get('category', 'others')):
             grouped = list(grouped)
             if name is None:
                 name = 'others'
