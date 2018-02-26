@@ -24,8 +24,6 @@ from ldraw.geometry import Identity, Vector
 from ldraw.parts import Parts, Quadrilateral, Triangle, Line
 from ldraw.pieces import Piece
 
-from ldraw.writers.svgtools import Poly2
-
 
 class Polygon:
     def __init__(self, zmin, points, colour):

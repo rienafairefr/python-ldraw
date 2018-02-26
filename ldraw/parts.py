@@ -21,13 +21,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import re
-from colours import Colour
-from geometry import Matrix, Vector
-from pieces import Piece
+from ldraw.colours import Colour
+from ldraw.geometry import Matrix, Vector
+from ldraw.pieces import Piece
+import codecs
 
 
 class PartError(Exception):
     pass
+
+
+DOT_DAT = re.compile(r"\.DAT", flags=re.IGNORECASE)
 
 
 class Parts:
@@ -72,9 +76,9 @@ class Parts:
     def load(self, path):
 
         try:
-            f = open(path)
+            f = codecs.open(path, 'r', encoding='utf-8')
             for line in f.readlines():
-                pieces = line.split(".DAT")
+                pieces = re.split(DOT_DAT, line)
                 if len(pieces) != 2:
                     break
                 code = pieces[0]
@@ -198,9 +202,9 @@ class Parts:
 
     def _load_primitives(self, path):
         try:
-            f = open(path)
+            f = codecs.open(path, 'r', encoding='utf-8')
             for line in f.readlines():
-                pieces = line.split(".DAT")
+                pieces = re.split(DOT_DAT, line)
                 if len(pieces) != 2:
                     break
                 code = pieces[0]
@@ -225,7 +229,7 @@ class Part:
     def load(self, path):
         self.path = path
         try:
-            lines = open(path).readlines()
+            lines = codecs.open(path, 'r', encoding='utf-8').readlines()
         except IOError:
             raise PartError("Failed to read part file: %s" % path)
         objects = []

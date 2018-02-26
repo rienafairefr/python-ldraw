@@ -19,8 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import sets
-from geometry import Identity, Vector
+from ldraw.geometry import Identity, Vector
 
 
 class Piece:
@@ -51,7 +50,7 @@ class Group:
     def __init__(self, position=Vector(0, 0, 0), matrix=Identity()):
         self.position = position
         self.matrix = matrix
-        self.pieces = sets.Set()
+        self.pieces = set()
 
     def __repr__(self):
         text = []

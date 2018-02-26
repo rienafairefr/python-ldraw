@@ -1,8 +1,16 @@
+.. image:: https://coveralls.io/repos/github/rienafairefr/python-ldraw/badge.svg?branch=master
+:target: https://coveralls.io/github/rienafairefr/python-ldraw?branch=master
+.. image:: https://travis-ci.org/rienafairefr/python-ldraw.svg?branch=master
+    :target: https://travis-ci.org/rienafairefr/python-ldraw
+
 This repo is a git copy of the repository at
 https://anonscm.debian.org/hg/python-ldraw/main
 
 It will not try to stay updated with the upstream repo of the original author, David Boddie
 The goal is to see what might be done, the original repo hasn't been updated since 2011
+
+Some of the documentation underneath might be outdated
+with the current state of the repo until the API congeals, sorry about that
 
 ======================
 pyldraw Python Package
@@ -26,6 +34,13 @@ descriptions using the Python_ programming language. Pieces are specified by
 their positions, orientations and other properties in normal executable Python
 scripts which are run to create model files.
 
+Compatibility
+-------------
+
+Be warned that some parts of the library (only some ldr2*** tools) require a working PyQt4/SIP installation, and for now
+have only been tested on Python 2.7.
+
+The other parts seem to work fine on Python 3.4+
 
 Installation
 ------------

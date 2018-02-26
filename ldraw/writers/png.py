@@ -24,7 +24,7 @@ from ldraw.geometry import Identity, Vector
 from ldraw.parts import Parts, Quadrilateral, Triangle, Line
 from ldraw.pieces import Piece
 
-import Numeric
+import numpy
 
 from PyQt4.QtCore import QPointF, Qt
 from PyQt4.QtGui import QBrush, QColor, QImage, QPainter, QPen, QPolygonF, \
@@ -181,7 +181,7 @@ class PNGWriter:
 
     def write(self, model, png_path, distance, image_size, stroke_colour=None, background_colour=None):
         image = QImage(image_size[0], image_size[1], QImage.Format_RGB16)
-        depth = Numeric.empty((image_size[0], image_size[1]), "f")
+        depth = numpy.empty((image_size[0], image_size[1]), "f")
         depth[:] = 1 << 32 - 1
         polygons = self._polygons_from_objects(model)
         if stroke_colour:

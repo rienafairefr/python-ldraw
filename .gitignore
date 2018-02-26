@@ -2,3 +2,8 @@
 *.pyc
 pyldraw\.egg-info/
 complete.zip
+tmp/
+\.pytest_cache/
+\.coverage
+\.tox
+tmp/
