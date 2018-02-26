@@ -12,7 +12,7 @@ INPUT_PATH = 'tests/test_data/car.ldr'
 def tool_test(func, suffix):
     fd, file = tempfile.mkstemp(suffix=suffix)
     func(file)
-    content = open(file,'r').read()
+    content = open(file, 'r').read()
     expected = open('tests/test_data/car' + suffix).read()
     assert expected == content
 
@@ -23,17 +23,17 @@ def test_ldr2inv():
 
 def test_ldr2png():
     tool_test(lambda f: ldr2png(PARTS_PATH, INPUT_PATH, f,
-            50, '800x800', '100,100,100', '0,0,0',
-            '#123456', '#FF0000'),'.png')
+                                50, '800x800', '100,100,100', '0,0,0',
+                                '#123456', '#FF0000'), '.png')
 
 
 def test_ldr2pov():
     tool_test(lambda f: ldr2pov(PARTS_PATH, INPUT_PATH, f,
-            '100,100,100', '0,0,0',
-            '#123456'), '.pov')
+                                '100,100,100', '0,0,0',
+                                '#123456'), '.pov')
 
 
 def test_ldr2svg():
     tool_test(lambda f: ldr2svg(PARTS_PATH, INPUT_PATH, f,
-            '800x800','100,100,100', '0,0,0',
-            '#123456'), '.svg')
+                                '800x800', '100,100,100', '0,0,0',
+                                '#123456'), '.svg')

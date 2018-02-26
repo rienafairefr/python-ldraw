@@ -228,7 +228,7 @@ class PNGWriter:
                     matrix = obj.matrix
                     polygons += self._polygons_from_objects(
                         part, colour, current_matrix * matrix,
-                                      current_position + current_matrix * obj.position)
+                        current_position + current_matrix * obj.position)
                 else:
                     sys.stderr.write("Part not found: %s\n" % obj.part)
             # elif isinstance(obj, Line):

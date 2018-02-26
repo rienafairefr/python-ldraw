@@ -151,8 +151,8 @@ class SVGWriter:
                     matrix = obj.matrix
                     polygons += self._polygons_from_objects(
                         part, top_level_piece or obj, colour,
-                              current_matrix * matrix,
-                              current_position + current_matrix * obj.position)
+                        current_matrix * matrix,
+                        current_position + current_matrix * obj.position)
                 else:
                     sys.stderr.write("Part not found: %s\n" % obj.part)
             elif isinstance(obj, Line):

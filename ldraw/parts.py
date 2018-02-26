@@ -74,7 +74,6 @@ class Parts:
         self.load(path)
 
     def load(self, path):
-
         try:
             f = codecs.open(path, 'r', encoding='utf-8')
             for line in f.readlines():

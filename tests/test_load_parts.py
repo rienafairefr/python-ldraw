@@ -10,4 +10,3 @@ def test_load_parts():
     part = p.part(code='3001')
 
     assert part.path == 'tests/test_ldraw/parts/3001.dat'
-
