@@ -8,33 +8,27 @@ import os
 from ldraw.parts import Parts
 import pystache
 
-from ldraw.utils import JsonEncoder, JsonDecoder
-
+from ldraw.utils import JsonEncoder, JsonDecoder, clean, camel
 
 p = Parts('tmp/ldraw/parts.lst')
 
-colours_template = codecs.open(os.path.join('templates', 'colours.mustache'), 'r', encoding='utf-8').read()
-colours_template = pystache.parse(colours_template)
+colours_template_data = codecs.open(os.path.join('templates', 'colours.mustache'), 'r', encoding='utf-8').read()
+colours_template = pystache.parse(colours_template_data)
 
-colours = [{'code':code, 'rgb':name} for name,code in p.colours.items() if isinstance(code,str)]
+context = {'colours': [{'code': c.code, 'name': camel(clean(c.name)),
+                        'alpha': c.alpha,
+                        'rgb': c.rgb, 'colour_attributes': c.colour_attributes} for c in p.colours_list]}
 
+colours_str = pystache.render(colours_template, context=context)
+colours_py = os.path.join('ldraw', 'library', 'colours.py')
 
+with codecs.open(colours_py, 'w', encoding='utf-8') as generated_file:
+    generated_file.write(colours_str)
 
 exit(0)
 
 parts_template = codecs.open(os.path.join('templates', 'metaparts.mustache'), 'r', encoding='utf-8').read()
 parts_template = pystache.parse(parts_template)
-
-
-def clean(varStr):
-    varStr = re.sub('\W|^(?=\d)', '_', varStr)
-    varStr = re.sub('\_+', '_', varStr)
-    varStr = re.sub('_x_', 'x', varStr)
-    return varStr
-
-
-def camel(input):
-    return ''.join(x for x in input.title() if not x.isspace())
 
 
 def get_parts():
@@ -70,7 +64,8 @@ for section, parts in sections:
     parts_list = [get_part_dict(description) for description in parts]
     parts_list = sorted(parts_list, key=lambda o: o['description'])
     part_str = pystache.render(parts_template, context={'parts': parts_list})
-    parts_py = os.path.join('ldraw', 'library', clean(section.lower()) + ('s' if not section.endswith('s') else '') + '.py')
+    parts_py = os.path.join('ldraw', 'library',
+                            clean(section.lower()) + ('s' if not section.endswith('s') else '') + '.py')
     with codecs.open(parts_py, 'w', encoding='utf-8') as generated_file:
         generated_file.write(part_str)
 

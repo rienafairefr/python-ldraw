@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import codecs
 import os
 import re
-from ldraw.colours import Colour
+from ldraw.colour import Colour
 from ldraw.geometry import Matrix, Vector
 from ldraw.pieces import Piece
 import codecs
@@ -30,8 +30,10 @@ import codecs
 class PartError(Exception):
     pass
 
+
 DOT_DAT = re.compile(r"\.DAT", flags=re.IGNORECASE)
 ENDS_DOT_DAT = re.compile(r"\.DAT$", flags=re.IGNORECASE)
+
 
 class Parts(object):
     ColourAttributes = ("CHROME", "PEARLESCENT", "RUBBER", "MATTE_METALLIC",
@@ -43,6 +45,7 @@ class Parts(object):
         self.parts_subdirs = {}
         self.parts = {}
         self.colours = {}
+        self.colours_list = []
         self.alpha_values = {}
         self.colour_attributes = {}
         self.Hats = {}
@@ -179,9 +182,10 @@ class Parts(object):
                 try:
                     name = pieces[1]
                     code = int(pieces[pieces.index("CODE") + 1])
-                    value = pieces[pieces.index("VALUE") + 1]
-                    self.colours[name] = value
-                    self.colours[code] = value
+                    rgb = pieces[pieces.index("VALUE") + 1]
+                    self.colours[name] = rgb
+                    self.colours[code] = rgb
+
                 except (ValueError, IndexError):
                     continue
                 try:
@@ -197,6 +201,10 @@ class Parts(object):
                     if attribute in pieces:
                         self.colour_attributes[name].append(attribute)
                         self.colour_attributes[code].append(attribute)
+
+                self.colours_list.append(Colour(code, name, rgb,
+                                                self.alpha_values.get(name, 255),
+                                                self.colour_attributes[name]))
 
     def _load_primitives(self, path):
         try:

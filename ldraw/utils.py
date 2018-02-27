@@ -82,3 +82,14 @@ def classproperty(func):
         func = classmethod(func)
 
     return ClassPropertyDescriptor(func)
+
+
+def clean(varStr):
+    varStr = re.sub('\W|^(?=\d)', '_', varStr)
+    varStr = re.sub('\_+', '_', varStr)
+    varStr = re.sub('_x_', 'x', varStr)
+    return varStr
+
+
+def camel(input):
+    return ''.join(x for x in input.title() if not x.isspace())

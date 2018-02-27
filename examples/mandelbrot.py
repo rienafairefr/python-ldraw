@@ -21,7 +21,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from ldraw.colours import *
+from ldraw.library.colours import *
 from ldraw.geometry import *
 from ldraw.pieces import *
 

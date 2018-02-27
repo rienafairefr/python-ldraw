@@ -14,6 +14,7 @@ ldraw/pieces.py
 ldraw/writers/__init__.py
 ldraw/writers/png.py
 ldraw/writers/povray.py
+ldraw/library.license.txt
 MANIFEST
 README.txt
 README.html

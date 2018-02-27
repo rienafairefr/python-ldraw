@@ -187,7 +187,7 @@ class Person:
 def test():
     import random
     from pieces import Piece
-    from colours import Yellow, LightGreen, Blue, Red, Green
+    from colour import Yellow, LightGreen, Blue, Red, Green
     random.seed()
     for x in range(-100, 200, 100):
         for z in range(-100, 200, 100):

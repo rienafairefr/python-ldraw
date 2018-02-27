@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import sys
 
-from ldraw.colours import Current
+from ldraw.library.colours import Main_Colour as Current
 from ldraw.geometry import Vector
 from ldraw.parts import Quadrilateral, Triangle
 from ldraw.pieces import Piece
