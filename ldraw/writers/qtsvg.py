@@ -103,7 +103,7 @@ class SVGWriter:
             for colour, colour_path in piece_dict.items():
                 if colour_path.isEmpty():
                     continue
-                rgb = self.parts.colours.get(colour, "#ffffff")
+                rgb = self.parts.colours.get(colour.value, "#ffffff")
                 shape = '<path style="fill:%s; opacity:%f" d="' % (
                     rgb, self._opacity_from_colour(colour))
                 i = 0
@@ -133,7 +133,7 @@ class SVGWriter:
             return colour.value
 
     def _opacity_from_colour(self, colour):
-        return self.parts.alpha_values.get(colour, 255) / 255.0
+        return self.parts.alpha_values.get(colour.value, 255) / 255.0
 
     def _polygons_from_objects(self, model, top_level_piece=None, current_colour=15, current_matrix=Identity(),
                                current_position=Vector(0, 0, 0)):

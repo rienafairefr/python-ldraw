@@ -68,7 +68,7 @@ class SVGWriter:
             svg_file.write('points="%.6f,%.6f %.6f,%.6f %.6f,%.6f %.6f,%.6f" />\n' % (
                 0.0, 0.0, width, 0.0, width, height, 0.0, height))
         for points, colour in shapes:
-            rgb = self.parts.colours.get(colour, "#ffffff")
+            rgb = self.parts.colours.get(colour.value, "#ffffff")
             if len(points) == 2:
                 svg_file.write('<line stroke="%s" ' % rgb)
                 svg_file.write('stroke-width="%s" ' % stroke_width)
@@ -98,7 +98,7 @@ class SVGWriter:
             return colour.value
 
     def _opacity_from_colour(self, colour):
-        return self.parts.alpha_values.get(colour, 255) / 255.0
+        return self.parts.alpha_values.get(colour.value, 255) / 255.0
 
     def _polygons_from_objects(self, model, current_colour=15, current_matrix=Identity(),
                                current_position=Vector(0, 0, 0)):

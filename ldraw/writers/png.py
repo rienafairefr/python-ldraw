@@ -258,7 +258,7 @@ class PNGWriter:
                 if r1.z >= 0 or r2.z >= 0 or r3.z >= 0:
                     continue
                 colour = self._current_colour(obj.colour, current_colour)
-                rgb = self.parts.colours.get(colour, "#ffffff")
+                rgb = self.parts.colours.get(colour.value, "#ffffff")
                 alpha = self._opacity_from_colour(colour)
                 polygons.append(Polygon([r1, r2, r3], rgb, alpha))
             elif isinstance(obj, Quadrilateral):
@@ -277,7 +277,7 @@ class PNGWriter:
                 if r1.z >= 0 or r2.z >= 0 or r3.z >= 0 or r4.z >= 0:
                     continue
                 colour = self._current_colour(obj.colour, current_colour)
-                rgb = self.parts.colours.get(colour, "#ffffff")
+                rgb = self.parts.colours.get(colour.value, "#ffffff")
                 alpha = self._opacity_from_colour(colour)
                 polygons.append(Polygon([r1, r2, r3, r4], rgb, alpha))
         return polygons
