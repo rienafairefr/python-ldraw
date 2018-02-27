@@ -27,7 +27,7 @@ class MatrixError(Exception):
     pass
 
 
-class Axis:
+class Axis(object):
     pass
 
 
@@ -43,7 +43,7 @@ class ZAxis(Axis):
     pass
 
 
-class AngleUnits:
+class AngleUnits(object):
     pass
 
 
@@ -55,7 +55,7 @@ class Degrees(AngleUnits):
     pass
 
 
-class Matrix:
+class Matrix(object):
     def __init__(self, rows):
         self.rows = rows
 
@@ -150,7 +150,7 @@ def Identity():
     return Matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
 
-class Vector:
+class Vector(object):
     def __init__(self, x, y, z):
         self.x, self.y, self.z = x, y, z
 

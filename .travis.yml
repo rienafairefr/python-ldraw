@@ -9,7 +9,9 @@ install:
 - PACKAGE_VERSION=`python setup.py --version`
 - TAG_NAME=v$PACKAGE_VERSION
 - pip install tox-travis
+- pip install -r dev-requirements.txt
 - ./fetch_parts_lst.py
+- ./generate.py
 before_install:
 - sudo apt-get -qq update
 - sudo apt-get install dos2unix python-pip python2.7-dev python3-pyqt4 libxext-dev python-qt4 qt4-dev-tools build-essential

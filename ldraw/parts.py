@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import re
-from ldraw.colours import Colour
+from ldraw.colour import Colour
 from ldraw.geometry import Matrix, Vector
 from ldraw.pieces import Piece
 import codecs
@@ -32,9 +32,10 @@ class PartError(Exception):
 
 
 DOT_DAT = re.compile(r"\.DAT", flags=re.IGNORECASE)
+ENDS_DOT_DAT = re.compile(r"\.DAT$", flags=re.IGNORECASE)
 
 
-class Parts:
+class Parts(object):
     ColourAttributes = ("CHROME", "PEARLESCENT", "RUBBER", "MATTE_METALLIC",
                         "METAL")
 
@@ -44,6 +45,7 @@ class Parts:
         self.parts_subdirs = {}
         self.parts = {}
         self.colours = {}
+        self.colours_list = []
         self.alpha_values = {}
         self.colour_attributes = {}
         self.Hats = {}
@@ -180,9 +182,10 @@ class Parts:
                 try:
                     name = pieces[1]
                     code = int(pieces[pieces.index("CODE") + 1])
-                    value = pieces[pieces.index("VALUE") + 1]
-                    self.colours[name] = value
-                    self.colours[code] = value
+                    rgb = pieces[pieces.index("VALUE") + 1]
+                    self.colours[name] = rgb
+                    self.colours[code] = rgb
+
                 except (ValueError, IndexError):
                     continue
                 try:
@@ -199,6 +202,10 @@ class Parts:
                         self.colour_attributes[name].append(attribute)
                         self.colour_attributes[code].append(attribute)
 
+                self.colours_list.append(Colour(code, name, rgb,
+                                                self.alpha_values.get(name, 255),
+                                                self.colour_attributes[name]))
+
     def _load_primitives(self, path):
         try:
             f = codecs.open(path, 'r', encoding='utf-8')
@@ -213,7 +220,7 @@ class Parts:
             raise PartError("Failed to load primitives file: %s" % path)
 
 
-class Part:
+class Part(object):
     def __init__(self, path):
         self._handlers = {
             "0": self._comment_or_meta,
@@ -263,7 +270,7 @@ class Part:
                 map(float, pieces[7:10]),
                 map(float, pieces[10:13])]
         part = pieces[13].upper()
-        if part.endswith(".DAT"):
+        if re.search(ENDS_DOT_DAT, part):
             part = part[:-4]
         return Piece(Colour(colour), Vector(*position), Matrix(rows), part)
 
@@ -311,24 +318,24 @@ class BlankLine:
     pass
 
 
-class Comment:
+class Comment(object):
     def __init__(self, text):
         self.text = text
 
 
-class MetaCommand:
+class MetaCommand(object):
     def __init__(self, text):
         self.text = text
 
 
-class Line:
+class Line(object):
     def __init__(self, colour, p1, p2):
         self.colour = colour
         self.p1 = p1
         self.p2 = p2
 
 
-class Triangle:
+class Triangle(object):
     def __init__(self, colour, p1, p2, p3):
         self.colour = colour
         self.p1 = p1
@@ -336,7 +343,7 @@ class Triangle:
         self.p3 = p3
 
 
-class Quadrilateral:
+class Quadrilateral(object):
     def __init__(self, colour, p1, p2, p3, p4):
         self.colour = colour
         self.p1 = p1
@@ -345,7 +352,7 @@ class Quadrilateral:
         self.p4 = p4
 
 
-class OptionalLine:
+class OptionalLine(object):
     def __init__(self, colour, p1, p2, p3, p4):
         self.colour = colour
         self.p1 = p1

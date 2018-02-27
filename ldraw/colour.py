@@ -1,5 +1,5 @@
 """
-__init__.py - Package file for the ldraw Python package.
+colours.py - Colour definitions for the Python ldraw package.
 
 Copyright (C) 2008 David Boddie <david@boddie.org.uk>
 
@@ -19,5 +19,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-__all__ = ["colour.py", "figure", "geometry", "parts", "pieces"]
-__version__ = "0.4.0"
+
+class Colour(object):
+    def __init__(self, code, name=None, rgb=None, alpha=None, colour_attributes=None):
+        self.code = code
+        self.name = name
+        self.rgb = rgb
+        self.alpha = alpha
+        self.colour_attributes = colour_attributes
+
+    def __eq__(self, other):
+        if isinstance(other, Colour):
+            return self.code == other.code
+        else:
+            return self.code == other
+
+    def __hash__(self):
+        return hash(self.code)

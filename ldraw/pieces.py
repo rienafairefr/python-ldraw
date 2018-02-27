@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from ldraw.geometry import Identity, Vector
 
 
-class Piece:
+class Piece(object):
     def __init__(self, colour, position, matrix, part, group=None):
         self.position = position
         self.colour = colour
@@ -40,13 +40,13 @@ class Piece:
             position = self.position
             matrix = self.matrix
         tup = tuple(reduce(lambda row1, row2: row1 + row2, matrix.rows))
-        return ("1 %i " % self.colour.value) + \
+        return ("1 %i " % self.colour.code) + \
                ("%f " * 3) % (position.x, position.y, position.z) + \
                ("%f " * 9) % tup + \
                ("%s.DAT" % self.part)
 
 
-class Group:
+class Group(object):
     def __init__(self, position=Vector(0, 0, 0), matrix=Identity()):
         self.position = position
         self.matrix = matrix

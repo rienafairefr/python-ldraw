@@ -92,10 +92,10 @@ class SVGWriter:
         svg_file.close()
 
     def _current_colour(self, colour, current_colour):
-        if colour.value == 16:
+        if colour.code == 16:
             return current_colour
         else:
-            return colour.value
+            return colour.code
 
     def _opacity_from_colour(self, colour):
         return self.parts.alpha_values.get(colour, 255) / 255.0
