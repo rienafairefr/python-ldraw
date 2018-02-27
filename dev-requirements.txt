@@ -2,3 +2,4 @@ pycodestyle
 pytest
 coveralls
 pytest-cov
+pystache

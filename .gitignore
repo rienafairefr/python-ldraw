@@ -6,4 +6,5 @@ tmp/
 \.pytest_cache/
 \.coverage
 \.tox
+ldraw/library/*
 tmp/
