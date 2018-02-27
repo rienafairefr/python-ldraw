@@ -100,14 +100,14 @@ class POVRayWriter:
         )
 
     def _rgb_from_colour(self, colour):
-        colour = self.parts.colours.get(colour.value, "#FFFFFF")
+        colour = self.parts.colours.get(colour.code, "#FFFFFF")
         red = int(colour[1:3], 16) / 255.0
         green = int(colour[3:5], 16) / 255.0
         blue = int(colour[5:7], 16) / 255.0
         return red, green, blue
 
     def _alpha_from_colour(self, colour):
-        return self.parts.alpha_values.get(colour.value, 0) / 255.0
+        return self.parts.alpha_values.get(colour.code, 0) / 255.0
 
     def _colour_string(self, colour):
         red, green, blue = self._rgb_from_colour(colour)
@@ -118,7 +118,7 @@ class POVRayWriter:
             return "rgb <%1.1f, %1.1f, %1.1f>" % (red, green, blue)
 
     def _finish_string(self, colour):
-        attributes = self.parts.colour_attributes.get(colour.value, [])
+        attributes = self.parts.colour_attributes.get(colour.code, [])
         if attributes:
             attributes = POVRayWriter.ColourAttributes.get(attributes[0], [])
             return "\n    ".join(attributes)

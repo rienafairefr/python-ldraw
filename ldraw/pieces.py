@@ -40,7 +40,7 @@ class Piece(object):
             position = self.position
             matrix = self.matrix
         tup = tuple(reduce(lambda row1, row2: row1 + row2, matrix.rows))
-        return ("1 %i " % self.colour.value) + \
+        return ("1 %i " % self.colour.code) + \
                ("%f " * 3) % (position.x, position.y, position.z) + \
                ("%f " * 9) % tup + \
                ("%s.DAT" % self.part)

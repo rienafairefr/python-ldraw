@@ -204,10 +204,10 @@ class PNGWriter:
         image.save(png_path)
 
     def _current_colour(self, colour, current_colour):
-        if colour.value == 16:
+        if colour.code == 16:
             return current_colour
         else:
-            return colour.value
+            return colour.code
 
     def _opacity_from_colour(self, colour):
         return self.parts.alpha_values.get(colour, 255) / 255.0
@@ -258,7 +258,7 @@ class PNGWriter:
                 if r1.z >= 0 or r2.z >= 0 or r3.z >= 0:
                     continue
                 colour = self._current_colour(obj.colour, current_colour)
-                rgb = self.parts.colours.get(colour.value, "#ffffff")
+                rgb = self.parts.colours.get(colour, "#ffffff")
                 alpha = self._opacity_from_colour(colour)
                 polygons.append(Polygon([r1, r2, r3], rgb, alpha))
             elif isinstance(obj, Quadrilateral):
@@ -277,7 +277,7 @@ class PNGWriter:
                 if r1.z >= 0 or r2.z >= 0 or r3.z >= 0 or r4.z >= 0:
                     continue
                 colour = self._current_colour(obj.colour, current_colour)
-                rgb = self.parts.colours.get(colour.value, "#ffffff")
+                rgb = self.parts.colours.get(colour, "#ffffff")
                 alpha = self._opacity_from_colour(colour)
                 polygons.append(Polygon([r1, r2, r3, r4], rgb, alpha))
         return polygons
