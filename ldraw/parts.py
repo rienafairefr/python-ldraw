@@ -18,7 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+import codecs
 import os
 import re
 from ldraw.colours import Colour
@@ -30,9 +30,8 @@ import codecs
 class PartError(Exception):
     pass
 
-
 DOT_DAT = re.compile(r"\.DAT", flags=re.IGNORECASE)
-
+ENDS_DOT_DAT = re.compile(r"\.DAT$", flags=re.IGNORECASE)
 
 class Parts(object):
     ColourAttributes = ("CHROME", "PEARLESCENT", "RUBBER", "MATTE_METALLIC",
@@ -262,8 +261,8 @@ class Part(object):
         rows = [map(float, pieces[4:7]),
                 map(float, pieces[7:10]),
                 map(float, pieces[10:13])]
-        part = pieces[13].upper()
-        if part.endswith(".DAT"):
+        part = pieces[13]
+        if re.search(ENDS_DOT_DAT, part):
             part = part[:-4]
         return Piece(Colour(colour), Vector(*position), Matrix(rows), part)
 

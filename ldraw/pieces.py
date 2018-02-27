@@ -27,7 +27,7 @@ class Piece(object):
         self.position = position
         self.colour = colour
         self.matrix = matrix
-        self.part = part.upper()
+        self.part = part
         self.group = group
         if group:
             group.add_piece(self)
