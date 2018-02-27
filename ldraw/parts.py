@@ -269,7 +269,7 @@ class Part(object):
         rows = [map(float, pieces[4:7]),
                 map(float, pieces[7:10]),
                 map(float, pieces[10:13])]
-        part = pieces[13]
+        part = pieces[13].upper()
         if re.search(ENDS_DOT_DAT, part):
             part = part[:-4]
         return Piece(Colour(colour), Vector(*position), Matrix(rows), part)
