@@ -9,6 +9,7 @@ install:
 - PACKAGE_VERSION=`python setup.py --version`
 - TAG_NAME=v$PACKAGE_VERSION
 - pip install tox-travis
+- pip install -r dev-requirements.txt
 - ./fetch_parts_lst.py
 - ./generate.py
 before_install:
