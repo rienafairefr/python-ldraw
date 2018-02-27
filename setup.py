@@ -3,9 +3,8 @@
 
 from distutils.core import setup
 
+import os
 from setuptools import find_packages
-
-import ldraw
 
 setup(
     name="pyldraw",
@@ -14,7 +13,7 @@ setup(
     author=" David Boddie <david@boddie.org.uk>",
     maintainer="Matthieu Berthomé <rienafairefr@gmail.com>",
     author_email="rienairefr@gmail.com, david@boddie.org.uk",
-    version=ldraw.__version__,
+    version=os.environ.get('TAG_NAME', os.environ.get('TRAVIS_TAG', 'dev')),
     packages=find_packages(),
     entry_points={
         'console_scripts': [
