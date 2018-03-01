@@ -18,3 +18,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+import os
+
+from ldraw.generate import generate_main
+from ldraw.dirs import get_data_dir, get_config_dir
+from ldraw.download_library import dowload_library_main
+
+config_dir = get_config_dir()
+
+if not os.path.exists(os.path.join(config_dir, 'ok_generated')):
+    dowload_library_main()
+    generate_main()
