@@ -18,10 +18,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+import importlib
 import os
 
 import imp
+import pkgutil
 
+import sys
 
 from ldraw.generation import generate_main
 from ldraw.dirs import get_data_dir, get_config_dir
@@ -31,18 +34,29 @@ config_dir = get_config_dir()
 data_dir = get_data_dir()
 
 
-__ok_generated = os.path.join(data_dir, '__ok_generated')
-if not os.path.exists(__ok_generated):
-    dowload_library_main(data_dir)
-    generate_main(data_dir)
+class CustomImporter(object):
+    virtual_module = 'ldraw.library'
+    def find_module(self, fullname, path=None):
+        """This method is called by Python if this class
+           is on sys.path. fullname is the fully-qualified
+           name of the module to look for, and path is either
+           __path__ (for submodules and subpackages) or None (for
+           a top-level module/package).
 
-    from ldraw import library
-    imp.reload(library)
+           Note that this method will be called every time an import
+           statement is detected (or __import__ is called), before
+           Python's built-in package/module-finding code kicks in.
+           Also note that if this method is called via pkgutil, it is possible
+           that path will not be passed as an argument, hence the default value.
+           Thanks to Damien Ayers for pointing this out!"""
 
-    from library.colours import Black
-    from library.parts.others import _Brick1X1
+        if fullname == self.virtual_module:
+            # As per PEP #302 (which implemented the sys.meta_path protocol),
+            # if fullname is the name of a module/package that we want to
+            # report as found, then we need to return a loader object.
+            # In this simple example, that will just be self.
 
-    open(__ok_generated, 'w').close()
+            return self
 
         # If we don't provide the requested module, return None, as per
         # PEP #302.
@@ -72,8 +86,8 @@ if not os.path.exists(__ok_generated):
         try:
             return load_lib()
         except ImportError, e:
+            dowload_library_main(data_dir)
             generate_main(data_dir)
-            download_main(data_dir)
             return load_lib()
 
 

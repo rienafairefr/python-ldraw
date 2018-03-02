@@ -17,6 +17,7 @@ download_main('tmp')
 write_config({'parts.lst': os.path.join('tmp', 'ldraw', 'parts.lst')})
 
 
+
 def tool_test(func, suffix):
     fd, file = tempfile.mkstemp(suffix=suffix)
     func(file)
@@ -26,6 +27,9 @@ def tool_test(func, suffix):
 
     expected = open('tests/test_data/car' + suffix).read()
     assert expected == content
+
+
+os.environ['LDRAW_PARTS_LST'] = 'tmp/ldraw/parts.lst'
 
 
 def test_ldr2inv():

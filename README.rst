@@ -74,6 +74,15 @@ This will generate the `ldraw.library` package, then you can install pyldraw wit
 You may need to become the root user or administrator to do this. Code generation shouldn't need root it's using
 your user data dir (through the `appdirs` package's user_data_dir)
 
+The ldraw.library module and its submodules (colours, parts)
+are not actual python modules, but are generated and loaded dynamically
+from a directory containing LDraw parts files
+
+If your system has never imported anything inside the ldraw.library namespace
+then it will download the library from ldraw.org and generate python files
+This can take a long time but should only be happening at the first such import
+
+
 
 Examples
 --------
@@ -93,6 +102,8 @@ at the moment the package was deployed on Pypi though
 
 It is possible to use the `ldraw.parts` module to create a parts database from within a scene
 script in the following way::
+
+Parts are available from the ldraw.library namespace, or from the Parts class::
 
   from ldraw.parts import Parts
   parts = Parts("parts.lst") # provide your custom parts.lst path

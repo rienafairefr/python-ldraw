@@ -29,6 +29,7 @@ import inflect
 from attrdict import AttrDict
 
 from ldraw.colour import Colour
+from ldraw.config import get_config
 from ldraw.geometry import Matrix, Vector
 from ldraw.lines import OptionalLine, Quadrilateral, Line, Triangle, MetaCommand, Comment
 from ldraw.pieces import Piece
@@ -44,13 +45,16 @@ DOT_DAT = re.compile(r"\.DAT", flags=re.IGNORECASE)
 ENDS_DOT_DAT = re.compile(r"\.DAT$", flags=re.IGNORECASE)
 
 
+config = get_config()
+
+
 class Parts(object):
     # pylint: disable=too-many-instance-attributes
     """ Part class """
     ColourAttributes = ("CHROME", "PEARLESCENT", "RUBBER", "MATTE_METALLIC",
                         "METAL")
 
-    def __init__(self, path):
+    def __init__(self, path=config['parts.lst']):
         self.path = None
         self.parts_dirs = []
         self.parts_subdirs = {}

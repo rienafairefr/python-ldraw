@@ -5,7 +5,7 @@ import mock
 import pytest
 
 
-@pytest.fixture
+@pytest.fixture()
 def data_dir():
     with mock.patch('appdirs.user_data_dir') as data_dir_mock:
         tmp_data_dir = tempfile.mkdtemp()
