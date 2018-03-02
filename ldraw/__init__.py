@@ -20,12 +20,68 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import os
 
-from ldraw.generate import generate_main
+import imp
+
+
+from ldraw.generation import generate_main
 from ldraw.dirs import get_data_dir, get_config_dir
-from ldraw.download_library import dowload_library_main
+from ldraw.download import download_main
 
 config_dir = get_config_dir()
+data_dir = get_data_dir()
 
-if not os.path.exists(os.path.join(config_dir, 'ok_generated')):
-    dowload_library_main()
-    generate_main()
+
+__ok_generated = os.path.join(data_dir, '__ok_generated')
+if not os.path.exists(__ok_generated):
+    dowload_library_main(data_dir)
+    generate_main(data_dir)
+
+    from ldraw import library
+    imp.reload(library)
+
+    from library.colours import Black
+    from library.parts.others import _Brick1X1
+
+    open(__ok_generated, 'w').close()
+
+        # If we don't provide the requested module, return None, as per
+        # PEP #302.
+
+        return None
+
+    def load_module(self, fullname):
+        """This method is called by Python if CustomImporter.find_module
+           does not return None. fullname is the fully-qualified name
+           of the module/package that was requested."""
+
+        if fullname != self.virtual_module:
+            # Raise ImportError as per PEP #302 if the requested module/package
+            # couldn't be loaded. This should never be reached in this
+            # simple example, but it's included here for completeness. :)
+            raise ImportError(fullname)
+
+        # PEP#302 says to return the module if the loader object (i.e,
+        # this class) successfully loaded the module.
+        # Note that a regular class works just fine as a module.
+
+        def load_lib():
+            info = imp.find_module('library', [data_dir])
+            library_module = imp.load_module('library', *info)
+            return library_module
+
+        try:
+            return load_lib()
+        except ImportError, e:
+            generate_main(data_dir)
+            download_main(data_dir)
+            return load_lib()
+
+
+# Add our import hook to sys.meta_path
+sys.meta_path.append(CustomImporter())
+
+from library.colours import Black
+from library.parts.others import _Brick1X1
+
+from ldraw.library.colours import Black
+from ldraw.library.parts.others import _Brick1X1

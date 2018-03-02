@@ -357,8 +357,8 @@ class Part(object):
             "4": _quadrilateral,
             "5": _optional_line
         }
+        self.path=path
         self.objects = []
-        self.path = path
 
         """ Load the Part from its path """
         try:
