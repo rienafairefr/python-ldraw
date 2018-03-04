@@ -26,7 +26,7 @@ import pkgutil
 
 import sys
 
-from ldraw.generation import generate_main
+from ldraw.library_gen import library_gen_main
 from ldraw.dirs import get_data_dir, get_config_dir
 from ldraw.download import download_main
 
@@ -86,16 +86,10 @@ class CustomImporter(object):
         try:
             return load_lib()
         except ImportError, e:
-            dowload_library_main(data_dir)
-            generate_main(data_dir)
+            download_main(data_dir)
+            library_gen_main(data_dir)
             return load_lib()
 
 
 # Add our import hook to sys.meta_path
 sys.meta_path.append(CustomImporter())
-
-from library.colours import Black
-from library.parts.others import _Brick1X1
-
-from ldraw.library.colours import Black
-from ldraw.library.parts.others import _Brick1X1

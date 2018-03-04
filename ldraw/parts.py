@@ -177,7 +177,10 @@ class Parts(object):
                 return None
         elif not code:
             return None
-        return self._load_part(code)
+        loaded_part = self._load_part(code)
+        if loaded_part.category is None:
+            self.fix_missing_category(loaded_part)
+        return loaded_part
 
     def _find_parts_subdirs(self, directory):
         for item in os.listdir(directory):
@@ -353,6 +356,17 @@ class Part(object):
     Contains data from a LDraw part file
     """
     def __init__(self, path):
+        self.category = None
+        self.comments = []
+        self.metas = []
+        self.meta = {}
+        self.comment_or_metas = []
+        self.subfiles = []
+        self.lines = []
+        self.triangles =[]
+        self.quadrilaterals = []
+        self.optional_lines = []
+
         self._handlers = {
             "0": _comment_or_meta,
             "1": _sub_file,
@@ -377,7 +391,7 @@ class Part(object):
                 # self.objects.append(BlankLine)
                 continue
             try:
-                handler = self._handlers[pieces[0]]
+                handler, container = self._handlers[pieces[0]]
             except KeyError:
                 raise PartError("Unknown command (%s) in %s at line %i" % (path, pieces[0], number))
             try:
