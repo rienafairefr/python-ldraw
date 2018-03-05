@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import random
 from ldraw.library.colours import *
+from ldraw.library.colours import Light_Grey as Grey
 from ldraw.figure import *
 from ldraw.pieces import Group, Piece
 

@@ -37,11 +37,11 @@ print figure.right_arm(Red, -90)
 print figure.right_hand(Yellow, 0)
 print
 
-print Piece(Colour(15), Vector(150, -100, -150),
+print Piece(White, Vector(150, -100, -150),
             Identity(), "LIGHT")
-print Piece(Colour(15), Vector(-150, -100, -150),
+print Piece(White, Vector(-150, -100, -150),
             Identity(), "LIGHT")
-print Piece(Colour(15), Vector(0, -100, 150),
+print Piece(White, Vector(0, -100, 150),
             Identity(), "LIGHT")
 
 # Camera should be at 120.0,-20.0,-140.0 in LDraw coordinates.

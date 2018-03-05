@@ -46,7 +46,7 @@ figure.left_arm(Black, 70)
 figure.left_hand(White, 0)
 figure.right_arm(Black, -30)
 figure.right_hand(White, 0)
-glass = parts.parts["Minifig Tool Magnifying Glass"]
+glass = parts.parts_by_description["Minifig Tool Magnifying Glass"]
 figure.right_hand_item(Chrome_Silver, Vector(0, -58, -20), 0, glass)
 figure.hips(Black)
 figure.left_leg(Black, 50)
