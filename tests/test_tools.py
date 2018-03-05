@@ -1,7 +1,7 @@
 import tempfile
 import os
 
-from ldraw import dowload_library_main
+from ldraw.download_library import dowload_library_main
 from ldraw.tools.ldr2inv import ldr2inv
 from ldraw.tools.ldr2png import ldr2png
 from ldraw.tools.ldr2pov import ldr2pov
