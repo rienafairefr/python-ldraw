@@ -21,15 +21,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import re
+import inflect
+
 from ldraw.colour import Colour
 from ldraw.geometry import Matrix, Vector
+from ldraw.lines import OptionalLine, Quadrilateral, Line, Triangle, MetaCommand, Comment, BlankLine
 from ldraw.pieces import Piece
 import codecs
+
+from ldraw.utils import camel, clean
 
 
 class PartError(Exception):
     pass
 
+
+p = inflect.engine()
 
 DOT_DAT = re.compile(r"\.DAT", flags=re.IGNORECASE)
 ENDS_DOT_DAT = re.compile(r"\.DAT$", flags=re.IGNORECASE)
@@ -43,41 +50,29 @@ class Parts(object):
         self.path = None
         self.parts_dirs = []
         self.parts_subdirs = {}
-        self.parts = {}
+        self.parts_by_description = {}
         self.colours = {}
         self.colours_list = []
         self.alpha_values = {}
         self.colour_attributes = {}
-        self.Hats = {}
-        self.Heads = {}
-        self.Torsos = {}
-        self.Hips = {}
-        self.Legs = {}
-        self.Arms = {}
-        self.Hands = {}
-        self.Others = {}
-        self.Accessories = {}
-        self.sections = {
-            "Cap": self.Hats,
-            "Hat": self.Hats,
-            "Helmet": self.Hats,
-            "Hair": self.Hats,
-            "Mask": self.Hats,
-            "Plume": self.Hats,
-            "Minifig Head": self.Heads,
-            "Mechanical Head": self.Heads,
-            "Skull": self.Heads,
-            "Torso": self.Torsos,
-            "Hips": self.Hips,
-            "Leg": self.Legs,
-            "Legs": self.Legs,
-            "Arm": self.Arms,
-            "Hand": self.Hands,
-        }
-        self.extra_sections = {
-            'Accessories': self.Accessories,
-            'Others': self.Others
-        }
+
+        self.parts = {
+            'minifig': {
+                'hats': {},
+                'heads': {},
+                'torsos': {},
+                'hips': {},
+                'legs': {},
+                'arms': {},
+                'hands': {},
+                'accessories': {},
+            },
+            'others': {
+
+            }}
+
+        self.minifig_descriptions = {k: camel(p.singular_noun(k)) for k in self.parts['minifig']}
+
         self.load(path)
 
     def load(self, path):
@@ -89,17 +84,18 @@ class Parts(object):
                     break
                 code = pieces[0]
                 description = pieces[1].strip()
-                self.parts[description] = code
-                for key, section in self.sections.items():
-                    at = description.find(key)
+                for key, section in self.parts['minifig'].items():
+                    searched = self.minifig_descriptions[key]
+                    at = description.find(searched)
+
                     if at != -1 and (
-                            at + len(key) == len(description) or
-                            description[at + len(key)] == " "):
+                            at + len(searched) == len(description) or
+                            description[at + len(searched)] == " "):
                         if description.startswith("Minifig "):
                             description = description[8:]
                             if description.startswith("(") and description.endswith(")"):
                                 description = description[1:-1]
-                        section[description] = code
+                            section[description] = code
                         break
                 else:
                     # The accessories are those Minifig items which do not fall into any
@@ -108,10 +104,11 @@ class Parts(object):
                         description = description[8:]
                         if description.startswith("(") and description.endswith(")"):
                             description = description[1:-1]
-                        self.Accessories[description] = code
+                        self.parts['minifig']['accessories'][description] = code
                     else:
-                        self.Others[description] = code
-        except IOError:
+                        self.parts['others'][description] = code
+                self.parts_by_description[description] = code
+        except IOError, e:
             raise PartError("Failed to load parts file: %s" % path)
         # If we successfully loaded the files then record the path and look for
         # part files.
@@ -136,7 +133,7 @@ class Parts(object):
             return None
         if description:
             try:
-                code = self.parts[description]
+                code = self.parts_by_description[description]
             except KeyError:
                 return None
         elif not code:
@@ -172,6 +169,7 @@ class Parts(object):
         for path in paths:
             try:
                 part = Part(path)
+                part.path = os.path.relpath(path, self.path)
             except PartError:
                 continue
             else:
@@ -222,7 +220,7 @@ class Parts(object):
                     break
                 code = pieces[0]
                 description = pieces[1].strip()
-                self.parts[description] = code
+                self.parts_by_description[description] = code
         except IOError:
             raise PartError("Failed to load primitives file: %s" % path)
 
@@ -319,50 +317,3 @@ class Part(object):
         p4 = map(float, pieces[10:13])
         return OptionalLine(Colour(colour), Vector(*p1), Vector(*p2),
                             Vector(*p3), Vector(*p4))
-
-
-class BlankLine:
-    pass
-
-
-class Comment(object):
-    def __init__(self, text):
-        self.text = text
-
-
-class MetaCommand(object):
-    def __init__(self, text):
-        self.text = text
-
-
-class Line(object):
-    def __init__(self, colour, p1, p2):
-        self.colour = colour
-        self.p1 = p1
-        self.p2 = p2
-
-
-class Triangle(object):
-    def __init__(self, colour, p1, p2, p3):
-        self.colour = colour
-        self.p1 = p1
-        self.p2 = p2
-        self.p3 = p3
-
-
-class Quadrilateral(object):
-    def __init__(self, colour, p1, p2, p3, p4):
-        self.colour = colour
-        self.p1 = p1
-        self.p2 = p2
-        self.p3 = p3
-        self.p4 = p4
-
-
-class OptionalLine(object):
-    def __init__(self, colour, p1, p2, p3, p4):
-        self.colour = colour
-        self.p1 = p1
-        self.p2 = p2
-        self.p3 = p3
-        self.p4 = p4

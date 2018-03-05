@@ -4,3 +4,4 @@ pymklist
 progress
 PyYaml
 pystache
+inflect

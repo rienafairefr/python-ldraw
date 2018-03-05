@@ -25,7 +25,8 @@ import sys
 import argparse
 
 from ldraw.config import get_config
-from ldraw.parts import Comment, Part, Parts, PartError
+from ldraw.parts import Part, Parts, PartError
+from ldraw.lines import Comment
 from ldraw.pieces import Piece
 
 

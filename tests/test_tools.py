@@ -1,6 +1,7 @@
 import tempfile
 import os
 
+from ldraw.config import write_config
 from ldraw.download import download_main
 from ldraw.tools.ldr2inv import ldr2inv
 from ldraw.tools.ldr2png import ldr2png
@@ -9,12 +10,8 @@ from ldraw.tools.ldr2svg import ldr2svg
 
 INPUT_PATH = 'tests/test_data/car.ldr'
 
-try:
-    os.makedirs('tmp')
-except:
-    pass
-
 download_main('tmp')
+write_config({'parts.lst': os.path.join('tmp', 'ldraw', 'parts.lst')})
 
 
 def tool_test(func, suffix):

@@ -28,6 +28,7 @@ setup(
         'numpy',
         'pymklist',
         'pystache',
+        'inflect',
         'progress',
         'PyYaml'
     ]
