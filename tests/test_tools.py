@@ -1,7 +1,7 @@
 import tempfile
 import os
 
-from ldraw.download_library import dowload_library_main
+from ldraw.download import download_main
 from ldraw.tools.ldr2inv import ldr2inv
 from ldraw.tools.ldr2png import ldr2png
 from ldraw.tools.ldr2pov import ldr2pov
@@ -14,7 +14,7 @@ try:
 except:
     pass
 
-dowload_library_main('tmp')
+download_main('tmp')
 
 
 def tool_test(func, suffix):

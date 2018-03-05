@@ -5,10 +5,10 @@ import os
 import pystache
 
 
-from ldraw.utils import clean, camel
+from ldraw.utils import clean, camel, ensure_exists
 
 
-def gen_colours(parts, config, data_dir, force=False):
+def gen_colours(parts, output_dir, force=False):
     """
     try:
         from ldraw.library.colours import Colour
@@ -33,7 +33,8 @@ def gen_colours(parts, config, data_dir, force=False):
     context['colours'].sort(key=lambda r: r['code'])
 
     colours_str = pystache.render(colours_template, context=context)
-    library_path = os.path.join(data_dir, 'library')
+    library_path = ensure_exists(os.path.join(output_dir, 'library'))
+
     colours_py = os.path.join(library_path, 'colours.py')
 
     with codecs.open(colours_py, 'w', encoding='utf-8') as generated_file:

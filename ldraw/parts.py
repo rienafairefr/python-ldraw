@@ -55,6 +55,7 @@ class Parts(object):
         self.Legs = {}
         self.Arms = {}
         self.Hands = {}
+        self.Others = {}
         self.Accessories = {}
         self.sections = {
             "Cap": self.Hats,
@@ -71,7 +72,11 @@ class Parts(object):
             "Leg": self.Legs,
             "Legs": self.Legs,
             "Arm": self.Arms,
-            "Hand": self.Hands
+            "Hand": self.Hands,
+        }
+        self.extra_sections = {
+            'Accessories': self.Accessories,
+            'Others': self.Others
         }
         self.load(path)
 
@@ -104,6 +109,8 @@ class Parts(object):
                         if description.startswith("(") and description.endswith(")"):
                             description = description[1:-1]
                         self.Accessories[description] = code
+                    else:
+                        self.Others[description] = code
         except IOError:
             raise PartError("Failed to load parts file: %s" % path)
         # If we successfully loaded the files then record the path and look for

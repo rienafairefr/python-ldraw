@@ -7,10 +7,10 @@ from progress.bar import Bar
 
 import pystache
 
-from ldraw.utils import clean, camel
+from ldraw.utils import clean, camel, ensure_exists
 
 
-def gen_parts(parts, config, data_dir, force=False):
+def gen_parts(parts, output_dir, force=False):
     """
     try:
         from ldraw.library.colours import ColoursByCode
@@ -60,7 +60,7 @@ def gen_parts(parts, config, data_dir, force=False):
 
     sections = list(map(get_section_dict, parts.extra_sections.items()))
     sections.extend(list(map(get_section_dict, parts.sections.items())))
-    library_path = os.path.join(data_dir, 'library')
+    library_path = ensure_exists(os.path.join(output_dir, 'library'))
 
     parts_dir = os.path.join(library_path, 'parts')
     try:

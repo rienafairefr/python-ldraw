@@ -93,3 +93,9 @@ def clean(varStr):
 
 def camel(input):
     return ''.join(x for x in input.title() if not x.isspace())
+def ensure_exists(path):
+    try:
+        os.makedirs(path)
+    except:
+        pass
+    return path
