@@ -22,6 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import argparse
 import sys
+
+from ldraw.config import get_config
 from ldraw.parts import Part, Parts, PartError
 from ldraw.writers.povray import POVRayWriter
 
@@ -37,7 +39,6 @@ def main():
                                                  "The optional sky colour is a single red,green,blue argument where\n"
                                                  "each component should be specified as a floating point number between\n"
                                                  "0.0 and 1.0 inclusive.\n\n")
-    parser.add_argument('ldraw_parts_file')
     parser.add_argument('ldraw_file')
     parser.add_argument('pov_file')
     parser.add_argument('camera_position')
@@ -46,12 +47,14 @@ def main():
 
     args = parser.parse_args()
 
-    ldr2pov(args.ldraw_parts_file, args.ldraw_file, args.pov_file,
+    ldr2pov(args.ldraw_file, args.pov_file,
             args.camera_position, args.look_at_position, args.sky)
 
 
-def ldr2pov(ldraw_parts_path, ldraw_path, pov_path,
+def ldr2pov(ldraw_path, pov_path,
             camera_position, look_at_position, sky):
+    config = get_config()
+    ldraw_parts_path = config['parts.lst']
     parts = Parts(ldraw_parts_path)
 
     try:

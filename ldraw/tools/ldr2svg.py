@@ -22,6 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import argparse
 import sys
+
+from ldraw.config import get_config
 from ldraw.geometry import Vector
 from ldraw.parts import Part, Parts, PartError
 
@@ -41,7 +43,6 @@ def main():
                                                  "The optional sky background colour is an SVG colour, either specified as\n"
                                                  "#rrggbb or as a named colour.\n\n"
                                                  "This tool requires PyQt4, built against Qt 4.4 or higher.\n\n")
-    parser.add_argument('ldraw_parts_file')
     parser.add_argument('ldraw_file')
     parser.add_argument('svg_file')
     parser.add_argument('viewport_size')
@@ -50,12 +51,14 @@ def main():
     parser.add_argument('--sky')
 
     args = parser.parse_args()
-    ldr2svg(args.ldraw_parts_file, args.ldraw_file, args.svg_file,
+    ldr2svg(args.ldraw_file, args.svg_file,
             args.viewport_size, args.camera_position, args.look_at_position, args.sky)
 
 
-def ldr2svg(parts_path, ldraw_path, svg_path,
+def ldr2svg(ldraw_path, svg_path,
             viewport_size, camera_position, look_at_position, background_colour):
+    config = get_config()
+    parts_path = config['parts.lst']
     viewport_size = map(float, viewport_size.split("x"))
     camera_position = Vector(*map(float, camera_position.split(",")))
     look_at_position = Vector(*map(float, look_at_position.split(",")))

@@ -23,23 +23,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import codecs
 import sys
 import argparse
+
+from ldraw.config import get_config
 from ldraw.parts import Comment, Part, Parts, PartError
 from ldraw.pieces import Piece
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('ldraw_parts_file')
     parser.add_argument('ldraw_file')
     parser.add_argument('output')
 
     args = parser.parse_args()
 
-    ldr2inv(args.ldraw_parts_file, args.ldraw_file, args.output)
+    ldr2inv(args.ldraw_file, args.output)
 
 
-def ldr2inv(parts_path, ldraw_path, inventory_path):
-    parts = Parts(parts_path)
+def ldr2inv(ldraw_path, inventory_path):
+    config = get_config()
+    parts = Parts(config['parts.lst'])
 
     try:
         model = Part(ldraw_path)

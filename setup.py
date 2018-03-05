@@ -23,5 +23,10 @@ setup(
             'ldr2svg = ldraw.tools.ldr2svg:main',
         ],
     },
-    install_requires=['numpy']
+    install_requires=[
+        'appdirs',
+        'numpy',
+        'pymklist',
+        'PyYaml'
+    ]
 )

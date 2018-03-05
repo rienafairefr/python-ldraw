@@ -6,5 +6,5 @@ tmp/
 \.pytest_cache/
 \.coverage
 \.tox
-ldraw/library/colours.py
 tmp/
+ldraw/library/
