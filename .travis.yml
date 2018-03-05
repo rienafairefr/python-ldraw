@@ -15,6 +15,8 @@ before_install:
 - sudo apt-get install dos2unix python-pip python2.7-dev python3-pyqt4 libxext-dev python-qt4 qt4-dev-tools build-essential
 - export TRAVIS_COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
 - echo "$TRAVIS_COMMIT_MESSAGE"
+- pip install -r requirements.txt
+- python local_gen.py
 script:
 - tox
 deploy:

@@ -27,6 +27,8 @@ setup(
         'appdirs',
         'numpy',
         'pymklist',
+        'pystache',
+        'progress',
         'PyYaml'
     ]
 )
