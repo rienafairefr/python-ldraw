@@ -29,7 +29,7 @@ def gen_colours(parts, output_dir, force=False):
                 'alpha': c.alpha,
                 'rgb': c.rgb, 'colour_attributes': c.colour_attributes}
 
-    context = {'colours': [get_c_dict(c) for c in parts.colours_list]}
+    context = {'colours': [get_c_dict(c) for c in parts.colours_by_name.values()]}
     context['colours'].sort(key=lambda r: r['code'])
 
     colours_str = pystache.render(colours_template, context=context)

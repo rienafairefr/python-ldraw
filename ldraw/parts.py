@@ -55,7 +55,6 @@ class Parts(object):
         self.parts_by_code = {}
 
         self.colours = {}
-        self.colours_list = []
         self.alpha_values = {}
         self.colour_attributes = {}
 
@@ -222,10 +221,6 @@ class Parts(object):
 
                 self.colour_attributes[name] = colour_attributes
                 self.colour_attributes[code] = colour_attributes
-
-                self.colours_list.append(Colour(code, name, rgb,
-                                                self.alpha_values.get(name, 255),
-                                                colour_attributes))
 
                 colour_name = clean(camel(name))
                 colour = Colour(code, name, rgb, self.alpha_values.get(name, 255), colour_attributes)
