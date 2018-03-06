@@ -46,8 +46,8 @@ print figure.right_arm(Yellow, 60)
 print figure.right_hand(Yellow, 0)
 print
 
-print Piece(Colour(15), Vector(-50, -200, -50), Identity(), "LIGHT")
-print Piece(Colour(15), Vector(50, -200, 0), Identity(), "LIGHT")
-print Piece(Colour(15), Vector(0, -200, 50), Identity(), "LIGHT")
+print Piece(White, Vector(-50, -200, -50), Identity(), "LIGHT")
+print Piece(White, Vector(50, -200, 0), Identity(), "LIGHT")
+print Piece(White, Vector(0, -200, 50), Identity(), "LIGHT")
 
 # Camera should be at 120.0,40.0,-200.0 in LDraw coordinates.

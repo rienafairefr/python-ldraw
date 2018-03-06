@@ -104,8 +104,8 @@ print figure.right_arm(Red, -35)
 print figure.right_hand(Red, 0)
 print
 
-# print Piece(Light_Grey, Vector(0, 72, 0), Identity(), "3867")
-print Piece(Colour(15), Vector(200, -300, -400),
+# print Piece(Grey, Vector(0, 72, 0), Identity(), "3867")
+print Piece(White, Vector(200, -300, -400),
             Identity(), "LIGHT")
 print Piece(Light_Grey, Vector(0, 72, 0),
             Identity(), "3947")

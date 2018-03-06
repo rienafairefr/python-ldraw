@@ -28,6 +28,7 @@ setup(
         'numpy',
         'pymklist',
         'pystache',
+        'attrdict',
         'inflect',
         'progress',
         'PyYaml'
