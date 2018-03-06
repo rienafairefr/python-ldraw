@@ -226,6 +226,7 @@ class Parts(object):
                 colour = Colour(code, name, rgb, self.alpha_values.get(name, 255), colour_attributes)
                 self.colours_by_name[name] = colour
                 self.colours_by_code[code] = colour
+
     def _load_primitives(self, path):
         try:
             f = codecs.open(path, 'r', encoding='utf-8')
@@ -281,10 +282,17 @@ class Part(object):
         else:
             return Comment(" ".join(pieces))
 
+    def colour_from_str(self, colour_str):
+        try:
+            return int(colour_str)
+        except ValueError:
+            if colour_str.startswith('0x2'):
+                return Colour(rgb="#" + colour_str[3:], alpha=255)
+
     def _subfile(self, pieces, line):
         if len(pieces) != 14:
             raise PartError("Invalid part data in %s at line %i" % (self.path, line))
-        colour = int(pieces[0])
+        colour = self.colour_from_str(pieces[0])
         position = map(float, pieces[1:4])
         rows = [map(float, pieces[4:7]),
                 map(float, pieces[7:10]),
@@ -297,7 +305,7 @@ class Part(object):
     def _line(self, pieces, line):
         if len(pieces) != 7:
             raise PartError("Invalid line data in %s at line %i" % (self.path, line))
-        colour = int(pieces[0])
+        colour = self.colour_from_str(pieces[0])
         p1 = map(float, pieces[1:4])
         p2 = map(float, pieces[4:7])
         return Line(Colour(colour), Vector(*p1), Vector(*p2))
@@ -305,7 +313,7 @@ class Part(object):
     def _triangle(self, pieces, line):
         if len(pieces) != 10:
             raise PartError("Invalid triangle data in %s at line %i" % (self.path, line))
-        colour = int(pieces[0])
+        colour = self.colour_from_str(pieces[0])
         p1 = map(float, pieces[1:4])
         p2 = map(float, pieces[4:7])
         p3 = map(float, pieces[7:10])
@@ -314,7 +322,7 @@ class Part(object):
     def _quadrilateral(self, pieces, line):
         if len(pieces) != 13:
             raise PartError("Invalid quadrilateral data in %s at line %i" % (self.path, line))
-        colour = int(pieces[0])
+        colour = self.colour_from_str(pieces[0])
         p1 = map(float, pieces[1:4])
         p2 = map(float, pieces[4:7])
         p3 = map(float, pieces[7:10])
@@ -325,7 +333,7 @@ class Part(object):
     def _optional_line(self, pieces, line):
         if len(pieces) != 13:
             raise PartError("Invalid line data in %s at line %i" % (self.path, line))
-        colour = int(pieces[0])
+        colour = self.colour_from_str(pieces[0])
         p1 = map(float, pieces[1:4])
         p2 = map(float, pieces[4:7])
         p3 = map(float, pieces[7:10])

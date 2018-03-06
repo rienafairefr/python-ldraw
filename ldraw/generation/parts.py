@@ -38,7 +38,7 @@ def gen_parts(parts, output_dir, force=False):
 
     def get_part_dict(description):
         try:
-            code = parts.parts_by_description[description]
+            code = parts.parts_by_name[description]
             part = parts.part(code=code)
             return {
                 'path': part.path,
