@@ -59,6 +59,9 @@ class Parts(object):
         self.alpha_values = {}
         self.colour_attributes = {}
 
+        self.colours_by_name = {}
+        self.colours_by_code = {}
+
         self.parts = {
             'minifig': {
                 'hats': {},
@@ -198,6 +201,10 @@ class Parts(object):
                     self.colours[name] = rgb
                     self.colours[code] = rgb
 
+                    colour = Colour(code, name, rgb)
+                    self.colours_by_name[name] = colour
+                    self.colours_by_code[code] = colour
+
                 except (ValueError, IndexError):
                     continue
                 try:
@@ -220,6 +227,10 @@ class Parts(object):
                                                 self.alpha_values.get(name, 255),
                                                 colour_attributes))
 
+                colour_name = clean(camel(name))
+                colour = Colour(code, name, rgb, self.alpha_values.get(name, 255), colour_attributes)
+                self.colours_by_name[name] = colour
+                self.colours_by_code[code] = colour
     def _load_primitives(self, path):
         try:
             f = codecs.open(path, 'r', encoding='utf-8')
