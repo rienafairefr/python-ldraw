@@ -37,16 +37,16 @@ parts = Parts(sys.argv[1])
 group = Group(Vector(0, 0, -40), Identity())
 
 figure = Person(group=group)
-head = parts.Heads["Head with Monocle, Scar, and Moustache Pattern"]
+head = parts.parts.minifig.heads["Head with Monocle, Scar, and Moustache Pattern"]
 figure.head(Yellow, part=head)
-figure.hat(Black, parts.Hats["Top Hat"])
-torso = parts.Torsos["Torso with Black Suit, Red Shirt, Gold Clasps Pattern"]
+figure.hat(Black, parts.minifig.hats["Top Hat"])
+torso = parts.minifig.torsos["Torso with Black Suit, Red Shirt, Gold Clasps Pattern"]
 figure.torso(Black, torso)
 figure.left_arm(Black, 70)
 figure.left_hand(White, 0)
 figure.right_arm(Black, -30)
 figure.right_hand(White, 0)
-glass = parts.parts_by_description["Minifig Tool Magnifying Glass"]
+glass = parts.parts_by_name["Minifig Tool Magnifying Glass"]
 figure.right_hand_item(Chrome_Silver, Vector(0, -58, -20), 0, glass)
 figure.hips(Black)
 figure.left_leg(Black, 50)

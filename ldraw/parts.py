@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import re
 import inflect
+from attrdict import AttrDict
 
 from ldraw.colour import Colour
 from ldraw.geometry import Matrix, Vector
@@ -50,7 +51,9 @@ class Parts(object):
         self.path = None
         self.parts_dirs = []
         self.parts_subdirs = {}
-        self.parts_by_description = {}
+        self.parts_by_name = {}
+        self.parts_by_code = {}
+
         self.colours = {}
         self.colours_list = []
         self.alpha_values = {}
@@ -107,14 +110,14 @@ class Parts(object):
                         self.parts['minifig']['accessories'][description] = code
                     else:
                         self.parts['others'][description] = code
-                self.parts_by_description[description] = code
+                self.parts_by_name[description] = code
+                self.parts_by_code[code] = description
         except IOError, e:
             raise PartError("Failed to load parts file: %s" % path)
         # If we successfully loaded the files then record the path and look for
         # part files.
         self.path = path
         directory = os.path.split(self.path)[0]
-        primitives_path = None
         for item in os.listdir(directory):
             obj = os.path.join(directory, item)
             if item.lower() == "parts" and os.path.isdir(obj):
@@ -128,12 +131,15 @@ class Parts(object):
             elif item.lower() == "p" + os.extsep + "lst" and os.path.isfile(obj):
                 self._load_primitives(obj)
 
+        self.parts['minifig'] = AttrDict(self.parts['minifig'])
+        self.parts = AttrDict(self.parts)
+
     def part(self, description=None, code=None):
         if not self.path:
             return None
         if description:
             try:
-                code = self.parts_by_description[description]
+                code = self.parts_by_name[description]
             except KeyError:
                 return None
         elif not code:
@@ -220,7 +226,7 @@ class Parts(object):
                     break
                 code = pieces[0]
                 description = pieces[1].strip()
-                self.parts_by_description[description] = code
+                self.parts_by_name[description] = code
         except IOError:
             raise PartError("Failed to load primitives file: %s" % path)
 
