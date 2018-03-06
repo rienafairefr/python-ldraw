@@ -25,56 +25,62 @@ import random
 from ldraw.library.colours import *
 from ldraw.library.colours import Light_Grey as Grey
 from ldraw.figure import *
+from ldraw.library.parts.minifig.torsos import TorsoWithClassicSpacePattern
+from ldraw.library.parts.others import Tyre6_50X8OffsetTread, SlopeBrick452X2, CarSteeringStandAndWheel_Complete_, \
+    Plate2X2, Brick1X2WithClassicSpaceLogoPattern, Antenna4HWithRoundedTop, Brick1X1RoundWithSolidStud, \
+    Plate2X2WithRedWheels_Complete_, Baseplate32X32WithCraters
 from ldraw.pieces import Group, Piece
+from ldraw.library.parts.minifig.accessories import HelmetClassicWithThickChinGuardAndVisorDimples as HelmetClassic, \
+    Torch, MetalDetector, Seat2X2
 
 figure = Person(Vector(0, 0, -10))
 print figure.head(Yellow, 30)
-print figure.hat(White, "193B")
-print figure.torso(White, "973P90")
+print figure.hat(White, HelmetClassic)
+print figure.torso(White, TorsoWithClassicSpacePattern)
 print figure.backpack(White, Vector(0, -2, 0))
 print figure.hips(White)
 print figure.left_leg(White, 0)
 print figure.right_leg(White, 0)
 print figure.left_arm(White, -45)
 print figure.left_hand(White, 0)
-print figure.left_hand_item(Light_Grey, Vector(0, -11, -12), 0, "3959")  # Torch
+print figure.left_hand_item(Light_Grey, Vector(0, -11, -12), 0, Torch)  # Torch
 print figure.right_arm(White, 0)
 print figure.right_hand(White, 0)
 print
 
 rover = Group(Vector(80, 48, 20), Identity())
 print Piece(Light_Grey, Vector(0, 0, 0),
-            Identity(), "122C01", rover)
+            Identity(), Plate2X2WithRedWheels_Complete_, rover)
 print Piece(Black, Vector(30, 6, 0),
-            Identity().rotate(90, YAxis), "3641", rover)
+            Identity().rotate(90, YAxis), Tyre6_50X8OffsetTread, rover)
 print Piece(Black, Vector(-30, 6, 0),
-            Identity().rotate(90, YAxis), "3641", rover)
+            Identity().rotate(90, YAxis), Tyre6_50X8OffsetTread, rover)
 print Piece(Light_Grey, Vector(0, 0, -80),
-            Identity(), "122C01", rover)
+            Identity(), Plate2X2WithRedWheels_Complete_, rover)
 print Piece(Black, Vector(30, 6, -80),
-            Identity().rotate(90, YAxis), "3641", rover)
+            Identity().rotate(90, YAxis), Tyre6_50X8OffsetTread, rover)
 print Piece(Black, Vector(-30, 6, -80),
-            Identity().rotate(90, YAxis), "3641", rover)
+            Identity().rotate(90, YAxis), Tyre6_50X8OffsetTread, rover)
 
 print Piece(Light_Grey, Vector(0, 0, -40),
-            Identity(), "3022", rover)
+            Identity(), Plate2X2, rover)
 
 print Piece(Light_Grey, Vector(0, -24, -10),
-            Identity().rotate(180, YAxis), "3039", rover)
+            Identity().rotate(180, YAxis), SlopeBrick452X2, rover)
 print Piece(Light_Grey, Vector(0, -32, -10),
-            Identity().rotate(180, YAxis), "3829", rover)
+            Identity().rotate(180, YAxis), CarSteeringStandAndWheel_Complete_, rover)
 print Piece(Light_Grey, Vector(0, -24, -60),
-            Identity().rotate(180, YAxis), "4079", rover)
+            Identity().rotate(180, YAxis), Seat2X2, rover)
 print Piece(Light_Grey, Vector(0, -8, -60),
-            Identity(), "3022", rover)
+            Identity(), Plate2X2, rover)
 print Piece(Light_Grey, Vector(0, -16, -60),
-            Identity(), "3022", rover)
+            Identity(), Plate2X2, rover)
 print Piece(Light_Grey, Vector(0, -24, -90),
-            Identity(), "3004P90", rover)
+            Identity(), Brick1X2WithClassicSpaceLogoPattern, rover)
 print Piece(Light_Grey, Vector(-10, -32, -90),
-            Identity(), "3957", rover)
+            Identity(), Antenna4HWithRoundedTop, rover)
 print Piece(Trans_Green, Vector(10, -48, -90),
-            Identity(), "3062A", rover)
+            Identity(), Brick1X1RoundWithSolidStud, rover)
 print Piece(Green, Vector(10, -52, -90),
             Identity(), "LIGHT", rover)
 
@@ -92,8 +98,8 @@ for piece in rover.pieces:
 figure = Person(Vector(0, -76, -50),
                 Identity().rotate(180, YAxis), group=rover)
 print figure.head(Yellow, 0)
-print figure.hat(Red, "193B")
-print figure.torso(Red, "973P90")
+print figure.hat(Red, HelmetClassic)
+print figure.torso(Red, TorsoWithClassicSpacePattern)
 print figure.backpack(Red, Vector(0, -2, 0))
 print figure.hips(Red)
 print figure.left_leg(Red, -90)
@@ -108,5 +114,5 @@ print
 print Piece(White, Vector(200, -300, -400),
             Identity(), "LIGHT")
 print Piece(Light_Grey, Vector(0, 72, 0),
-            Identity(), "3947")
+            Identity(), Baseplate32X32WithCraters)
 # print Piece(Light_Grey, Vector(60, 72, -60), Identity(), "52")

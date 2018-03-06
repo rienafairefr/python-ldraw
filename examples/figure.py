@@ -23,11 +23,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from ldraw.library.colours import *
 from ldraw.figure import *
+from ldraw.library.parts.minifig.accessories import HairMale
+from ldraw.library.parts.minifig.torsos import Torso
 
 figure = Person()
 print figure.head(Yellow, 35)
-print figure.hat(Black, "3901")  # Hair Male
-print figure.torso(Red, "973")  # Torso
+print figure.hat(Black, HairMale)  # Hair Male
+print figure.torso(Red, Torso)  # Torso
 print figure.hips(Blue)
 print figure.left_leg(Blue, 5)
 print figure.right_leg(Blue, 20)

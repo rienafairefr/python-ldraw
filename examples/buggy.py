@@ -26,6 +26,9 @@ from ldraw.library.colours import *
 from ldraw.library.colours import Light_Grey as Grey
 from ldraw.figure import *
 from ldraw.geometry import YAxis
+from ldraw.library.parts.minifig.accessories import Seat2X2
+from ldraw.library.parts.others import Plate2X2WithRedWheels_Complete_, Tyre6_50X8OffsetTread, Plate2X2, Baseplate16X16, \
+    Brick1X2WithClassicSpaceLogoPattern, Antenna4HWithRoundedTop, CarSteeringStandAndWheel_Complete_, SlopeBrick452X2
 from ldraw.pieces import Group, Piece
 
 # figure = Person(Vector(0, 0, -10))
@@ -46,44 +49,44 @@ from ldraw.pieces import Group, Piece
 rover = Group(Vector(0, 48, 60),
               Identity().rotate(-15, YAxis))
 print Piece(Light_Grey, Vector(0, 0, 0),
-            Identity(), "122C01", rover)
+            Identity(), Plate2X2WithRedWheels_Complete_, rover)
 print Piece(Rubber_Black, Vector(30, 6, 0),
-            Identity().rotate(90, YAxis), "3641", rover)
+            Identity().rotate(90, YAxis), Tyre6_50X8OffsetTread, rover)
 print Piece(Rubber_Black, Vector(-30, 6, 0),
-            Identity().rotate(90, YAxis), "3641", rover)
+            Identity().rotate(90, YAxis), Tyre6_50X8OffsetTread, rover)
 print Piece(Light_Grey, Vector(0, 0, -80),
-            Identity(), "122C01", rover)
+            Identity(), Plate2X2WithRedWheels_Complete_, rover)
 print Piece(Rubber_Black, Vector(30, 6, -80),
-            Identity().rotate(90, YAxis), "3641", rover)
+            Identity().rotate(90, YAxis), Tyre6_50X8OffsetTread, rover)
 print Piece(Rubber_Black, Vector(-30, 6, -80),
-            Identity().rotate(90, YAxis), "3641", rover)
+            Identity().rotate(90, YAxis), Tyre6_50X8OffsetTread, rover)
 
 print Piece(Light_Grey, Vector(0, 0, -40),
-            Identity(), "3022", rover)
+            Identity(), Plate2X2, rover)
 
 print Piece(Chrome_Silver, Vector(0, -24, -10),
-            Identity().rotate(180, YAxis), "3039", rover)
+            Identity().rotate(180, YAxis), SlopeBrick452X2, rover)
 print Piece(Chrome_Silver, Vector(0, -32, -10),
-            Identity().rotate(180, YAxis), "3829", rover)
+            Identity().rotate(180, YAxis), CarSteeringStandAndWheel_Complete_, rover)
 print Piece(Chrome_Gold, Vector(0, -24, -60),
-            Identity().rotate(180, YAxis), "4079", rover)
+            Identity().rotate(180, YAxis), Seat2X2, rover)
 print Piece(Chrome_Gold, Vector(0, -8, -60),
-            Identity(), "3022", rover)
+            Identity(), Plate2X2, rover)
 print Piece(Chrome_Gold, Vector(0, -16, -60),
-            Identity(), "3022", rover)
+            Identity(), Plate2X2, rover)
 print Piece(Chrome_Gold, Vector(0, -24, -90),
-            Identity(), "3004P90", rover)
+            Identity(), Brick1X2WithClassicSpaceLogoPattern, rover)
 print Piece(Chrome_Silver, Vector(-10, -32, -90),
-            Identity(), "3957", rover)
+            Identity(), Antenna4HWithRoundedTop, rover)
 
 print Piece(Yellow, Vector(0, 72, 0),
-            Identity(), "3867")
+            Identity(), Baseplate16X16)
 print Piece(Yellow, Vector(0, 72, -320),
-            Identity(), "3867")
+            Identity(), Baseplate16X16)
 print Piece(Blue, Vector(320, 72, 0),
-            Identity(), "3867")
+            Identity(), Baseplate16X16)
 print Piece(Blue, Vector(320, 72, -320),
-            Identity(), "3867")
+            Identity(), Baseplate16X16)
 print Piece(White, Vector(-90, -150, 90),
             Identity(), "LIGHT")
 print Piece(White, Vector(90, -150, 90),

@@ -25,6 +25,7 @@ from ldraw.library.colours import (Blue_Violet, Blue, Light_Blue,
                                    Light_Green, Green, Yellow,
                                    Orange, Red, Magenta, Purple,
                                    Black, White)
+from ldraw.library.parts.others import Brick1X1
 from ldraw.pieces import *
 
 colours = [Blue_Violet, Blue, Light_Blue, Light_Green, Green, Yellow,
@@ -55,7 +56,7 @@ def draw_mandelbrot(x1, z1, x2, z2, r1, i1, r2, i2):
             else:
                 colour = colours[count]
 
-            print Piece(colour, Vector(x * 20, y, z * 20), Identity(), "3005")
+            print Piece(colour, Vector(x * 20, y, z * 20), Identity(), Brick1X1)
             x += 1
 
         z += 1
