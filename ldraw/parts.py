@@ -194,6 +194,7 @@ class Parts(object):
                     name = pieces[1]
                     code = int(pieces[pieces.index("CODE") + 1])
                     rgb = pieces[pieces.index("VALUE") + 1]
+
                     self.colours[name] = rgb
                     self.colours[code] = rgb
 
@@ -206,16 +207,18 @@ class Parts(object):
                     self.alpha_values[code] = alpha
                 except (IndexError, ValueError):
                     pass
-                self.colour_attributes[name] = []
-                self.colour_attributes[code] = []
+
+                colour_attributes = []
                 for attribute in Parts.ColourAttributes:
                     if attribute in pieces:
-                        self.colour_attributes[name].append(attribute)
-                        self.colour_attributes[code].append(attribute)
+                        colour_attributes.append(attribute)
+
+                self.colour_attributes[name] = colour_attributes
+                self.colour_attributes[code] = colour_attributes
 
                 self.colours_list.append(Colour(code, name, rgb,
                                                 self.alpha_values.get(name, 255),
-                                                self.colour_attributes[name]))
+                                                colour_attributes))
 
     def _load_primitives(self, path):
         try:
