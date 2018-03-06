@@ -36,11 +36,11 @@ print figure.left_leg(White, 0)
 print figure.right_leg(White, 0)
 print figure.left_arm(White, -45)
 print figure.left_hand(White, 0)
-print figure.left_hand_item(Grey,
+print figure.left_hand_item(Light_Grey,
                             Vector(0, -11, -12), 0, "3959")  # Torch
 print figure.right_arm(White, 0)
 print figure.right_hand(White, 0)
-print figure.right_hand_item(Grey,
+print figure.right_hand_item(Light_Grey,
                              Vector(0, -23, -12), 90, "4479")  # Metal detector
 
 figure = Person(Vector(97.5, 0, 57.5),
@@ -56,10 +56,10 @@ print figure.left_arm(Red, -45)
 print figure.left_hand(Red, 0)
 print figure.right_arm(Red, -30)
 print figure.right_hand(Red, 0)
-print figure.right_hand_item(Grey, Vector(0, -11, -12), 0, "3959")  # Torch
+print figure.right_hand_item(Light_Grey, Vector(0, -11, -12), 0, "3959")  # Torch
 print
 
-print Piece(Grey, Vector(0, 72, 0), Identity(), "3867")
-print Piece(Grey, Vector(60, 72, -60), Identity(), "52")
+print Piece(Light_Grey, Vector(0, 72, 0), Identity(), "3867")
+print Piece(Light_Grey, Vector(60, 72, -60), Identity(), "52")
 
 # Camera should be at 160.0,-80.0,-240.0 in LDraw coordinates.

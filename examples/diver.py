@@ -40,7 +40,7 @@ print figure.right_leg(Yellow, -10)
 print figure.right_shoe(Black, -10, "2599")  # Flipper
 print figure.left_arm(Yellow, -45)
 print figure.left_hand(Yellow, 10)
-print figure.left_hand_item(Grey,
+print figure.left_hand_item(Light_Grey,
                             Vector(0, 0, -12), -15, "30148")  # Camera Movie
 print figure.right_arm(Yellow, 60)
 print figure.right_hand(Yellow, 0)

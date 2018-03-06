@@ -44,35 +44,35 @@ from ldraw.pieces import Group, Piece
 
 rover = Group(Vector(0, 48, 60),
               Identity().rotate(-15, YAxis))
-print Piece(Grey, Vector(0, 0, 0),
+print Piece(Light_Grey, Vector(0, 0, 0),
             Identity(), "122C01", rover)
-print Piece(BlackRubber, Vector(30, 6, 0),
+print Piece(Rubber_Black, Vector(30, 6, 0),
             Identity().rotate(90, YAxis), "3641", rover)
-print Piece(BlackRubber, Vector(-30, 6, 0),
+print Piece(Rubber_Black, Vector(-30, 6, 0),
             Identity().rotate(90, YAxis), "3641", rover)
-print Piece(Grey, Vector(0, 0, -80),
+print Piece(Light_Grey, Vector(0, 0, -80),
             Identity(), "122C01", rover)
-print Piece(BlackRubber, Vector(30, 6, -80),
+print Piece(Rubber_Black, Vector(30, 6, -80),
             Identity().rotate(90, YAxis), "3641", rover)
-print Piece(BlackRubber, Vector(-30, 6, -80),
+print Piece(Rubber_Black, Vector(-30, 6, -80),
             Identity().rotate(90, YAxis), "3641", rover)
 
-print Piece(Grey, Vector(0, 0, -40),
+print Piece(Light_Grey, Vector(0, 0, -40),
             Identity(), "3022", rover)
 
-print Piece(ChromeSilver, Vector(0, -24, -10),
+print Piece(Chrome_Silver, Vector(0, -24, -10),
             Identity().rotate(180, YAxis), "3039", rover)
-print Piece(ChromeSilver, Vector(0, -32, -10),
+print Piece(Chrome_Silver, Vector(0, -32, -10),
             Identity().rotate(180, YAxis), "3829", rover)
-print Piece(ChromeGold, Vector(0, -24, -60),
+print Piece(Chrome_Gold, Vector(0, -24, -60),
             Identity().rotate(180, YAxis), "4079", rover)
-print Piece(ChromeGold, Vector(0, -8, -60),
+print Piece(Chrome_Gold, Vector(0, -8, -60),
             Identity(), "3022", rover)
-print Piece(ChromeGold, Vector(0, -16, -60),
+print Piece(Chrome_Gold, Vector(0, -16, -60),
             Identity(), "3022", rover)
-print Piece(ChromeGold, Vector(0, -24, -90),
+print Piece(Chrome_Gold, Vector(0, -24, -90),
             Identity(), "3004P90", rover)
-print Piece(ChromeSilver, Vector(-10, -32, -90),
+print Piece(Chrome_Silver, Vector(-10, -32, -90),
             Identity(), "3957", rover)
 
 print Piece(Yellow, Vector(0, 72, 0),

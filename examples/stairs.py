@@ -47,7 +47,7 @@ figure.left_hand(White, 0)
 figure.right_arm(Black, -30)
 figure.right_hand(White, 0)
 glass = parts.parts["Minifig Tool Magnifying Glass"]
-figure.right_hand_item(ChromeSilver, Vector(0, -58, -20), 0, glass)
+figure.right_hand_item(Chrome_Silver, Vector(0, -58, -20), 0, glass)
 figure.hips(Black)
 figure.left_leg(Black, 50)
 figure.right_leg(Black, -40)
@@ -63,10 +63,10 @@ x = -120
 y = 144
 z = -160
 steps = 5
-Piece(DarkBlue, Vector(x, y, z + 40), Identity(), "3958", group=stairs)
+Piece(Dark_Blue, Vector(x, y, z + 40), Identity(), "3958", group=stairs)
 for i in range(0, steps):
     for pz in range(z, z + 120, 40):
-        Piece(DarkBlue, Vector(x + 50 + (i * 40), y - 24 - (i * 24), pz),
+        Piece(Dark_Blue, Vector(x + 50 + (i * 40), y - 24 - (i * 24), pz),
               Identity(), "3002", group=stairs)
 
 for piece in stairs.pieces:
@@ -80,15 +80,15 @@ for i in range(1, staircases + 1):
         print piece
 
 top_y = y - (steps * 24) - 8
-print Piece(DarkBlue, Vector(120, top_y, -120), Identity(), "3958")
+print Piece(Dark_Blue, Vector(120, top_y, -120), Identity(), "3958")
 
 for i in range(1, 5):
-    print Piece(DarkRed, Vector(170, top_y - (i * 24), -170),
+    print Piece(Dark_Red, Vector(170, top_y - (i * 24), -170),
                 Identity(), "3005")
-    print Piece(DarkRed, Vector(70, top_y - (i * 24), -170),
+    print Piece(Dark_Red, Vector(70, top_y - (i * 24), -170),
                 Identity(), "3005")
 
-print Piece(DarkRed, Vector(120, top_y - (5 * 24), -170),
+print Piece(Dark_Red, Vector(120, top_y - (5 * 24), -170),
             Identity(), "3455")
 
 print Piece(White, Vector(200, -200, 200), Identity(), "LIGHT")
