@@ -25,7 +25,7 @@ from ldraw.library.colours import *
 from ldraw.geometry import *
 from ldraw.pieces import *
 
-colours = [VioletBlue, Blue, LightBlue, LightGreen, Green, Yellow,
+colours = [Blue_Violet, Blue, Light_Blue, Light_Green, Green, Yellow,
            Orange, Red, Magenta, Purple]
 
 
