@@ -50,7 +50,7 @@ class Group(object):
     def __init__(self, position=Vector(0, 0, 0), matrix=Identity()):
         self.position = position
         self.matrix = matrix
-        self.pieces = set()
+        self.pieces = []
 
     def __repr__(self):
         text = []
@@ -59,7 +59,7 @@ class Group(object):
         return "\n".join(text)
 
     def add_piece(self, piece):
-        self.pieces.add(piece)
+        self.pieces.append(piece)
         if piece.group and piece.group != self:
             piece.group.remove_piece(piece)
         piece.group = self
