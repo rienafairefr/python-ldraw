@@ -1,4 +1,4 @@
-"""
+
 takes care of reading and writing a configuration in config.yml
 """
 import os

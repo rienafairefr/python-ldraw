@@ -9,9 +9,9 @@
 pyldraw Python Package
 ======================
 
-:Author: `Matthieu Berthomé, code originally from David Boddie`_
+:Author: `rienafairefr`_ code originally from `David Boddie`_
 :Date: 2018-02-22
-:Version: 0.3
+:Version: 0.5.1
 
 .. contents::
 
@@ -27,27 +27,26 @@ descriptions using the Python_ programming language. Pieces are specified by
 their positions, orientations and other properties in normal executable Python
 scripts which are run to create model files.
 
-The `pyldraw` packages as deployed on PyPi includes code to have the complete LDraw library available
+The `pyldraw` package includes code to have the complete LDraw library available
 to you through normal Python imports, like::
 
   from ldraw.library.colours import Light_Grey
   from ldraw.library.parts.minifig.accessories import Seat2X2
   from ldraw.library.parts.others import Brick1X2WithClassicSpaceLogoPattern
 
-The actual parts library hierarchy is still a work in progress. You can always specify parts
-by their LDraw code::
+The actual parts library hierarchy (in which subpackage each brick is, etc...),
+is still a work in progress. You can always specify parts by their LDraw code::
 
   rover = group()
   Piece(Light_Grey, Vector(-10, -32, -90),
             Identity(), "3957a", rover)
 
 
-When installing from the git repository,
 
 Compatibility
 -------------
 
-Be warned that some parts of the library (only some ldr2*** tools) require a working PyQt4/SIP installation, and for now
+Be warned that some parts of the library (only some ldr2*** tools and maybe others) require a working PyQt4/SIP installation, and for now
 have only been tested on Python 2.7.
 
 The other parts seem to work fine on Python 3.4+
@@ -59,29 +58,17 @@ The simplest way is through pip::
 
   pip install pyldraw
 
-If you download the source code, if you want to use the ldraw.library.* hierarchy,
-you must download the LDraw library and generate the python code before running the installer (`python setup.py install`)
-To do that, install the requirements for code generation `pip install -r gen-requirements.txt`, then run::
 
-  python -m ldraw.download
-  python -m ldraw.library_gen
-
-This will generate the `ldraw.library` package, then you can install pyldraw with::
-
-  python setup.py install
-
-
-You may need to become the root user or administrator to do this. Code generation shouldn't need root it's using
-your user data dir (through the `appdirs` package's user_data_dir)
-
-The ldraw.library module and its submodules (colours, parts)
-are not actual python modules, but are generated and loaded dynamically
-from a directory containing LDraw parts files
-
-If your system has never imported anything inside the ldraw.library namespace
-then it will download the library from ldraw.org and generate python files
-This can take a long time but should only be happening at the first such import
-
+The ldraw.library.* package is kind of special, it is auto-generated from a LDraw parts library (complete.zip)
+with the parts.lst itself auto-generated using pymklist_.
+On running code that needs something in the ldraw.library, pyldraw will know (through a `sys.meta_path` hook)
+and attempt to auto-generate it on-the-fly.
+Considering that the toolchain complete.zip download, parts.lst generation, python code generation takes
+quite some time, and we don't want to re-download anyway,
+the generated library will be cached and reused on subsequent import or python scripts run.
+If you provide another parts.lst or modify it, the library will be re-generated.
+The cached generated library is stored in the directory where the ldraw package is, if that's user-writeable,
+otherwise in an OS-dependent cache directory (somewhere in ~/.cache for example)
 
 
 Examples
@@ -199,4 +186,6 @@ with the current state of the repo until the API congeals, sorry about that
 
 .. _LDraw:          http://www.ldraw.org/
 .. _Python:         http://www.python.org/
+.. _pymklist:       https://github.com/rienafairefr/pymklist
 .. _`David Boddie`: mailto:david@boddie.org.uk
+.. _`rienafairefr`: mailto:rienafairefr@gmail.com

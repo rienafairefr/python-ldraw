@@ -3,5 +3,3 @@ pytest
 coveralls
 pytest-cov
 mock
-pystache
-mock

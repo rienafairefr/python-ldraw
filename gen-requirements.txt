@@ -4,3 +4,4 @@ progress
 pystache
 inflect
 attrdict
+PyYaml

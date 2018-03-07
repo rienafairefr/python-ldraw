@@ -177,10 +177,7 @@ class Parts(object):
                 return None
         elif not code:
             return None
-        loaded_part = self._load_part(code)
-        if loaded_part.category is None:
-            self.fix_missing_category(loaded_part)
-        return loaded_part
+        return self._load_part(code)
 
     def _find_parts_subdirs(self, directory):
         for item in os.listdir(directory):

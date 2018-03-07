@@ -7,6 +7,8 @@ import sys
 import pytest
 from mock import mock
 
+from tests.utils import with_mocked_parts_lst
+
 
 @contextlib.contextmanager
 def stdoutIO(stdout=None):
@@ -21,8 +23,8 @@ def stdoutIO(stdout=None):
 examples_dir = os.path.join(os.path.dirname(__file__), '..', 'examples')
 all_examples = [os.path.splitext(os.path.basename(s))[0] for s in glob.glob(os.path.join(examples_dir, '*.py'))]
 
-
-def exec_example(name):
+@with_mocked_parts_lst
+def exec_example(name, save=False):
     script_file = os.path.join(examples_dir, '%s.py' % name)
 
     d = dict(locals(), **globals())

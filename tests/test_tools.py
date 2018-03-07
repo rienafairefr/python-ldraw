@@ -1,5 +1,4 @@
 import tempfile
-import os
 
 from ldraw.config import write_config
 from ldraw.download import download_main
@@ -10,14 +9,12 @@ from ldraw.tools.ldr2pov import ldr2pov
 from ldraw.tools.ldr2svg import ldr2svg
 from ldraw.writers.png import PNGArgs
 from ldraw.writers.svg import SVGArgs
+from tests.utils import with_mocked_parts_lst
 
 INPUT_PATH = 'tests/test_data/car.ldr'
 
-download_main('tmp')
-write_config({'parts.lst': os.path.join('tmp', 'ldraw', 'parts.lst')})
 
-
-
+@with_mocked_parts_lst
 def tool_test(func, suffix):
     fd, file = tempfile.mkstemp(suffix=suffix)
     func(file)
@@ -29,14 +26,13 @@ def tool_test(func, suffix):
     assert expected == content
 
 
-os.environ['LDRAW_PARTS_LST'] = 'tmp/ldraw/parts.lst'
-
-
 def test_ldr2inv():
+    from ldraw.tools.ldr2inv import ldr2inv
     tool_test(lambda f: ldr2inv(INPUT_PATH, f), '.inv')
 
 
 def test_ldr2png():
+    from ldraw.tools.ldr2png import ldr2png
     tool_test(lambda f: ldr2png(INPUT_PATH, f,
                                 vector_position('0,0,0'),
                                 vector_position('200,200,200'),
@@ -45,6 +41,7 @@ def test_ldr2png():
 
 
 def test_ldr2pov():
+    from ldraw.tools.ldr2pov import ldr2pov
     tool_test(lambda f: ldr2pov(INPUT_PATH, f,
                                 vector_position('100,100,100'),
                                 vector_position('0,0,0'),
@@ -53,6 +50,7 @@ def test_ldr2pov():
 
 
 def test_ldr2svg():
+    from ldraw.tools.ldr2svg import ldr2svg
     tool_test(lambda f: ldr2svg(INPUT_PATH, f,
                                 vector_position('100,100,100'),
                                 vector_position('0,0,0'),
