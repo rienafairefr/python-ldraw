@@ -6,6 +6,7 @@ import os
 from mklist.generate import generate_parts_lst
 
 from ldraw.compat import urlretrieve
+from ldraw.dirs import get_data_dir
 from ldraw.utils import ensure_exists
 
 
@@ -36,4 +37,4 @@ def download_main(output_dir):
 
 
 if __name__ == '__main__':
-    download_main('tmp')
+    download_main(get_data_dir())

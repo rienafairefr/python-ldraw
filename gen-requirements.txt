@@ -1,8 +1,6 @@
 appdirs
-numpy
 pymklist
 progress
-PyYaml
 pystache
 inflect
 attrdict
