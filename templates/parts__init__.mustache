@@ -23,10 +23,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 << This file is auto-generated, you shouldn't have to modify it>>
 """
 
-from ldraw.parts import PartMeta
 
 
-{{# parts }}
-class {{{ class_name }}}(Part):
-    code = "{{{ code }}}"
-{{/ parts }}
+__all__ = [
+{{# sections }}
+'{{ module_name }}',
+{{/ sections }}
+]

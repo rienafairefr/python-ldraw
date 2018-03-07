@@ -26,3 +26,15 @@ from ldraw.colour import Colour
 {{# colours }}
 {{ name }} = Colour({{code}}, "{{{name}}}", "{{{rgb}}}", {{alpha}}, {{{colour_attributes}}})
 {{/ colours }}
+
+ColoursByCode = {
+{{# colours }}
+    {{code}}: {{ name }},
+{{/ colours }}
+}
+
+ColoursByName = {
+{{# colours }}
+    "{{{full_name}}}": {{ name }},
+{{/ colours }}
+}

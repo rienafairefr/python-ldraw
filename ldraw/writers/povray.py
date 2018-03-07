@@ -22,7 +22,7 @@ import sys
 
 from ldraw.library.colours import Main_Colour as Current
 from ldraw.geometry import Vector
-from ldraw.parts import Quadrilateral, Triangle
+from ldraw.lines import Quadrilateral, Triangle
 from ldraw.pieces import Piece
 
 

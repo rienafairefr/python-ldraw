@@ -186,8 +186,7 @@ class Person:
 
 def test():
     import random
-    from pieces import Piece
-    from colour import Yellow, LightGreen, Blue, Red, Green
+    from ldraw.library.colours import Yellow, Light_Green, Blue, Red, Green
     random.seed()
     for x in range(-100, 200, 100):
         for z in range(-100, 200, 100):
@@ -197,7 +196,7 @@ def test():
             orientation = orientation.rotate(random.randrange(0, 360), ZAxis)
             figure = Person(Vector(x, 0, z), orientation)
             print figure.head(Yellow)
-            print figure.torso(LightGreen, "973P90")
+            print figure.torso(Light_Green, "973P90")
             print figure.hips(Blue)
             angle = random.randrange(-90, 60)
             print figure.left_leg(Red, angle)

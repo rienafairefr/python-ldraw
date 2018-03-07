@@ -3,14 +3,7 @@
 .. image:: https://travis-ci.org/rienafairefr/python-ldraw.svg?branch=master
     :target: https://travis-ci.org/rienafairefr/python-ldraw
 
-This repo is a git copy of the repository at
-https://anonscm.debian.org/hg/python-ldraw/main
 
-It will not try to stay updated with the upstream repo of the original author, David Boddie
-The goal is to see what might be done, the original repo hasn't been updated since 2011
-
-Some of the documentation underneath might be outdated
-with the current state of the repo until the API congeals, sorry about that
 
 ======================
 pyldraw Python Package
@@ -29,10 +22,27 @@ Introduction
 LDraw_ is a standard format used by CAD applications that create LEGO models
 and scenes. 
 
-The `ldraw` package provides facilities to allow users to create LDraw scene
+The `pyldraw` package provides facilities to allow users to create LDraw scene
 descriptions using the Python_ programming language. Pieces are specified by
 their positions, orientations and other properties in normal executable Python
 scripts which are run to create model files.
+
+The `pyldraw` packages as deployed on PyPi includes code to have the complete LDraw library available
+to you through normal Python imports, like::
+
+  from ldraw.library.colours import Light_Grey
+  from ldraw.library.parts.minifig.accessories import Seat2X2
+  from ldraw.library.parts.others import Brick1X2WithClassicSpaceLogoPattern
+
+The actual parts library hierarchy is still a work in progress. You can always specify parts
+by their LDraw code::
+
+  rover = group()
+  Piece(Light_Grey, Vector(-10, -32, -90),
+            Identity(), "3957a, rover)
+
+
+When installing from the git repository,
 
 Compatibility
 -------------
@@ -45,14 +55,24 @@ The other parts seem to work fine on Python 3.4+
 Installation
 ------------
 
-To install the package alongside other packages and modules in your Python
-installation, unpack the contents of the archive. At the command line, enter
-the directory containing the ``setup.py`` script and install it by typing the
-following::
+The simplest way is through pip::
+
+  pip install pyldraw
+
+If you download the source code, if you want to use the ldraw.library.* hierarchy,
+you must download the LDraw library and generate the python code before running the installer (`python setup.py install`)
+To do that, install the requirements for code generation `pip install -r gen-requirements.txt`, then run::
+
+  python -m ldraw.download
+  python -m ldraw.library_gen
+
+This will generate the `ldraw.library` package, then you can install pyldraw with::
 
   python setup.py install
 
-You may need to become the root user or administrator to do this.
+
+You may need to become the root user or administrator to do this. Code generation shouldn't need root it's using
+your user data dir (through the `appdirs` package's user_data_dir)
 
 
 Examples
@@ -66,30 +86,23 @@ from an example, redirect its output to a file.
 Part Descriptions
 -----------------
 
-This package does not include a list of parts derived from those supplied in
-the official LDraw archive, so users will have to download and consult this
-list separately. However, once the user has obtained this file, it is possible
-to use the `ldraw.parts` module to create a parts database from within a scene
+Even though this package does include a list of parts derived from those supplied in
+the official LDraw archive, users can download or modify this
+list separately. The ldraw.library.* hierarchy will stay current with the LDraw database
+at the moment the package was deployed on Pypi though
+
+It is possible to use the `ldraw.parts` module to create a parts database from within a scene
 script in the following way::
 
   from ldraw.parts import Parts
-  parts = Parts("parts.lst") # parts.lst is supplied with LDraw
+  parts = Parts("parts.lst") # provide your custom parts.lst path
 
-Figure-specific parts can then be accessed using the relevant dictionary
+Parts can then be accessed using the relevant dictionary
 attributes of the `parts` instance. For example::
 
-  cowboy_hat = parts.Hats["Hat Cowboy"]
-  head = parts.Heads["Head with Solid Stud"]
-
-Although this makes it easier to refer to parts, you can still refer to them
-using their part numbers. For example::
-
-  figure = Person()
-  print figure.head(Yellow, 35)
-  print figure.hat(Black, "3901")  # Hair Male
-
-This can be useful if you want to refer unambiguously to a specific part.
-
+  cowboy_hat = parts.minifig.hats["Hat Cowboy"]
+  head = parts.minifig.heads["Head with Solid Stud"]
+  brick1x1 = parts.others["Brick  1 x  1"]
 
 Writers and Tools
 -----------------
@@ -115,6 +128,20 @@ and convert that to a POV-Ray scene file (`temp.pov`)::
 
 Finally, POV-Ray is used to process the scene description and create a PNG
 image file (`temp.png`).
+
+Some other tools and writers are included,
+
+  - ldr2inv:
+
+  Transforms a LDR file into a file containing the Bill Of Materials or Inventory of the model
+
+  - ldr2png
+
+  Renders the LDR file into a PNG file
+
+  - ldr2svg
+
+  Renders the LDR file into a vector image in SVG
 
 
 License
@@ -146,6 +173,17 @@ Trademarks
 LDraw is a trademark of the Estate of James Jessiman. LEGO is a registered
 trademark of the LEGO Group.
 
+Origins
+-------
+
+This repo was extracted from the mercurial repository at
+https://anonscm.debian.org/hg/python-ldraw/main
+
+It will not try to stay updated with the upstream repo of the original author, David Boddie
+The goal is to see what might be done, the original repo hasn't been updated since 2011
+
+Some of the documentation underneath might be outdated
+with the current state of the repo until the API congeals, sorry about that
 
 
 .. _LDraw:          http://www.ldraw.org/

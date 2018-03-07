@@ -23,82 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 << This file is auto-generated, you shouldn't have to modify it>>
 """
 
-from ldraw.colours import Colour
-from ldraw.geometry import Matrix, Vector
-from ldraw.pieces import Piece
-from ldraw.parts import (PartFactory, Quadrilateral, Comment,
-                         MetaCommand, Line,
-                         OptionalLine, Triangle)
+from ldraw.parts import Part
 
 
 {{# parts }}
-{{ class_name }} = PartFactory.create("{{{ path }}}}
-{{/ parts }}
-class {{ class_name }}(object):
-    description = "{{ description }}"
-    {{# part }}
-
-
-    comments = [
-    {{# comments }}
-        Comment('''{{{text}}}'''),
-    {{/ comments }}
-    ]
-
-    metas = [
-    {{# metas }}
-        MetaCommand('''{{{text}}}'''),
-    {{/ metas }}
-    ]
-
-    subfiles = [
-    {{# subfiles }}
-        Piece({{{position}}},
-              {{{colour}}},
-              Matrix({{#matrix}}({{#rows}}
-                     ({{# .}}{{.}}, {{/ . }}),{{/rows}}
-              ){{/matrix}}),
-              "{{{part}}}"),
-    {{/ subfiles }}
-    ]
-
-    lines = [
-    {{# lines }}
-        Line({{{colour}}},
-             {{{p1}}},
-             {{{p2}}}),
-    {{/ lines }}
-    ]
-
-    triangles = [
-    {{# triangles }}
-        Triangle({{{colour}}},
-                 {{{p1}}},
-                 {{{p2}}},
-                 {{{p3}}}),
-    {{/ triangles }}
-    ]
-
-    quadrilaterals = [
-    {{# quadrilaterals }}
-        Quadrilateral({{{colour}}},
-                      {{{p1}}},
-                      {{{p2}}},
-                      {{{p3}}},
-                      {{{p4}}}),
-    {{/ quadrilaterals }}
-    ]
-
-    optional_lines = [
-    {{# optional_lines }}
-        OptionalLine({{{colour}}},
-                     {{{p1}}},
-                     {{{p2}}},
-                     {{{p3}}},
-                     {{{p4}}}),
-    {{/ optional_lines }}
-    ]
-
-    {{/ part }}
-
+{{{ class_name }}} = "{{{ code }}}"
 {{/ parts }}

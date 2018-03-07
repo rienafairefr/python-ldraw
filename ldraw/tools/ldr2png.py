@@ -22,6 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import argparse
 import sys
+
+from ldraw.config import get_config
 from ldraw.geometry import Vector
 from ldraw.parts import Part, Parts, PartError
 from ldraw.writers.png import PNGWriter
@@ -39,7 +41,6 @@ def main():
                                                  "a length in LDraw scene coordinates. Its default value is 1.0.\n\n"
                                                  "The optional sky background and stroke colours are PNG colours, either specified as\n"
                                                  "#rrggbb or as a named colour.\n\n")
-    parser.add_argument('ldraw_parts_file')
     parser.add_argument('ldraw_file')
     parser.add_argument('png_file')
     parser.add_argument('image_size')
@@ -51,14 +52,16 @@ def main():
 
     args = parser.parse_args()
 
-    ldr2png(args.ldraw_parts_file, args.ldraw_file, args.png_file,
+    ldr2png(args.ldraw_file, args.png_file,
             args.distance, args.image_size, args.camera_position, args.look_at_position,
             args.sky, args.stroke_colour)
 
 
-def ldr2png(parts_path, ldraw_path, png_path,
+def ldr2png(ldraw_path, png_path,
             distance, image_size, camera_position, look_at_position,
             sky, stroke_colour):
+    config = get_config()
+    parts_path = config['parts.lst']
 
     image_dimensions = image_size.split("x")
     if len(image_dimensions) != 2:

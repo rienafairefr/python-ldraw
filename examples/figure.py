@@ -23,11 +23,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from ldraw.library.colours import *
 from ldraw.figure import *
+from ldraw.library.parts.minifig.accessories import HairMale
+from ldraw.library.parts.minifig.torsos import Torso
 
 figure = Person()
 print figure.head(Yellow, 35)
-print figure.hat(Black, "3901")  # Hair Male
-print figure.torso(Red, "973")  # Torso
+print figure.hat(Black, HairMale)  # Hair Male
+print figure.torso(Red, Torso)  # Torso
 print figure.hips(Blue)
 print figure.left_leg(Blue, 5)
 print figure.right_leg(Blue, 20)
@@ -37,11 +39,11 @@ print figure.right_arm(Red, -90)
 print figure.right_hand(Yellow, 0)
 print
 
-print Piece(Colour(15), Vector(150, -100, -150),
+print Piece(White, Vector(150, -100, -150),
             Identity(), "LIGHT")
-print Piece(Colour(15), Vector(-150, -100, -150),
+print Piece(White, Vector(-150, -100, -150),
             Identity(), "LIGHT")
-print Piece(Colour(15), Vector(0, -100, 150),
+print Piece(White, Vector(0, -100, 150),
             Identity(), "LIGHT")
 
 # Camera should be at 120.0,-20.0,-140.0 in LDraw coordinates.

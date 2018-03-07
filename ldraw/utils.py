@@ -1,6 +1,14 @@
 import json
 
-from ldraw.parts import *
+import collections
+import re
+
+import os
+
+from ldraw.colour import Colour
+from ldraw.geometry import Vector, Matrix
+from ldraw.lines import *
+from ldraw.pieces import Piece
 
 record_types = [Comment,
                 MetaCommand,
@@ -93,3 +101,37 @@ def clean(varStr):
 
 def camel(input):
     return ''.join(x for x in input.title() if not x.isspace())
+
+
+def ensure_exists(path):
+    try:
+        os.makedirs(path)
+    except:
+        pass
+    return path
+
+
+# https://stackoverflow.com/a/6037657
+def unflatten(dictionary, sep='.'):
+    result_dict = {}
+    for key, value in dictionary.iteritems():
+        parts = key.split(sep)
+        new_dict = result_dict
+        for part in parts[:-1]:
+            if part not in new_dict:
+                new_dict[part] = {}
+            new_dict = new_dict[part]
+        new_dict[parts[-1]] = value
+    return result_dict
+
+
+# https://stackoverflow.com/a/6027615
+def flatten(input_dict, parent_key='', sep='.'):
+    items = []
+    for key, value in input_dict.items():
+        new_key = parent_key + sep + key if parent_key else key
+        if isinstance(value, collections.MutableMapping):
+            items.extend(flatten(value, new_key, sep=sep).items())
+        else:
+            items.append((new_key, value))
+    return dict(items)

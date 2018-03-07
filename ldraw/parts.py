@@ -21,15 +21,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import re
+import inflect
+from attrdict import AttrDict
+
 from ldraw.colour import Colour
 from ldraw.geometry import Matrix, Vector
+from ldraw.lines import OptionalLine, Quadrilateral, Line, Triangle, MetaCommand, Comment, BlankLine
 from ldraw.pieces import Piece
 import codecs
+
+from ldraw.utils import camel, clean
 
 
 class PartError(Exception):
     pass
 
+
+p = inflect.engine()
 
 DOT_DAT = re.compile(r"\.DAT", flags=re.IGNORECASE)
 ENDS_DOT_DAT = re.compile(r"\.DAT$", flags=re.IGNORECASE)
@@ -43,36 +51,33 @@ class Parts(object):
         self.path = None
         self.parts_dirs = []
         self.parts_subdirs = {}
-        self.parts = {}
+        self.parts_by_name = {}
+        self.parts_by_code = {}
+
         self.colours = {}
-        self.colours_list = []
         self.alpha_values = {}
         self.colour_attributes = {}
-        self.Hats = {}
-        self.Heads = {}
-        self.Torsos = {}
-        self.Hips = {}
-        self.Legs = {}
-        self.Arms = {}
-        self.Hands = {}
-        self.Accessories = {}
-        self.sections = {
-            "Cap": self.Hats,
-            "Hat": self.Hats,
-            "Helmet": self.Hats,
-            "Hair": self.Hats,
-            "Mask": self.Hats,
-            "Plume": self.Hats,
-            "Minifig Head": self.Heads,
-            "Mechanical Head": self.Heads,
-            "Skull": self.Heads,
-            "Torso": self.Torsos,
-            "Hips": self.Hips,
-            "Leg": self.Legs,
-            "Legs": self.Legs,
-            "Arm": self.Arms,
-            "Hand": self.Hands
-        }
+
+        self.colours_by_name = {}
+        self.colours_by_code = {}
+
+        self.parts = {
+            'minifig': {
+                'hats': {},
+                'heads': {},
+                'torsos': {},
+                'hips': {},
+                'legs': {},
+                'arms': {},
+                'hands': {},
+                'accessories': {},
+            },
+            'others': {
+
+            }}
+
+        self.minifig_descriptions = {k: camel(p.singular_noun(k)) for k in self.parts['minifig']}
+
         self.load(path)
 
     def load(self, path):
@@ -84,17 +89,18 @@ class Parts(object):
                     break
                 code = pieces[0]
                 description = pieces[1].strip()
-                self.parts[description] = code
-                for key, section in self.sections.items():
-                    at = description.find(key)
+                for key, section in self.parts['minifig'].items():
+                    searched = self.minifig_descriptions[key]
+                    at = description.find(searched)
+
                     if at != -1 and (
-                            at + len(key) == len(description) or
-                            description[at + len(key)] == " "):
+                            at + len(searched) == len(description) or
+                            description[at + len(searched)] == " "):
                         if description.startswith("Minifig "):
                             description = description[8:]
                             if description.startswith("(") and description.endswith(")"):
                                 description = description[1:-1]
-                        section[description] = code
+                            section[description] = code
                         break
                 else:
                     # The accessories are those Minifig items which do not fall into any
@@ -103,14 +109,17 @@ class Parts(object):
                         description = description[8:]
                         if description.startswith("(") and description.endswith(")"):
                             description = description[1:-1]
-                        self.Accessories[description] = code
-        except IOError:
+                        self.parts['minifig']['accessories'][description] = code
+                    else:
+                        self.parts['others'][description] = code
+                self.parts_by_name[description] = code
+                self.parts_by_code[code] = description
+        except IOError, e:
             raise PartError("Failed to load parts file: %s" % path)
         # If we successfully loaded the files then record the path and look for
         # part files.
         self.path = path
         directory = os.path.split(self.path)[0]
-        primitives_path = None
         for item in os.listdir(directory):
             obj = os.path.join(directory, item)
             if item.lower() == "parts" and os.path.isdir(obj):
@@ -124,12 +133,15 @@ class Parts(object):
             elif item.lower() == "p" + os.extsep + "lst" and os.path.isfile(obj):
                 self._load_primitives(obj)
 
+        self.parts['minifig'] = AttrDict(self.parts['minifig'])
+        self.parts = AttrDict(self.parts)
+
     def part(self, description=None, code=None):
         if not self.path:
             return None
         if description:
             try:
-                code = self.parts[description]
+                code = self.parts_by_name[description]
             except KeyError:
                 return None
         elif not code:
@@ -165,6 +177,7 @@ class Parts(object):
         for path in paths:
             try:
                 part = Part(path)
+                part.path = os.path.relpath(path, self.path)
             except PartError:
                 continue
             else:
@@ -183,8 +196,13 @@ class Parts(object):
                     name = pieces[1]
                     code = int(pieces[pieces.index("CODE") + 1])
                     rgb = pieces[pieces.index("VALUE") + 1]
+
                     self.colours[name] = rgb
                     self.colours[code] = rgb
+
+                    colour = Colour(code, name, rgb)
+                    self.colours_by_name[name] = colour
+                    self.colours_by_code[code] = colour
 
                 except (ValueError, IndexError):
                     continue
@@ -195,16 +213,19 @@ class Parts(object):
                     self.alpha_values[code] = alpha
                 except (IndexError, ValueError):
                     pass
-                self.colour_attributes[name] = []
-                self.colour_attributes[code] = []
+
+                colour_attributes = []
                 for attribute in Parts.ColourAttributes:
                     if attribute in pieces:
-                        self.colour_attributes[name].append(attribute)
-                        self.colour_attributes[code].append(attribute)
+                        colour_attributes.append(attribute)
 
-                self.colours_list.append(Colour(code, name, rgb,
-                                                self.alpha_values.get(name, 255),
-                                                self.colour_attributes[name]))
+                self.colour_attributes[name] = colour_attributes
+                self.colour_attributes[code] = colour_attributes
+
+                colour_name = clean(camel(name))
+                colour = Colour(code, name, rgb, self.alpha_values.get(name, 255), colour_attributes)
+                self.colours_by_name[name] = colour
+                self.colours_by_code[code] = colour
 
     def _load_primitives(self, path):
         try:
@@ -215,7 +236,7 @@ class Parts(object):
                     break
                 code = pieces[0]
                 description = pieces[1].strip()
-                self.parts[description] = code
+                self.parts_by_name[description] = code
         except IOError:
             raise PartError("Failed to load primitives file: %s" % path)
 
@@ -261,10 +282,17 @@ class Part(object):
         else:
             return Comment(" ".join(pieces))
 
+    def colour_from_str(self, colour_str):
+        try:
+            return int(colour_str)
+        except ValueError:
+            if colour_str.startswith('0x2'):
+                return Colour(rgb="#" + colour_str[3:], alpha=255)
+
     def _subfile(self, pieces, line):
         if len(pieces) != 14:
             raise PartError("Invalid part data in %s at line %i" % (self.path, line))
-        colour = int(pieces[0])
+        colour = self.colour_from_str(pieces[0])
         position = map(float, pieces[1:4])
         rows = [map(float, pieces[4:7]),
                 map(float, pieces[7:10]),
@@ -277,7 +305,7 @@ class Part(object):
     def _line(self, pieces, line):
         if len(pieces) != 7:
             raise PartError("Invalid line data in %s at line %i" % (self.path, line))
-        colour = int(pieces[0])
+        colour = self.colour_from_str(pieces[0])
         p1 = map(float, pieces[1:4])
         p2 = map(float, pieces[4:7])
         return Line(Colour(colour), Vector(*p1), Vector(*p2))
@@ -285,7 +313,7 @@ class Part(object):
     def _triangle(self, pieces, line):
         if len(pieces) != 10:
             raise PartError("Invalid triangle data in %s at line %i" % (self.path, line))
-        colour = int(pieces[0])
+        colour = self.colour_from_str(pieces[0])
         p1 = map(float, pieces[1:4])
         p2 = map(float, pieces[4:7])
         p3 = map(float, pieces[7:10])
@@ -294,7 +322,7 @@ class Part(object):
     def _quadrilateral(self, pieces, line):
         if len(pieces) != 13:
             raise PartError("Invalid quadrilateral data in %s at line %i" % (self.path, line))
-        colour = int(pieces[0])
+        colour = self.colour_from_str(pieces[0])
         p1 = map(float, pieces[1:4])
         p2 = map(float, pieces[4:7])
         p3 = map(float, pieces[7:10])
@@ -305,57 +333,10 @@ class Part(object):
     def _optional_line(self, pieces, line):
         if len(pieces) != 13:
             raise PartError("Invalid line data in %s at line %i" % (self.path, line))
-        colour = int(pieces[0])
+        colour = self.colour_from_str(pieces[0])
         p1 = map(float, pieces[1:4])
         p2 = map(float, pieces[4:7])
         p3 = map(float, pieces[7:10])
         p4 = map(float, pieces[10:13])
         return OptionalLine(Colour(colour), Vector(*p1), Vector(*p2),
                             Vector(*p3), Vector(*p4))
-
-
-class BlankLine:
-    pass
-
-
-class Comment(object):
-    def __init__(self, text):
-        self.text = text
-
-
-class MetaCommand(object):
-    def __init__(self, text):
-        self.text = text
-
-
-class Line(object):
-    def __init__(self, colour, p1, p2):
-        self.colour = colour
-        self.p1 = p1
-        self.p2 = p2
-
-
-class Triangle(object):
-    def __init__(self, colour, p1, p2, p3):
-        self.colour = colour
-        self.p1 = p1
-        self.p2 = p2
-        self.p3 = p3
-
-
-class Quadrilateral(object):
-    def __init__(self, colour, p1, p2, p3, p4):
-        self.colour = colour
-        self.p1 = p1
-        self.p2 = p2
-        self.p3 = p3
-        self.p4 = p4
-
-
-class OptionalLine(object):
-    def __init__(self, colour, p1, p2, p3, p4):
-        self.colour = colour
-        self.p1 = p1
-        self.p2 = p2
-        self.p3 = p3
-        self.p4 = p4

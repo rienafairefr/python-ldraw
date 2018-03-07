@@ -21,7 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
 
 from ldraw.geometry import Identity, Vector
-from ldraw.parts import Parts, Quadrilateral, Triangle, Line
+from ldraw.parts import Parts
+from ldraw.lines import Quadrilateral, Line, Triangle
 from ldraw.pieces import Piece
 
 
