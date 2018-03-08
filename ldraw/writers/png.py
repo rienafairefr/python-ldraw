@@ -57,7 +57,11 @@ class Edge(object):
                 self.z1, self.dz_dy)
 
 
-class Polygon:
+class Polygon(object):
+    """
+    Describes a polygon for PNG rendering
+    """
+
     def __init__(self, points, rgb, alpha):
         self.points = points
         colour = QColor(rgb)
@@ -252,8 +256,6 @@ class PNGWriter(object):
             stroke_colour = QColor(stroke_colour).rgb()
         if background_colour is not None:
             image.fill(QColor(background_colour).rgb())
-        current_colour = None
-        current_alpha = None
         viewport_scale = min(float(image_size[0]), float(image_size[1]))
         # Draw opaque polygons first.
         for polygon in polygons:
@@ -267,81 +269,86 @@ class PNGWriter(object):
                 polygon.render(image, depth, viewport_scale, stroke_colour)
         image.save(png_path)
 
-    def _current_colour(self, colour, current_colour):
-        if colour.code == 16:
-            return current_colour
-        else:
-            return colour.code
-
     def _opacity_from_colour(self, colour):
         return self.parts.alpha_values.get(colour, 255) / 255.0
 
-    def _polygons_from_objects(self, model, current_colour=15, current_matrix=Identity(),
+    def _triangle_get_poly(self,
+                           obj,
+                           current_matrix,
+                           current_colour,
+                           current_position):
+        camera_position = self.camera_position
+
+        points = [current_matrix * p + current_position - camera_position for p in obj.points]
+        if abs((points[2] - points[0]).cross(points[1] - points[0])) == 0:
+            return False
+
+        return self._common_get_poly(obj, current_colour, points)
+
+    def _common_get_poly(self, obj, current_colour, points):
+        x_axis, y_axis, z_axis = self.axes
+        proj_points = [Vector(p.dot(x_axis), p.dot(y_axis), p.dot(z_axis)) for p in points]
+
+        if any(p.z >= 0 for p in proj_points):
+            return False
+
+        colour = _current_colour(obj.colour, current_colour)
+        rgb = self.parts.colours.get(colour, "#ffffff")
+        alpha = self._opacity_from_colour(colour)
+        return [Polygon(proj_points, rgb, alpha)]
+
+    def _quadrilateral_get_poly(self,
+                                obj,
+                                current_matrix,
+                                current_colour,
+                                current_position):
+        camera_position = self.camera_position
+
+        points = [current_matrix * p + current_position - camera_position for p in obj.points]
+
+        if abs((points[2] - points[0]).cross(points[1] - points[0])) == 0:
+            return False
+        if abs((points[2] - points[0]).cross(points[3] - points[0])) == 0:
+            return False
+
+        return self._common_get_poly(obj, current_colour, points)
+
+    def _polygons_from_objects(self,
+                               model,
+                               current_colour=White.code,
+                               current_matrix=Identity(),
                                current_position=Vector(0, 0, 0)):
         # Extract polygons from objects, filtering out those behind the camera.
         polygons = []
-        c = self.camera_position
-        x, y, z = self.axes
+
+        poly_handlers = {
+            Piece: self._subpart_get_poly,
+            Triangle: self._triangle_get_poly,
+            Quadrilateral: self._quadrilateral_get_poly,
+        }
+
         for obj in model.objects:
-            if isinstance(obj, Piece):
-                if obj.part == "LIGHT":
-                    continue
-                colour = self._current_colour(obj.colour, current_colour)
-                part = self.parts.part(code=obj.part)
-                if part:
-                    matrix = obj.matrix
-                    polygons += self._polygons_from_objects(
-                        part, colour, current_matrix * matrix,
-                        current_position + current_matrix * obj.position)
-                else:
-                    sys.stderr.write("Part not found: %s\n" % obj.part)
-            # elif isinstance(obj, Line):
-            #
-            #    p1 = current_matrix * obj.p1 + current_position - c
-            #    p2 = current_matrix * obj.p2 + current_position - c
-            #
-            #    r1 = Vector(p1.dot(x), p1.dot(y), p1.dot(z))
-            #    r2 = Vector(p2.dot(x), p2.dot(y), p2.dot(z))
-            #
-            #    if r1.z >= 0 or r2.z >= 0:
-            #        continue
-            #
-            #    colour = self._current_colour(obj.colour, current_colour)
-            #    rgb = self.parts.colours.get(colour, "#ffffff")
-            #    alpha = self._opacity_from_colour(colour)
-            #    polygons.append(Polygon([r1, r2, r2, r1], rgb, alpha))
-            elif isinstance(obj, Triangle):
-                p1 = current_matrix * obj.p1 + current_position - c
-                p2 = current_matrix * obj.p2 + current_position - c
-                p3 = current_matrix * obj.p3 + current_position - c
-                if abs((p3 - p1).cross(p2 - p1)) == 0:
-                    continue
-                r1 = Vector(p1.dot(x), p1.dot(y), p1.dot(z))
-                r2 = Vector(p2.dot(x), p2.dot(y), p2.dot(z))
-                r3 = Vector(p3.dot(x), p3.dot(y), p3.dot(z))
-                if r1.z >= 0 or r2.z >= 0 or r3.z >= 0:
-                    continue
-                colour = self._current_colour(obj.colour, current_colour)
-                rgb = self.parts.colours.get(colour, "#ffffff")
-                alpha = self._opacity_from_colour(colour)
-                polygons.append(Polygon([r1, r2, r3], rgb, alpha))
-            elif isinstance(obj, Quadrilateral):
-                p1 = current_matrix * obj.p1 + current_position - c
-                p2 = current_matrix * obj.p2 + current_position - c
-                p3 = current_matrix * obj.p3 + current_position - c
-                p4 = current_matrix * obj.p4 + current_position - c
-                if abs((p3 - p1).cross(p2 - p1)) == 0:
-                    continue
-                if abs((p3 - p1).cross(p4 - p1)) == 0:
-                    continue
-                r1 = Vector(p1.dot(x), p1.dot(y), p1.dot(z))
-                r2 = Vector(p2.dot(x), p2.dot(y), p2.dot(z))
-                r3 = Vector(p3.dot(x), p3.dot(y), p3.dot(z))
-                r4 = Vector(p4.dot(x), p4.dot(y), p4.dot(z))
-                if r1.z >= 0 or r2.z >= 0 or r3.z >= 0 or r4.z >= 0:
-                    continue
-                colour = self._current_colour(obj.colour, current_colour)
-                rgb = self.parts.colours.get(colour, "#ffffff")
-                alpha = self._opacity_from_colour(colour)
-                polygons.append(Polygon([r1, r2, r3, r4], rgb, alpha))
+            if isinstance(obj, Piece) and obj.part == "LIGHT":
+                continue
+            try:
+                args = (obj, current_matrix, current_colour, current_position)
+                poly = poly_handlers[type(obj)](*args)
+            except KeyError:
+                continue
+            if poly:
+                polygons.extend(poly)
+            else:
+                continue
+
         return polygons
+
+    def _subpart_get_poly(self, obj, current_matrix, current_colour, current_position):
+        colour = _current_colour(obj.colour, current_colour)
+        part = self.parts.part(code=obj.part)
+        if part:
+            matrix = obj.matrix
+            return self._polygons_from_objects(
+                part, colour, current_matrix * matrix,
+                              current_position + current_matrix * obj.position)
+        sys.stderr.write("Part not found: %s\n" % obj.part)
+        return False
