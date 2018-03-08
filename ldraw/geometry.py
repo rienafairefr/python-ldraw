@@ -145,6 +145,15 @@ class Matrix(object):
     def flatten(self):
         return tuple(reduce(lambda x, y: x + y, self.rows))
 
+    def fix_diagonal(self):
+        # POV-Ray does not like matrices with zero diagonal elements.
+        corrected = False
+        for i in range(3):
+            if self.rows[i][i] == 0.0:
+                self.rows[i][i] = 0.001
+                corrected = True
+        return corrected
+
 
 def Identity():
     return Matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
@@ -215,3 +224,4 @@ class Vector(object):
 
     def dot(self, other):
         return self.x * other.x + self.y * other.y + self.z * other.z
+

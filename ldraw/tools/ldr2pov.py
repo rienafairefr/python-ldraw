@@ -105,7 +105,7 @@ def ldr2pov(ldraw_path, pov_path,
                 "}\n" % sky
             )
 
-    for message, part in writer.warnings.keys():
+    for message, part in writer.warnings:
         sys.stderr.write((message + "\n") % part)
 
 
