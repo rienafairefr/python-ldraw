@@ -15,6 +15,10 @@ class Quadrilateral(object):
         self.p3 = p3
         self.p4 = p4
 
+    @property
+    def points(self):
+        return [self.p1, self.p2, self.p3, self.p4]
+
 
 class Line(object):
     def __init__(self, colour, p1, p2):
@@ -29,6 +33,10 @@ class Triangle(object):
         self.p1 = p1
         self.p2 = p2
         self.p3 = p3
+
+    @property
+    def points(self):
+        return [self.p1, self.p2, self.p3]
 
 
 class MetaCommand(object):

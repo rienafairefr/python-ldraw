@@ -26,7 +26,7 @@ import sys
 from ldraw.config import get_config
 from ldraw.geometry import Vector
 from ldraw.parts import Part, Parts, PartError
-from ldraw.writers.png import PNGWriter
+from ldraw.writers.png import PNGWriter, PNGArgs
 
 
 def main():
@@ -107,9 +107,8 @@ def ldr2png(ldraw_path, png_path,
     y_axis = z_axis.cross(x_axis)
 
     writer = PNGWriter(camera_position, (x_axis, y_axis, z_axis), parts)
-    writer.write(model, png_path, distance, image_size,
-                 background_colour=background_colour,
-                 stroke_colour=stroke_colour)
+    png_args = PNGArgs(distance, image_size, stroke_colour, background_colour)
+    writer.write(model, png_path, png_args)
 
 
 if __name__ == "__main__":

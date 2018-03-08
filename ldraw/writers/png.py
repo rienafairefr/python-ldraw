@@ -20,16 +20,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import sys
 
+import numpy
+from PyQt4.QtGui import QColor, QImage, \
+    qRed, qGreen, qBlue, qRgb
+
 from ldraw.geometry import Identity, Vector
-from ldraw.parts import Parts
-from ldraw.lines import Quadrilateral, Line, Triangle
+from ldraw.library.colours import Main_Colour, White
+from ldraw.lines import Quadrilateral, Triangle
 from ldraw.pieces import Piece
 
-import numpy
 
-from PyQt4.QtCore import QPointF, Qt
-from PyQt4.QtGui import QBrush, QColor, QImage, QPainter, QPen, QPolygonF, \
-    qRed, qGreen, qBlue, qRgb
+class Edge(object):
+    def __init__(self, point1, point2):
+        """
+        :param point1:
+        :type point1: Vector
+        :param point2:
+        :type point2: Vector
+        """
+
+        self.point1 = point1
+        self.point2 = point2
+
+        self.x1 = point1.x
+        self.y1 = point1.y
+        self.y2 = point2.y
+        self.z1 = point1.z
+
+        self.dx_dy = (point2.x - point1.x) / (point2.y - point1.y)
+        self.dz_dy = (point2.z - point1.z) / (point2.y - point1.y)
+
+    @property
+    def t(self):
+        return (self.y1, self.y2,
+                self.x1, self.dx_dy,
+                self.z1, self.dz_dy)
 
 
 class Polygon:
@@ -169,8 +194,31 @@ class Polygon:
                     image.setPixel(sx2, py, stroke_colour)
             py += 1
 
+class PNGArgs(object):
+    def __init__(self, distance, image_size, stroke_colour=None, background_colour=None):
+        """
+        :param distance: distance of the camera
+        :param image_size: size of the image as a string (e.g. '800x800')
+        :param stroke_colour: colour of the edges
+        :param background_colour: colour of the background
+        """
+        self.distance = distance
+        self.image_size = image_size
+        self.stroke_colour = stroke_colour
+        self.background_colour = background_colour
 
-class PNGWriter:
+
+def _current_colour(colour, current_colour):
+    return current_colour if colour == Main_Colour else colour.code
+
+
+class PNGWriter(object):
+    """
+    Renders a LDR model into a PNG
+    """
+
+    # pylint: disable=too-few-public-methods
+
     def __init__(self, camera_position, axes, parts):
         self.parts = parts
         self.lights = []
@@ -180,7 +228,22 @@ class PNGWriter:
         self.camera_position = camera_position
         self.axes = axes
 
-    def write(self, model, png_path, distance, image_size, stroke_colour=None, background_colour=None):
+    def write(self, model, png_path, png_args):
+        """
+        Writes the model's polygons to the provided PNG file
+
+        :param model: LDR model
+        :type model: Part
+        :param png_path: where to output the PNG
+        :param png_args: Arguments for the rendering (distance, etc.)
+        :type png_args: PNGArgs
+
+        :return:
+        """
+        distance = png_args.distance
+        image_size = png_args.image_size
+        stroke_colour = png_args.stroke_colour
+        background_colour = png_args.background_colour
         image = QImage(image_size[0], image_size[1], QImage.Format_RGB16)
         depth = numpy.empty((image_size[0], image_size[1]), "f")
         depth[:] = 1 << 32 - 1
