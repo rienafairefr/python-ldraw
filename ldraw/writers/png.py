@@ -91,58 +91,91 @@ class Polygon(object):
         edges = []
         len_points = len(self.points)
         for i in range(len_points):
-            pxa, pya = self.projected[i]
-            pxa = width / 2 + (pxa * viewport_scale)
-            pya = height / 2 - (pya * viewport_scale)
-            za = -self.points[i].z
+            point1_x, point1_y = self.projected[i]
+            point1_x = width / 2 + (point1_x * viewport_scale)
+            point1_y = height / 2 - (point1_y * viewport_scale)
+            point1_z = -self.points[i].z
             j = (i + 1) % len_points
-            pxb, pyb = self.projected[j]
-            pxb = width / 2 + (pxb * viewport_scale)
-            pyb = height / 2 - (pyb * viewport_scale)
-            zb = -self.points[j].z
+            point1 = Vector(point1_x, point1_y, point1_z)
+
+            point2_x, point2_y = self.projected[j]
+            point2_x = width / 2 + (point2_x * viewport_scale)
+            point2_y = height / 2 - (point2_y * viewport_scale)
+            point2_z = -self.points[j].z
+            point2 = Vector(point2_x, point2_y, point2_z)
             # Append the starting and finishing y coordinates, the starting
             # x coordinate, the dx/dy gradient of the edge, the starting
             # z coordinate and the dz/dy gradient of the edge.
-            if int(pya) < int(pyb):
-                edges.append((pya, pyb, pxa, (pxb - pxa) / (pyb - pya),
-                              za, (zb - za) / (pyb - pya)))
-            elif int(pya) > int(pyb):
-                edges.append((pyb, pya, pxb, (pxa - pxb) / (pya - pyb),
-                              zb, (za - zb) / (pya - pyb)))
+            if int(point1_y) < int(point2_y):
+                edges.append(Edge(point1, point2))
+            elif int(point1_y) > int(point2_y):
+                edges.append(Edge(point2, point1))
         if not edges:
             return
-        edges.sort()
-        end_py = edges[-1][1]
+        edges.sort(key=lambda e: e.t)
+        end_py = edges[-1].t[1]
         if end_py < 0:
             return
-        py1, end_py1, px1, dx1, z1, dz1 = edges.pop(0)
-        if py1 >= height:
+
+        edge1 = edges.pop(0)
+
+        edge1_y1 = edge1.y1
+        edge1_y2 = edge1.y2
+        edge1_x1 = edge1.x1
+        edge1_dx_dy = edge1.dx_dy
+        edge1_z1 = edge1.z1
+        edge1_dz_dy = edge1.dz_dy
+
+        if edge1_y1 >= height:
             return
-        py2, end_py2, px2, dx2, z2, dz2 = edges.pop(0)
-        py = int(py1)
-        if py < py1 or py < py2:
+
+        edge2 = edges.pop(0)
+
+        edge2_y1 = edge2.y1
+        edge2_y2 = edge2.y2
+        edge2_x1 = edge2.x1
+        edge2_dx_dy = edge2.dx_dy
+        edge2_z1 = edge2.z1
+        edge2_dz_dy = edge2.dz_dy
+        py = int(edge1_y1)
+
+        if py < edge1_y1 or py < edge2_y1:
             py += 1
         while py <= end_py and py < height:
             # Retrieve new edges as required.
-            if py >= end_py1:
+            if py >= edge1_y2:
                 if not edges:
                     break
-                py1, end_py1, px1, dx1, z1, dz1 = edges.pop(0)
-            if py >= end_py2:
+                edge1 = edges.pop(0)
+
+                edge1_y1 = edge1.y1
+                edge1_y2 = edge1.y2
+                edge1_x1 = edge1.x1
+                edge1_dx_dy = edge1.dx_dy
+                edge1_z1 = edge1.z1
+                edge1_dz_dy = edge1.dz_dy
+            if py >= edge2_y2:
                 if not edges:
                     break
-                py2, end_py2, px2, dx2, z2, dz2 = edges.pop(0)
+                edge2 = edges.pop(0)
+
+                edge2_y1 = edge2.y1
+                edge2_y2 = edge2.y2
+                edge2_x1 = edge2.x1
+                edge2_dx_dy = edge2.dx_dy
+                edge2_z1 = edge2.z1
+                edge2_dz_dy = edge2.dz_dy
             if py < 0:
                 py += 1
                 continue
             # Calculate the starting and finishing x coordinates of the span
             # at the current y coordinate.
-            sx1 = px1 + dx1 * (py - py1)
-            sx2 = px2 + dx2 * (py - py2)
+            sx1 = edge1_x1 + edge1_dx_dy * (py - edge1_y1)
+            sx2 = edge2_x1 + edge2_dx_dy * (py - edge2_y1)
             # Calculate the starting and finishing z coordinates of the span
             # at the current y coordinate.
-            sz1 = z1 + dz1 * (py - py1)
-            sz2 = z2 + dz2 * (py - py2)
+            sz1 = edge1_z1 + edge1_dz_dy * (py - edge1_y1)
+            sz2 = edge2_z1 + edge2_dz_dy * (py - edge2_y1)
             # Do not render the span if it lies outside the image or has
             # values that cannot be stored in the depth buffer.
             # Truncate the span if it lies partially within the image.
@@ -197,6 +230,7 @@ class Polygon(object):
                 if 0 <= sx2 < width and 0 < sz2 <= depth[int(sx2)][int(py)]:
                     image.setPixel(sx2, py, stroke_colour)
             py += 1
+
 
 class PNGArgs(object):
     def __init__(self, distance, image_size, stroke_colour=None, background_colour=None):
