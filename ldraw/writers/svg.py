@@ -24,6 +24,9 @@ from ldraw.writers.common import Writer
 
 
 class Polygon(object):
+    """Polygon used for SVG rendering"""
+    # pylint: disable=too-few-public-methods
+
     def __init__(self, zmin, points, colour):
         self.zmin = zmin
         self.points = points
@@ -60,9 +63,11 @@ points=\""""
 
 class SVGArgs(object):
     """Data-only container for arguments passed to an SVG writer"""
+    # pylint: disable=too-few-public-methods
 
     def __init__(self, width, height, stroke_colour=None,
                  stroke_width=None, background_colour=None):
+        # pylint: disable=too-many-arguments
         self.width = width
         self.height = height
         self.stroke_colour = stroke_colour
@@ -81,13 +86,16 @@ def _project_polygons(width, height, polygons):
     for polygon in polygons:
         new_points = []
         for point in polygon.points:
-            new_points.append(Vector2D(half_width * (point.x / (half_width + pixel_x * -point.z)),
-                                       half_height * (point.y / (half_height + pixel_y * -point.z))))
+            point_x = half_width * (point.x / (half_width + pixel_x * -point.z))
+            point_y = half_height * (point.y / (half_height + pixel_y * -point.z))
+            new_point = Vector2D(point_x, point_y)
+            new_points.append(new_point)
         new_polygons.append((new_points, polygon.colour))
     return new_polygons
 
 
 class SVGWriter(Writer):
+    """Writes a model into a SVG"""
     # pylint: disable=too-few-public-methods
     def __init__(self, camera_position, axes, parts):
         self.parts = parts
