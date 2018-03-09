@@ -26,6 +26,10 @@ class Line(object):
         self.p1 = p1
         self.p2 = p2
 
+    @property
+    def points(self):
+        return [self.p1, self.p2]
+
 
 class Triangle(object):
     def __init__(self, colour, p1, p2, p3):

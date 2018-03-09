@@ -30,7 +30,7 @@ from ldraw.parts import Part, Parts, PartError
 try:
     from ldraw.writers.qtsvg import SVGWriter
 except ImportError:
-    from ldraw.writers.svg import SVGWriter
+    from ldraw.writers.svg import SVGWriter, SVGArgs
 
 
 def main():
@@ -90,7 +90,8 @@ def ldr2svg(ldraw_path, svg_path,
 
     with open(svg_path, "w") as svg_file:
         writer = SVGWriter(camera_position, (x_axis, y_axis, z_axis), parts)
-        writer.write(model, svg_file, viewport_size[0], viewport_size[1], background_colour=background_colour)
+        svg_args = SVGArgs(viewport_size[0], viewport_size[1], background_colour=background_colour)
+        writer.write(model, svg_file, svg_args)
 
 
 if __name__ == "__main__":

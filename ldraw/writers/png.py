@@ -18,48 +18,86 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import sys
 
 import numpy
-from PyQt4.QtGui import QColor, QImage, \
-    qRed, qGreen, qBlue, qRgb
+from PyQt4.QtGui import QColor, QImage, qRed, qGreen, qBlue, qRgb
 
-from ldraw.geometry import Identity, Vector, Vector2D
-from ldraw.library.colours import Main_Colour, White
-from ldraw.lines import Quadrilateral, Triangle
-from ldraw.pieces import Piece
-
-Z_MAX = 1 << 16
+from ldraw.geometry import Vector, Vector2D
+from ldraw.writers.common import Writer
+from ldraw.writers.geometry import Z_MAX, Edge
 
 
-class Edge(object):
-    """
-    Holds an edge of a polygon, used during pixel rendering
-    """
-    def __init__(self, point1, point2):
+class PNGArgs(object):
+    def __init__(self, distance, image_size, stroke_colour=None, background_colour=None):
         """
-        :param point1:
-        :type point1: Vector
-        :param point2:
-        :type point2: Vector
+        :param distance: distance of the camera
+        :param image_size: size of the image as a string (e.g. '800x800')
+        :param stroke_colour: colour of the edges
+        :param background_colour: colour of the background
         """
+        self.distance = distance
+        self.image_size = image_size
+        self.stroke_colour = stroke_colour
+        self.background_colour = background_colour
 
-        self.point1 = point1
-        self.point2 = point2
 
-        self.x1 = point1.x
-        self.y1 = point1.y
-        self.y2 = point2.y
-        self.z1 = point1.z
+class PNGWriter(Writer):
+    """
+    Renders a LDR model into a PNG
+    """
 
-        self.dx_dy = (point2.x - point1.x) / (point2.y - point1.y)
-        self.dz_dy = (point2.z - point1.z) / (point2.y - point1.y)
+    # pylint: disable=too-few-public-methods
 
-    @property
-    def t(self):
-        return (self.y1, self.y2,
-                self.x1, self.dx_dy,
-                self.z1, self.dz_dy)
+    def __init__(self, camera_position, axes, parts):
+        self.parts = parts
+        self.lights = []
+        self.minimum = Vector(0, 0, 0)
+        self.maximum = Vector(0, 0, 0)
+        self.bbox_cache = {}
+        self.camera_position = camera_position
+        self.axes = axes
+
+    def write(self, model, png_path, png_args):
+        """
+        Writes the model's polygons to the provided PNG file
+
+        :param model: LDR model
+        :type model: Part
+        :param png_path: where to output the PNG
+        :param png_args: Arguments for the rendering (distance, etc.)
+        :type png_args: PNGArgs
+
+        :return:
+        """
+        distance = png_args.distance
+        image_size = png_args.image_size
+        stroke_colour = png_args.stroke_colour
+        background_colour = png_args.background_colour
+        image = QImage(image_size[0], image_size[1], QImage.Format_RGB16)
+        depth = numpy.empty((image_size[0], image_size[1]), "f")
+        depth[:] = 1 << 32 - 1
+        polygons = self._polygons_from_objects(model)
+        if stroke_colour:
+            stroke_colour = QColor(stroke_colour).rgb()
+        if background_colour is not None:
+            image.fill(QColor(background_colour).rgb())
+        viewport_scale = min(float(image_size[0]), float(image_size[1]))
+        # Draw opaque polygons first.
+        for polygon in polygons:
+            if polygon.alpha == 1.0:
+                polygon.project(distance)
+                polygon.render(image, depth, viewport_scale, stroke_colour)
+        # Draw translucent polygons last.
+        for polygon in polygons:
+            if polygon.alpha < 1.0:
+                polygon.project(distance)
+                polygon.render(image, depth, viewport_scale, stroke_colour)
+        image.save(png_path)
+
+    def _get_polygon(self, colour, projections):
+        rgb = self.parts.colours.get(colour, "#ffffff")
+        alpha = self._opacity_from_colour(colour)
+        return [Polygon(projections, rgb, alpha)]
 
 
 class Polygon(object):
@@ -219,159 +257,3 @@ class Polygon(object):
                 image.setPixel(start_2.x, int_edge1_y1, stroke_colour)
         int_edge1_y1 += 1
         return int_edge1_y1
-
-
-class PNGArgs(object):
-    def __init__(self, distance, image_size, stroke_colour=None, background_colour=None):
-        """
-        :param distance: distance of the camera
-        :param image_size: size of the image as a string (e.g. '800x800')
-        :param stroke_colour: colour of the edges
-        :param background_colour: colour of the background
-        """
-        self.distance = distance
-        self.image_size = image_size
-        self.stroke_colour = stroke_colour
-        self.background_colour = background_colour
-
-
-def _current_colour(colour, current_colour):
-    return current_colour if colour == Main_Colour else colour.code
-
-
-class PNGWriter(object):
-    """
-    Renders a LDR model into a PNG
-    """
-
-    # pylint: disable=too-few-public-methods
-
-    def __init__(self, camera_position, axes, parts):
-        self.parts = parts
-        self.lights = []
-        self.minimum = Vector(0, 0, 0)
-        self.maximum = Vector(0, 0, 0)
-        self.bbox_cache = {}
-        self.camera_position = camera_position
-        self.axes = axes
-
-    def write(self, model, png_path, png_args):
-        """
-        Writes the model's polygons to the provided PNG file
-
-        :param model: LDR model
-        :type model: Part
-        :param png_path: where to output the PNG
-        :param png_args: Arguments for the rendering (distance, etc.)
-        :type png_args: PNGArgs
-
-        :return:
-        """
-        distance = png_args.distance
-        image_size = png_args.image_size
-        stroke_colour = png_args.stroke_colour
-        background_colour = png_args.background_colour
-        image = QImage(image_size[0], image_size[1], QImage.Format_RGB16)
-        depth = numpy.empty((image_size[0], image_size[1]), "f")
-        depth[:] = 1 << 32 - 1
-        polygons = self._polygons_from_objects(model)
-        if stroke_colour:
-            stroke_colour = QColor(stroke_colour).rgb()
-        if background_colour is not None:
-            image.fill(QColor(background_colour).rgb())
-        viewport_scale = min(float(image_size[0]), float(image_size[1]))
-        # Draw opaque polygons first.
-        for polygon in polygons:
-            if polygon.alpha == 1.0:
-                polygon.project(distance)
-                polygon.render(image, depth, viewport_scale, stroke_colour)
-        # Draw translucent polygons last.
-        for polygon in polygons:
-            if polygon.alpha < 1.0:
-                polygon.project(distance)
-                polygon.render(image, depth, viewport_scale, stroke_colour)
-        image.save(png_path)
-
-    def _opacity_from_colour(self, colour):
-        return self.parts.alpha_values.get(colour, 255) / 255.0
-
-    def _triangle_get_poly(self,
-                           obj,
-                           current_matrix,
-                           current_colour,
-                           current_position):
-        camera_position = self.camera_position
-
-        points = [current_matrix * p + current_position - camera_position for p in obj.points]
-        if abs((points[2] - points[0]).cross(points[1] - points[0])) == 0:
-            return False
-
-        return self._common_get_poly(obj, current_colour, points)
-
-    def _common_get_poly(self, obj, current_colour, points):
-        x_axis, y_axis, z_axis = self.axes
-        proj_points = [Vector(p.dot(x_axis), p.dot(y_axis), p.dot(z_axis)) for p in points]
-
-        if any(p.z >= 0 for p in proj_points):
-            return False
-
-        colour = _current_colour(obj.colour, current_colour)
-        rgb = self.parts.colours.get(colour, "#ffffff")
-        alpha = self._opacity_from_colour(colour)
-        return [Polygon(proj_points, rgb, alpha)]
-
-    def _quadrilateral_get_poly(self,
-                                obj,
-                                current_matrix,
-                                current_colour,
-                                current_position):
-        camera_position = self.camera_position
-
-        points = [current_matrix * p + current_position - camera_position for p in obj.points]
-
-        if abs((points[2] - points[0]).cross(points[1] - points[0])) == 0:
-            return False
-        if abs((points[2] - points[0]).cross(points[3] - points[0])) == 0:
-            return False
-
-        return self._common_get_poly(obj, current_colour, points)
-
-    def _polygons_from_objects(self,
-                               model,
-                               current_colour=White.code,
-                               current_matrix=Identity(),
-                               current_position=Vector(0, 0, 0)):
-        # Extract polygons from objects, filtering out those behind the camera.
-        polygons = []
-
-        poly_handlers = {
-            Piece: self._subpart_get_poly,
-            Triangle: self._triangle_get_poly,
-            Quadrilateral: self._quadrilateral_get_poly,
-        }
-
-        for obj in model.objects:
-            if isinstance(obj, Piece) and obj.part == "LIGHT":
-                continue
-            try:
-                args = (obj, current_matrix, current_colour, current_position)
-                poly = poly_handlers[type(obj)](*args)
-            except KeyError:
-                continue
-            if poly:
-                polygons.extend(poly)
-            else:
-                continue
-
-        return polygons
-
-    def _subpart_get_poly(self, obj, current_matrix, current_colour, current_position):
-        colour = _current_colour(obj.colour, current_colour)
-        part = self.parts.part(code=obj.part)
-        if part:
-            matrix = obj.matrix
-            return self._polygons_from_objects(part, colour,
-                                               current_matrix * matrix,
-                                               current_position + current_matrix * obj.position)
-        sys.stderr.write("Part not found: %s\n" % obj.part)
-        return False
