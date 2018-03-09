@@ -98,7 +98,6 @@ class POVRayWriter(object):
         self.lights = []
         self.minimum = Vector(0, 0, 0)
         self.maximum = Vector(0, 0, 0)
-        self.bbox_cache = {}
         self.warnings = []
 
     def write(self, model):

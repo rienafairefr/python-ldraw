@@ -98,15 +98,6 @@ def _project_polygons(width, height, polygons):
 class SVGWriter(Writer):
     """Writes a model into a SVG"""
     # pylint: disable=too-few-public-methods
-    def __init__(self, camera_position, axes, parts):
-        self.parts = parts
-        self.lights = []
-        self.minimum = Vector(0, 0, 0)
-        self.maximum = Vector(0, 0, 0)
-        self.bbox_cache = {}
-        self.camera_position = camera_position
-        self.axes = axes
-
     def write(self, model, svg_file, svg_args):
         """Writes the SVG """
         polygons = self._polygons_from_objects(model)

@@ -47,16 +47,6 @@ class PNGWriter(Writer):
     """
 
     # pylint: disable=too-few-public-methods
-
-    def __init__(self, camera_position, axes, parts):
-        self.parts = parts
-        self.lights = []
-        self.minimum = Vector(0, 0, 0)
-        self.maximum = Vector(0, 0, 0)
-        self.bbox_cache = {}
-        self.camera_position = camera_position
-        self.axes = axes
-
     def write(self, model, png_path, png_args):
         """
         Writes the model's polygons to the provided PNG file

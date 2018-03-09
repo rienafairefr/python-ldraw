@@ -24,7 +24,7 @@ from PyQt4.QtCore import QPointF, QT_VERSION
 from PyQt4.QtGui import QPainterPath, QPolygonF
 
 from ldraw.geometry import Vector
-from ldraw.writers.svg import SVGWriter as CommonSVGWriter
+from ldraw.writers.svg import SVGWriter, SVG_PREAMBLE
 
 if QT_VERSION < 0x40400:
     raise ImportError("This module requires PyQt4, built against Qt 4.4 or higher.")
@@ -40,15 +40,8 @@ class Polygon:
     def __lt__(self, other):
         return self.zmin < other.zmin
 
-
-class SVGWriter(CommonSVGWriter):
-    def __init__(self, camera_position, axes, parts):
-        self.parts = parts
-        self.lights = []
-        self.minimum = Vector(0, 0, 0)
-        self.maximum = Vector(0, 0, 0)
-        self.camera_position = camera_position
-        self.axes = axes
+class QTSVGWriter(SVGWriter):
+    """SVGWriter Using QT"""
 
     def _write(self, shapes, svg_file, svg_args):
         width = svg_args.width

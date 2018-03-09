@@ -11,6 +11,11 @@ def _current_colour(colour, current_colour):
 
 
 class Writer(object):
+    def __init__(self, camera_position, axes, parts):
+        self.camera_position = camera_position
+        self.axes = axes
+        self.parts = parts
+
     def _opacity_from_colour(self, colour):
         return self.parts.alpha_values.get(colour, 255) / 255.0
 

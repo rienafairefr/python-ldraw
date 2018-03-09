@@ -88,8 +88,8 @@ def ldr2svg(ldraw_path, svg_path,
     with open(svg_path, "w") as svg_file:
         svg_args = SVGArgs(viewport_size[0], viewport_size[1], background_colour=background_colour)
         if qt:
-            from ldraw.writers.qtsvg import SVGWriter
-            writer = SVGWriter(camera_position, (x_axis, y_axis, z_axis), parts)
+            from ldraw.writers.qtsvg import QTSVGWriter
+            writer = QTSVGWriter(camera_position, (x_axis, y_axis, z_axis), parts)
         else:
             from ldraw.writers.svg import SVGWriter
             writer = SVGWriter(camera_position, (x_axis, y_axis, z_axis), parts)
