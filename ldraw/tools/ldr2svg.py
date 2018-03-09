@@ -26,11 +26,7 @@ import sys
 from ldraw.config import get_config
 from ldraw.geometry import Vector
 from ldraw.parts import Part, Parts, PartError
-
-try:
-    from ldraw.writers.qtsvg import SVGWriter
-except ImportError:
-    from ldraw.writers.svg import SVGWriter, SVGArgs
+from ldraw.writers.svg import SVGArgs
 
 
 def main():
@@ -49,14 +45,15 @@ def main():
     parser.add_argument('camera_position')
     parser.add_argument('look_at_position', required=False, default="0,0,0")
     parser.add_argument('--sky')
+    parser.add_argument('--qt', default=True)
 
     args = parser.parse_args()
     ldr2svg(args.ldraw_file, args.svg_file,
-            args.viewport_size, args.camera_position, args.look_at_position, args.sky)
+            args.viewport_size, args.camera_position, args.look_at_position, args.sky, args.qt)
 
 
 def ldr2svg(ldraw_path, svg_path,
-            viewport_size, camera_position, look_at_position, background_colour):
+            viewport_size, camera_position, look_at_position, background_colour, qt):
     config = get_config()
     parts_path = config['parts.lst']
     viewport_size = map(float, viewport_size.split("x"))
@@ -89,9 +86,17 @@ def ldr2svg(ldraw_path, svg_path,
     y_axis = z_axis.cross(x_axis)
 
     with open(svg_path, "w") as svg_file:
-        writer = SVGWriter(camera_position, (x_axis, y_axis, z_axis), parts)
-        svg_args = SVGArgs(viewport_size[0], viewport_size[1], background_colour=background_colour)
-        writer.write(model, svg_file, svg_args)
+        if qt:
+            from ldraw.writers.qtsvg import SVGWriter
+            writer = SVGWriter(camera_position, (x_axis, y_axis, z_axis), parts)
+            writer.write(model, svg_file, viewport_size[0], viewport_size[1], background_colour=background_colour)
+        else:
+            from ldraw.writers.svg import SVGWriter
+            writer = SVGWriter(camera_position, (x_axis, y_axis, z_axis), parts)
+            svg_args = SVGArgs(viewport_size[0], viewport_size[1], background_colour=background_colour)
+            writer.write(model, svg_file, svg_args)
+
+
 
 
 if __name__ == "__main__":

@@ -19,13 +19,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import sys
+from collections import OrderedDict
 
 from ldraw.geometry import Identity, Vector
 from ldraw.parts import Parts
 from ldraw.lines import Quadrilateral, Line, Triangle
 from ldraw.pieces import Piece
-
-from ldraw.writers.svgtools import Poly2
 
 from PyQt4.QtCore import QPointF, Qt, QT_VERSION
 from PyQt4.QtGui import QBrush, QColor, QImage, QPainter, QPainterPath, QPen, QPolygonF
@@ -79,7 +78,7 @@ class SVGWriter:
                 0.0, 0.0, width, 0.0, width, height, 0.0, height))
         path = QPainterPath()
         shapes.reverse()
-        new_shapes = {}
+        new_shapes = OrderedDict()
         for points, polygon in shapes:
             rgb = self.parts.colours.get(polygon.colour, "#ffffff")
             new_points = []
@@ -96,7 +95,7 @@ class SVGWriter:
             # the result.
             path = path.united(new_path)
             path = path.simplified()
-            piece_dict = new_shapes.setdefault(polygon.piece, {})
+            piece_dict = new_shapes.setdefault(polygon.piece, OrderedDict())
             colour_path = piece_dict.get(polygon.colour, QPainterPath())
             piece_dict[polygon.colour] = colour_path.united(remaining)
         for piece, piece_dict in new_shapes.items():
@@ -104,7 +103,7 @@ class SVGWriter:
             for colour, colour_path in piece_dict.items():
                 if colour_path.isEmpty():
                     continue
-                rgb = self.parts.colours.get(colour.code, "#ffffff")
+                rgb = self.parts.colours.get(colour, "#ffffff")
                 shape = '<path style="fill:%s; opacity:%f" d="' % (
                     rgb, self._opacity_from_colour(colour))
                 i = 0
@@ -134,7 +133,7 @@ class SVGWriter:
             return colour.code
 
     def _opacity_from_colour(self, colour):
-        return self.parts.alpha_values.get(colour.code, 255) / 255.0
+        return self.parts.alpha_values.get(colour, 255) / 255.0
 
     def _polygons_from_objects(self, model, top_level_piece=None, current_colour=15, current_matrix=Identity(),
                                current_position=Vector(0, 0, 0)):
@@ -215,81 +214,3 @@ class SVGWriter:
                                    h * (point.y / (h + b * -point.z))))
             new_polygons.append((new_points, polygon))
         return new_polygons
-
-    def _combine_polygons(self, polygons):
-        # Create a dictionary mapping adjacent vertices to polygons with those
-        # vertices.
-        mapping = {}
-        new_polygons = []
-        for points, colour in polygons:
-            len_points = len(points)
-            if len_points == 2:
-                new_polygons.append((points, colour))
-                continue
-            for i in range(len_points):
-                p1, p2 = points[i], points[(i + 1) % len_points]
-                polygon = Poly2(points)
-                polygon.colour = colour
-                mapping.setdefault((p1, p2), []).append(polygon)
-        discarded = {}
-        for key, shared in mapping.items():
-            colour = shared[0].colour
-            shared = filter(lambda polygon: polygon not in discarded and polygon.colour == colour, shared)
-            if len(shared) == 1:
-                new_polygons.append((shared[0].points, colour))
-                discarded[shared[0]] = None
-            elif len(shared) >= 2:
-                # Join the two polygons where they share vertices.
-                while len(shared) > 1:
-                    poly1 = shared.pop()
-                    poly2 = shared.pop()
-                    polygon = poly1.join(key, poly2)
-                    new_polygons.append((polygon.points, colour))
-                    discarded[poly1] = None
-                    discarded[poly2] = None
-                if shared:
-                    new_polygons.append((shared[0].points, colour))
-                    discarded[shared[0]] = None
-        return new_polygons
-
-    def _remove_obscured_polygons(self, polygons):
-        # Perform an expensive test to remove obscured polygons.
-        polygons.reverse()
-        i = 0
-        while i < len(polygons):
-            points, colour = polygons[i]
-            j = i + 1
-            while j < len(polygons):
-                other_points, other_colour = polygons[j]
-                if other_colour != colour:
-                    j += 1
-                    continue
-                for p in other_points:
-                    if not self._point_within_polygon(p, points):
-                        j += 1
-                        break
-                else:
-                    print "Discarding polygon", polygons[j]
-                    del polygons[j]
-            i += 1
-        polygons.reverse()
-        return polygons
-
-    def _point_within_polygon(self, p, points):
-        x, y = p
-        x1, y1 = points[-1]
-        inside = False
-        for x2, y2 in points:
-            if y1 == y2:
-                continue
-            if y1 <= y <= y2 or y2 <= y <= y1:
-                if x <= x1 == x2:
-                    inside = not inside
-                elif x <= min(x1, x2):
-                    inside = not inside
-                elif x <= max(x1, x2):
-                    x_inter = x1 + (y - y1) * (x2 - x1) / (y2 - y1)
-                    if x <= x_inter:
-                        inside = not inside
-            x1, y1 = x2, y2
-        return inside

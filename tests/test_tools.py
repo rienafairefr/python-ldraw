@@ -18,6 +18,9 @@ def tool_test(func, suffix):
     fd, file = tempfile.mkstemp(suffix=suffix)
     func(file)
     content = open(file, 'r').read()
+    # uncomment to save content to expected
+    # open('tests/test_data/car' + suffix, 'w').write(content)
+
     expected = open('tests/test_data/car' + suffix).read()
     assert expected == content
 
@@ -41,4 +44,9 @@ def test_ldr2pov():
 def test_ldr2svg():
     tool_test(lambda f: ldr2svg(INPUT_PATH, f,
                                 '800x800', '100,100,100', '0,0,0',
-                                '#123456'), '.svg')
+                                '#123456', False), '.svg')
+
+def test_ldr2svg_qt():
+    tool_test(lambda f: ldr2svg(INPUT_PATH, f,
+                                '800x800', '100,100,100', '0,0,0',
+                                '#123456', True), '.qt.svg')
