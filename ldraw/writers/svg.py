@@ -96,8 +96,8 @@ class SVGWriter(object):
         for points, colour in shapes:
             rgb = self.parts.colours.get(colour, "#ffffff")
             if len(points) == 2:
-                point1 = Vector2D(points[0][0] + width / 2.0, height / 2.0 - points[0][1])
-                point2 = Vector2D(points[1][0] + width / 2.0, height / 2.0 - points[1][1])
+                point1 = Vector2D(points[0].x + width / 2.0, height / 2.0 - points[0].y)
+                point2 = Vector2D(points[1].x + width / 2.0, height / 2.0 - points[1].y)
 
                 svg_file.write(SVG_LINE.format(rgb=rgb, stroke_width=stroke_width, opacity=self._opacity_from_colour(colour),
                                                point1=point1, point2=point2))
@@ -106,8 +106,8 @@ class SVGWriter(object):
                                                            stroke_colour=stroke_colour if stroke_colour else rgb,
                                                            stroke_width=stroke_width,
                                                            opacity=self._opacity_from_colour(colour)))
-                for x, y in points:
-                    point = Vector2D(x + width / 2.0, height / 2.0 - y)
+                for pt in points:
+                    point = Vector2D(pt.x + width / 2.0, height / 2.0 - pt.y)
                     svg_file.write('{point.x:.6f},{point.y:.6f} '.format(point=point) )
                 svg_file.write('" />\n')
         svg_file.write("</svg>\n")
@@ -190,7 +190,7 @@ class SVGWriter(object):
         for polygon in polygons:
             new_points = []
             for point in polygon.points:
-                new_points.append((w * (point.x / (w + a * -point.z)),
+                new_points.append(Vector2D(w * (point.x / (w + a * -point.z)),
                                    h * (point.y / (h + b * -point.z))))
             new_polygons.append((new_points, polygon.colour))
         return new_polygons
