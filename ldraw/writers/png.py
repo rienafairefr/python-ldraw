@@ -94,7 +94,7 @@ class PNGWriter(Writer):
                 polygon.render(image, depth, viewport_scale, stroke_colour)
         image.save(png_path)
 
-    def _get_polygon(self, colour, projections):
+    def _get_polygon(self, top_level_piece, colour, projections):
         rgb = self.parts.colours.get(colour, "#ffffff")
         alpha = self._opacity_from_colour(colour)
         return [Polygon(projections, rgb, alpha)]

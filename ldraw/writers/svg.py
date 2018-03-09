@@ -27,10 +27,11 @@ class Polygon(object):
     """Polygon used for SVG rendering"""
     # pylint: disable=too-few-public-methods
 
-    def __init__(self, zmin, points, colour):
+    def __init__(self, zmin, points, colour, piece):
         self.zmin = zmin
         self.points = points
         self.colour = colour
+        self.piece = piece
 
     def __lt__(self, other):
         return self.zmin < other.zmin
@@ -90,7 +91,7 @@ def _project_polygons(width, height, polygons):
             point_y = half_height * (point.y / (half_height + pixel_y * -point.z))
             new_point = Vector2D(point_x, point_y)
             new_points.append(new_point)
-        new_polygons.append((new_points, polygon.colour))
+        new_polygons.append((new_points, polygon))
     return new_polygons
 
 
@@ -122,13 +123,13 @@ class SVGWriter(Writer):
             svg_file.write('points="%.6f,%.6f %.6f,%.6f %.6f,%.6f %.6f,%.6f" />\n' % (
                 0.0, 0.0, args.width, 0.0, args.width, args.height, 0.0, args.height))
         shift = Vector2D(args.width / 2.0, args.height / 2.0)
-        for points, colour in shapes:
-            rgb = self.parts.colours.get(colour, "#ffffff")
+        for points, polygon in shapes:
+            rgb = self.parts.colours.get(polygon.colour, "#ffffff")
             stroke_colour = args.stroke_colour if args.stroke_colour else rgb
             context = dict(rgb=rgb,
                            stroke_width=stroke_width,
                            stroke_colour=stroke_colour,
-                           opacity=self._opacity_from_colour(colour))
+                           opacity=self._opacity_from_colour(polygon.colour))
             if len(points) == 2:
                 context['point1'] = Vector2D(points[0].x, -points[0].y) + shift
                 context['point2'] = Vector2D(points[1].x, -points[1].y) + shift
@@ -143,14 +144,14 @@ class SVGWriter(Writer):
         svg_file.write("</svg>\n")
         svg_file.close()
 
-    def _line_get_poly(self, obj, current_matrix, current_colour, current_position):
+    def _line_get_poly(self, obj, top_level_piece, current_matrix, current_colour, current_position):
         camera_position = self.camera_position
 
         points = [current_matrix * p + current_position - camera_position for p in obj.points]
 
-        return self._common_get_poly(obj, current_colour, points)
+        return self._common_get_poly(obj, top_level_piece, current_colour, points)
 
-    def _get_polygon(self, colour, projections):  # pylint: disable=no-self-use
+    def _get_polygon(self, top_level_piece, colour, projections):  # pylint: disable=no-self-use
         return [Polygon(min(p.z for p in projections),
                         projections,
-                        colour)]
+                        colour, top_level_piece)]
