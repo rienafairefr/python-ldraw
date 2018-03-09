@@ -225,3 +225,61 @@ class Vector(object):
     def dot(self, other):
         return self.x * other.x + self.y * other.y + self.z * other.z
 
+
+class Vector2D(object):
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+    def __repr__(self):
+        return "<Vector2D: (%f, %f) >" % (self.x, self.y)
+
+    def __hash__(self):
+        return hash((self.x, self.y))
+
+    def __add__(self, other):
+        x = self.x + other.x
+        y = self.y + other.y
+        # Return a new object.
+        return Vector2D(x, y)
+
+    __radd__ = __add__
+
+    def __sub__(self, other):
+        x = self.x - other.x
+        y = self.y - other.y
+        # Return a new object.
+        return Vector2D(x, y)
+
+    def __rsub__(self, other):
+        x = other.x - self.x
+        y = other.y - self.y
+        # Return a new object.
+        return Vector2D(x, y)
+
+    def __cmp__(self, other):
+        # This next expression will only return zero (equals) if all
+        # expressions are false.
+        return self.x != other.x or self.y != other.y
+
+    def __abs__(self):
+        return (self.x ** 2 + self.y ** 2) ** 0.5
+
+    def __rmul__(self, other):
+        if isinstance(other, float) or isinstance(other, int):
+            return Vector2D(self.x * other, self.y * other)
+        raise ValueError("Cannot multiply %s with %s" % (self.__class__, type(other)))
+
+    def __div__(self, other):
+        if isinstance(other, float) or isinstance(other, int):
+            return Vector2D(self.x / other, self.y / other)
+        raise ValueError("Cannot divide %s with %s" % (self.__class__, type(other)))
+
+    def copy(self):
+        """vector = copy(self)
+        Copy the vector so that new vectors containing the same values
+        are passed around rather than references to the same object.
+        """
+        return Vector2D(self.x, self.y)
+
+    def dot(self, other):
+        return self.x * other.x + self.y * other.y

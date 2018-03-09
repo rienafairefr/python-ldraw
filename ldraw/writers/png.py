@@ -24,13 +24,16 @@ import numpy
 from PyQt4.QtGui import QColor, QImage, \
     qRed, qGreen, qBlue, qRgb
 
-from ldraw.geometry import Identity, Vector
+from ldraw.geometry import Identity, Vector, Vector2D
 from ldraw.library.colours import Main_Colour, White
 from ldraw.lines import Quadrilateral, Triangle
 from ldraw.pieces import Piece
 
 
 class Edge(object):
+    """
+    Holds an edge of a polygon, used during pixel rendering
+    """
     def __init__(self, point1, point2):
         """
         :param point1:
@@ -119,117 +122,100 @@ class Polygon(object):
 
         edge1 = edges.pop(0)
 
-        edge1_y1 = edge1.y1
-        edge1_y2 = edge1.y2
-        edge1_x1 = edge1.x1
-        edge1_dx_dy = edge1.dx_dy
-        edge1_z1 = edge1.z1
-        edge1_dz_dy = edge1.dz_dy
-
-        if edge1_y1 >= height:
+        if edge1.y1 >= height:
             return
 
         edge2 = edges.pop(0)
 
-        edge2_y1 = edge2.y1
-        edge2_y2 = edge2.y2
-        edge2_x1 = edge2.x1
-        edge2_dx_dy = edge2.dx_dy
-        edge2_z1 = edge2.z1
-        edge2_dz_dy = edge2.dz_dy
-        py = int(edge1_y1)
+        int_edge1_y1 = int(edge1.y1)
 
-        if py < edge1_y1 or py < edge2_y1:
-            py += 1
-        while py <= end_py and py < height:
+        if int_edge1_y1 < edge1.y1 or int_edge1_y1 < edge2.y1:
+            int_edge1_y1 += 1
+        while int_edge1_y1 <= end_py and int_edge1_y1 < height:
             # Retrieve new edges as required.
-            if py >= edge1_y2:
+            if int_edge1_y1 >= edge1.y2:
                 if not edges:
                     break
                 edge1 = edges.pop(0)
-
-                edge1_y1 = edge1.y1
-                edge1_y2 = edge1.y2
-                edge1_x1 = edge1.x1
-                edge1_dx_dy = edge1.dx_dy
-                edge1_z1 = edge1.z1
-                edge1_dz_dy = edge1.dz_dy
-            if py >= edge2_y2:
+            if int_edge1_y1 >= edge2.y2:
                 if not edges:
                     break
                 edge2 = edges.pop(0)
-
-                edge2_y1 = edge2.y1
-                edge2_y2 = edge2.y2
-                edge2_x1 = edge2.x1
-                edge2_dx_dy = edge2.dx_dy
-                edge2_z1 = edge2.z1
-                edge2_dz_dy = edge2.dz_dy
-            if py < 0:
-                py += 1
+            if int_edge1_y1 < 0:
+                int_edge1_y1 += 1
                 continue
-            # Calculate the starting and finishing x coordinates of the span
+            # Calculate the starting and finishing coordinates of the span
             # at the current y coordinate.
-            sx1 = edge1_x1 + edge1_dx_dy * (py - edge1_y1)
-            sx2 = edge2_x1 + edge2_dx_dy * (py - edge2_y1)
-            # Calculate the starting and finishing z coordinates of the span
-            # at the current y coordinate.
-            sz1 = edge1_z1 + edge1_dz_dy * (py - edge1_y1)
-            sz2 = edge2_z1 + edge2_dz_dy * (py - edge2_y1)
+            gradient_1 = Vector2D(edge1.dx_dy, edge1.dz_dy)
+            start_point_1 = Vector2D(edge1.x1, edge1.z1)
+            start_1 = start_point_1 + (int_edge1_y1 - edge1.y1) * gradient_1
+
+            gradient_2 = Vector2D(edge2.dx_dy, edge2.dz_dy)
+            start_point_2 = Vector2D(edge2.x1, edge2.z1)
+            start_2 = start_point_2 + (int_edge1_y1 - edge2.y1) * gradient_2
+
             # Do not render the span if it lies outside the image or has
             # values that cannot be stored in the depth buffer.
             # Truncate the span if it lies partially within the image.
-            if sx1 > sx2:
-                sx1, sx2 = sx2, sx1
-                sz1, sz2 = sz2, sz1
+            if start_1.x > start_2.x:
+                start_1.x, start_2.x = start_2.x, start_1.x
+                start_1.y, start_2.y = start_2.y, start_1.y
             # Only calculate a depth gradient for the span if it is more than
             # one pixel wide.
-            if sx1 != sx2:
-                dz = (sz2 - sz1) / (sx2 - sx1)
-            else:
-                dz = 0.0
-            if sz1 <= 0 and sz2 <= 0:
-                py += 1
+            if start_1.y <= 0 and start_2.y <= 0:
+                int_edge1_y1 += 1
                 continue
-            elif sz1 >= z_max and sz2 >= z_max:
-                py += 1
+            elif start_1.y >= z_max and start_2.y >= z_max:
+                int_edge1_y1 += 1
                 continue
-            sx, end_sx = int(sx1), int(sx2)
-            if sx < sx1:
-                sx += 1
-            if sx >= width:
-                py += 1
+
+            start_x, end_sx = int(start_1.x), int(start_2.x)
+            if start_x < start_1.x:
+                start_x += 1
+            if start_x >= width:
+                int_edge1_y1 += 1
                 continue
             elif end_sx < 0:
-                py += 1
+                int_edge1_y1 += 1
                 continue
-            if sx < 0:
-                sx = 0
-            if end_sx >= width:
-                end_sx = width - 1
-            # Draw the span.
-            while sx <= end_sx:
-                sz = sz1 + dz * (sx - sx1)
-                if 0 < sz <= depth[int(sx)][int(py)]:
-                    if self.alpha < 1.0:
-                        pixel = image.pixel(sx, py)
-                        dr = qRed(pixel)
-                        dg = qGreen(pixel)
-                        db = qBlue(pixel)
-                        r = (1 - self.alpha) * dr + self.alpha * self.red
-                        g = (1 - self.alpha) * dg + self.alpha * self.green
-                        b = (1 - self.alpha) * db + self.alpha * self.blue
-                        image.setPixel(sx, py, qRgb(r, g, b))
-                    else:
-                        depth[int(sx)][int(py)] = sz
-                        image.setPixel(sx, py, self.rgba)
-                sx += 1
-            if stroke_colour:
-                if 0 <= sx1 < width and 0 < sz1 <= depth[int(sx1)][int(py)]:
-                    image.setPixel(sx1, py, stroke_colour)
-                if 0 <= sx2 < width and 0 < sz2 <= depth[int(sx2)][int(py)]:
-                    image.setPixel(sx2, py, stroke_colour)
-            py += 1
+
+            int_edge1_y1 = self.draw_span(depth, end_sx, image, int_edge1_y1, start_1, start_2, start_x,
+                                          stroke_colour, width)
+
+    def draw_span(self, depth, end_sx, image, int_edge1_y1, start_1, start_2, start_x, stroke_colour,
+                  width):
+        if start_1.x != start_2.x:
+            start_dz_dx = (start_2.y - start_1.y) / (start_2.x - start_1.x)
+        else:
+            start_dz_dx = 0.0
+        if start_x < 0:
+            start_x = 0
+        if end_sx >= width:
+            end_sx = width - 1
+        # Draw the span.
+        while start_x <= end_sx:
+            start_z = start_1.y + start_dz_dx * (start_x - start_1.x)
+            if 0 < start_z <= depth[int(start_x)][int(int_edge1_y1)]:
+                if self.alpha < 1.0:
+                    pixel = image.pixel(start_x, int_edge1_y1)
+                    dred = qRed(pixel)
+                    dgreen = qGreen(pixel)
+                    dblue = qBlue(pixel)
+                    red = (1 - self.alpha) * dred + self.alpha * self.red
+                    green = (1 - self.alpha) * dgreen + self.alpha * self.green
+                    blue = (1 - self.alpha) * dblue + self.alpha * self.blue
+                    image.setPixel(start_x, int_edge1_y1, qRgb(red, green, blue))
+                else:
+                    depth[int(start_x)][int(int_edge1_y1)] = start_z
+                    image.setPixel(start_x, int_edge1_y1, self.rgba)
+            start_x += 1
+        if stroke_colour:
+            if 0 <= start_1.x < width and 0 < start_1.y <= depth[int(start_1.x)][int(int_edge1_y1)]:
+                image.setPixel(start_1.x, int_edge1_y1, stroke_colour)
+            if 0 <= start_2.x < width and 0 < start_2.y <= depth[int(start_2.x)][int(int_edge1_y1)]:
+                image.setPixel(start_2.x, int_edge1_y1, stroke_colour)
+        int_edge1_y1 += 1
+        return int_edge1_y1
 
 
 class PNGArgs(object):
@@ -381,8 +367,8 @@ class PNGWriter(object):
         part = self.parts.part(code=obj.part)
         if part:
             matrix = obj.matrix
-            return self._polygons_from_objects(
-                part, colour, current_matrix * matrix,
-                              current_position + current_matrix * obj.position)
+            return self._polygons_from_objects(part, colour,
+                                               current_matrix * matrix,
+                                               current_position + current_matrix * obj.position)
         sys.stderr.write("Part not found: %s\n" % obj.part)
         return False
