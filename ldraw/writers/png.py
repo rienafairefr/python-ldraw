@@ -29,6 +29,8 @@ from ldraw.library.colours import Main_Colour, White
 from ldraw.lines import Quadrilateral, Triangle
 from ldraw.pieces import Piece
 
+Z_MAX = 1 << 16
+
 
 class Edge(object):
     """
@@ -81,41 +83,19 @@ class Polygon(object):
         # px = c * x / (c + z)
         for point in self.points:
             self.projected.append(
-                ((distance * point.x) / (distance + -point.z),
-                 (distance * point.y) / (distance + -point.z))
+                Vector((distance * point.x) / (distance + -point.z),
+                 (distance * point.y) / (distance + -point.z), -point.z)
             )
 
     def render(self, image, depth, viewport_scale, stroke_colour):
         # Sort the edges of the polygon by their minimum projected y
         # coordinates, discarding horizontal edges.
-        width = image.width()
-        height = image.height()
-        z_max = 1 << 16
-        edges = []
-        len_points = len(self.points)
-        for i in range(len_points):
-            point1_x, point1_y = self.projected[i]
-            point1_x = width / 2 + (point1_x * viewport_scale)
-            point1_y = height / 2 - (point1_y * viewport_scale)
-            point1_z = -self.points[i].z
-            j = (i + 1) % len_points
-            point1 = Vector(point1_x, point1_y, point1_z)
-
-            point2_x, point2_y = self.projected[j]
-            point2_x = width / 2 + (point2_x * viewport_scale)
-            point2_y = height / 2 - (point2_y * viewport_scale)
-            point2_z = -self.points[j].z
-            point2 = Vector(point2_x, point2_y, point2_z)
-            # Append the starting and finishing y coordinates, the starting
-            # x coordinate, the dx/dy gradient of the edge, the starting
-            # z coordinate and the dz/dy gradient of the edge.
-            if int(point1_y) < int(point2_y):
-                edges.append(Edge(point1, point2))
-            elif int(point1_y) > int(point2_y):
-                edges.append(Edge(point2, point1))
+        edges = self.get_edges(image, viewport_scale)
         if not edges:
             return
-        edges.sort(key=lambda e: e.t)
+        width = image.width()
+        height = image.height()
+
         end_py = edges[-1].t[1]
         if end_py < 0:
             return
@@ -158,14 +138,13 @@ class Polygon(object):
             # values that cannot be stored in the depth buffer.
             # Truncate the span if it lies partially within the image.
             if start_1.x > start_2.x:
-                start_1.x, start_2.x = start_2.x, start_1.x
-                start_1.y, start_2.y = start_2.y, start_1.y
+                start_2, start_1 = start_1, start_2
             # Only calculate a depth gradient for the span if it is more than
             # one pixel wide.
             if start_1.y <= 0 and start_2.y <= 0:
                 int_edge1_y1 += 1
                 continue
-            elif start_1.y >= z_max and start_2.y >= z_max:
+            elif start_1.y >= Z_MAX and start_2.y >= Z_MAX:
                 int_edge1_y1 += 1
                 continue
 
@@ -181,6 +160,30 @@ class Polygon(object):
 
             int_edge1_y1 = self.draw_span(depth, end_sx, image, int_edge1_y1, start_1, start_2, start_x,
                                           stroke_colour, width)
+
+    def get_edges(self, image, viewport_scale):
+        width = image.width()
+        height = image.height()
+        edges = []
+        len_points = len(self.points)
+        for i in range(len_points):
+            point1 = self.projected[i].copy()
+            point1.x = width / 2 + (point1.x * viewport_scale)
+            point1.y = height / 2 - (point1.y * viewport_scale)
+            j = (i + 1) % len_points
+
+            point2 = self.projected[j].copy()
+            point2.x = width / 2 + (point2.x * viewport_scale)
+            point2.y = height / 2 - (point2.y * viewport_scale)
+            # Append the starting and finishing y coordinates, the starting
+            # x coordinate, the dx/dy gradient of the edge, the starting
+            # z coordinate and the dz/dy gradient of the edge.
+            if int(point1.y) < int(point2.y):
+                edges.append(Edge(point1, point2))
+            elif int(point1.y) > int(point2.y):
+                edges.append(Edge(point2, point1))
+        edges.sort(key=lambda e: e.t)
+        return edges
 
     def draw_span(self, depth, end_sx, image, int_edge1_y1, start_1, start_2, start_x, stroke_colour,
                   width):
