@@ -1,33 +1,36 @@
 #!/usr/bin/env python
+"""
+Called by ldraw.library_gen to generate the ldraw/library/colours.py file
+"""
+from __future__ import print_function
 import codecs
 import os
 
 import pystache
 
-
 from ldraw.utils import clean, camel, ensure_exists
 
 
-def gen_colours(parts, output_dir, force=False):
+def get_c_dict(colour):
     """
-    try:
-        from ldraw.library.colours import Colour
-        if not force:
-            return
-    except ImportError, e:
-        pass
-"""
+    Gets a dict from a Colour object
+    """
+    return {'code': colour.code,
+            'full_name': colour.name,
+            'name': camel(clean(colour.name)),
+            'alpha': colour.alpha,
+            'rgb': colour.rgb, 'colour_attributes': colour.colour_attributes}
+
+
+def gen_colours(parts, output_dir):
+    """
+    Generates a colours.py from library data
+    """
     print('generate ldraw.library.colours...')
 
-    colours_template_data = codecs.open(os.path.join('templates', 'colours.mustache'), 'r', encoding='utf-8').read()
-    colours_template = pystache.parse(colours_template_data)
-
-    def get_c_dict(c):
-        return {'code': c.code,
-                'full_name': c.name,
-                'name': camel(clean(c.name)),
-                'alpha': c.alpha,
-                'rgb': c.rgb, 'colour_attributes': c.colour_attributes}
+    colours_mustache = os.path.join('templates', 'colours.mustache')
+    colours_template_file = codecs.open(colours_mustache, 'r', encoding='utf-8')
+    colours_template = pystache.parse(colours_template_file.read())
 
     context = {'colours': [get_c_dict(c) for c in parts.colours_by_name.values()]}
     context['colours'].sort(key=lambda r: r['code'])
