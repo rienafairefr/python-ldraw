@@ -1,20 +1,23 @@
-import appdirs
+"""
+takes care of reading and writing a configuration in config.yml
+"""
 import os
-from os.path import exists, join
-
+from os.path import join
 import yaml
 
 from ldraw.dirs import get_config_dir, get_data_dir
 
-config_dir = get_config_dir()
-data_dir = get_data_dir()
 
-config_file_path = join(config_dir, 'config.yml')
+def get_config_file_path():
+    """ get the config file path """
+    return join(get_config_dir(), 'config.yml')
 
 
 def get_config():
+    """ get the configuration from config.yml, create it if not there """
+    data_dir = get_data_dir()
     try:
-        config = yaml.load(open(config_file_path, 'r'))
+        config = yaml.load(open(get_config_file_path(), 'r'))
         parts_path = os.environ.get('LDRAW_PARTS')
         if parts_path:
             config['parts'] = parts_path
@@ -22,7 +25,7 @@ def get_config():
         if parts_lst_path:
             config['parts.lst'] = parts_lst_path
         return config
-    except:
+    except OSError:
         ldraw = join(data_dir, 'ldraw')
         conf = {
             'parts': join(ldraw, 'parts'),
@@ -33,4 +36,5 @@ def get_config():
 
 
 def write_config(config_dict):
-    yaml.dump(config_dict, open(config_file_path, 'w'))
+    """ write the config to config.yml """
+    yaml.dump(config_dict, open(get_config_file_path(), 'w'))
