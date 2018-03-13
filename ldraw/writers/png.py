@@ -124,7 +124,7 @@ class Polygon(object):
         width = image.width()
         height = image.height()
 
-        end_py = edges[-1].t[1]
+        end_py = edges[-1].point2.y
         if end_py < 0:
             return
 
@@ -210,7 +210,7 @@ class Polygon(object):
                 edges.append(Edge(point1, point2))
             elif int(point1.y) > int(point2.y):
                 edges.append(Edge(point2, point1))
-        edges.sort(key=lambda e: e.t)
+        edges.sort(key=lambda e: e.sort_key)
         return edges
 
     def draw_span(self, depth, end_sx, image, int_edge1_y1, start_1, start_2, start_x, stroke_colour,

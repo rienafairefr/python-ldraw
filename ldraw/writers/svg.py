@@ -135,7 +135,11 @@ class SVGWriter(Writer):
         svg_file.write("</svg>\n")
         svg_file.close()
 
-    def _line_get_poly(self, obj, top_level_piece, current_matrix, current_colour, current_position):
+    def _line_get_poly(self, obj,
+                       top_level_piece,
+                       current_matrix,
+                       current_colour,
+                       current_position):
         camera_position = self.camera_position
 
         points = [current_matrix * p + current_position - camera_position for p in obj.points]

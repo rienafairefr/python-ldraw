@@ -1,10 +1,12 @@
-from ldraw.geometry import Vector
+""" Some geometry elements used in Writers """
 
 
 class Edge(object):
+    # pylint:disable=too-few-public-methods
     """
     Holds an edge of a polygon, used during pixel rendering
     """
+
     def __init__(self, point1, point2):
         """
         :param point1:
@@ -16,19 +18,15 @@ class Edge(object):
         self.point1 = point1
         self.point2 = point2
 
-        self.x1 = point1.x
-        self.y1 = point1.y
-        self.y2 = point2.y
-        self.z1 = point1.z
-
         self.dx_dy = (point2.x - point1.x) / (point2.y - point1.y)
         self.dz_dy = (point2.z - point1.z) / (point2.y - point1.y)
 
     @property
-    def t(self):
-        return (self.y1, self.y2,
-                self.x1, self.dx_dy,
-                self.z1, self.dz_dy)
+    def sort_key(self):
+        """ used for sorting the edges before rendering """
+        return (self.point1.y, self.point2.y,
+                self.point1.x, self.dx_dy,
+                self.point1.z, self.dz_dy)
 
 
 Z_MAX = 1 << 16
