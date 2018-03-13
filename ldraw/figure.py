@@ -18,12 +18,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
-from ldraw.geometry import *
+#pylint: disable=missing-docstring
+from ldraw.geometry import Vector, Identity, XAxis, YAxis, ZAxis
 from ldraw.pieces import Piece
 
 
-class Person:
+class Person(object):
     def __init__(self, position=Vector(0, 0, 0), matrix=Identity(),
                  group=None):
         self.position = position
@@ -44,7 +44,7 @@ class Person:
         try:
             head = self.pieces_info["head"]
         except KeyError:
-            return
+            return None
         # Displacement from head
         displacement = head.position + head.matrix * Vector(0, 0, 0)
         piece = Piece(colour, displacement, head.matrix, part, self.group)
@@ -84,7 +84,7 @@ class Person:
         try:
             left_arm = self.pieces_info["left arm"]
         except KeyError:
-            return
+            return None
         # Displacement from left hand
         displacement = left_arm.position + left_arm.matrix * Vector(4, 17, -9)
         matrix = left_arm.matrix * Identity().rotate(40, XAxis) * Identity().rotate(angle, ZAxis)
@@ -94,11 +94,11 @@ class Person:
 
     def left_hand_item(self, colour, displacement, angle=0, part=None):
         if not part:
-            return
+            return None
         try:
             left_hand = self.pieces_info["left hand"]
         except KeyError:
-            return
+            return None
         # Displacement from left hand
         displacement = left_hand.position + left_hand.matrix * displacement
         matrix = left_hand.matrix * Identity().rotate(10, XAxis) * Identity().rotate(angle, YAxis)
@@ -118,7 +118,7 @@ class Person:
         try:
             right_arm = self.pieces_info["right arm"]
         except KeyError:
-            return
+            return None
         # Displacement from right arm
         displacement = right_arm.position + right_arm.matrix * Vector(-4, 17, -9)
         matrix = right_arm.matrix * Identity().rotate(40, XAxis) * Identity().rotate(angle, ZAxis)
@@ -128,11 +128,11 @@ class Person:
 
     def right_hand_item(self, colour, displacement, angle=0, part=None):
         if not part:
-            return
+            return None
         try:
             right_hand = self.pieces_info["right hand"]
         except KeyError:
-            return
+            return None
         # Displacement from right hand
         displacement = right_hand.position + right_hand.matrix * displacement
         matrix = right_hand.matrix * Identity().rotate(10, XAxis) * Identity().rotate(angle, YAxis)
@@ -150,11 +150,11 @@ class Person:
 
     def left_shoe(self, colour, angle=0, part=None):
         if not part:
-            return
+            return None
         try:
             left_leg = self.pieces_info["left leg"]
         except KeyError:
-            return
+            return None
         # Displacement from left leg
         displacement = left_leg.position + left_leg.matrix * Vector(10, 28, 0)
         matrix = left_leg.matrix * Identity().rotate(angle, YAxis)
@@ -172,46 +172,13 @@ class Person:
 
     def right_shoe(self, colour, angle=0, part=None):
         if not part:
-            return
+            return None
         try:
             right_leg = self.pieces_info["right leg"]
         except KeyError:
-            return
+            return None
         # Displacement from right leg
         displacement = right_leg.position + right_leg.matrix * Vector(-10, 28, 0)
         matrix = right_leg.matrix * Identity().rotate(angle, YAxis)
         piece = Piece(colour, displacement, matrix, part, self.group)
         return piece
-
-
-def test():
-    import random
-    from ldraw.library.colours import Yellow, Light_Green, Blue, Red, Green
-    random.seed()
-    for x in range(-100, 200, 100):
-        for z in range(-100, 200, 100):
-            orientation = Identity()
-            orientation = orientation.rotate(random.randrange(0, 360), XAxis)
-            orientation = orientation.rotate(random.randrange(0, 360), YAxis)
-            orientation = orientation.rotate(random.randrange(0, 360), ZAxis)
-            figure = Person(Vector(x, 0, z), orientation)
-            print figure.head(Yellow)
-            print figure.torso(Light_Green, "973P90")
-            print figure.hips(Blue)
-            angle = random.randrange(-90, 60)
-            print figure.left_leg(Red, angle)
-            angle = random.randrange(-90, 60)
-            print figure.right_leg(Green, angle)
-            angle = random.randrange(-120, 60)
-            print figure.left_arm(Red, angle)
-            angle = random.randrange(-90, 90)
-            print figure.left_hand(Yellow, angle)
-            angle = random.randrange(-120, 60)
-            print figure.right_arm(Green, angle)
-            angle = random.randrange(-90, 90)
-            print figure.right_hand(Yellow, angle)
-            print
-
-
-if __name__ == "__main__":
-    test()
