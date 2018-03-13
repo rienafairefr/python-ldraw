@@ -18,6 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+# pylint: disable=too
 
 import numpy
 from PyQt4.QtGui import QColor, QImage, qRed, qGreen, qBlue, qRgb
@@ -112,7 +113,7 @@ class Polygon(object):
         for point in self.points:
             self.projected.append(
                 Vector((distance * point.x) / (distance + -point.z),
-                 (distance * point.y) / (distance + -point.z), -point.z)
+                       (distance * point.y) / (distance + -point.z), -point.z)
             )
 
     def render(self, image, depth, viewport_scale, stroke_colour):
@@ -186,7 +187,13 @@ class Polygon(object):
                 int_edge1_y1 += 1
                 continue
 
-            int_edge1_y1 = self.draw_span(depth, end_sx, image, int_edge1_y1, start_1, start_2, start_x,
+            int_edge1_y1 = self.draw_span(depth,
+                                          end_sx,
+                                          image,
+                                          int_edge1_y1,
+                                          start_1,
+                                          start_2,
+                                          start_x,
                                           stroke_colour, width)
 
     def get_edges(self, image, viewport_scale):
@@ -213,7 +220,11 @@ class Polygon(object):
         edges.sort(key=lambda e: e.sort_key)
         return edges
 
-    def draw_span(self, depth, end_sx, image, int_edge1_y1, start_1, start_2, start_x, stroke_colour,
+    def draw_span(self,
+                  depth, end_sx,
+                  image, int_edge1_y1,
+                  start_1, start_2,
+                  start_x, stroke_colour,
                   width):
         if start_1.x != start_2.x:
             start_dz_dx = (start_2.y - start_1.y) / (start_2.x - start_1.x)
