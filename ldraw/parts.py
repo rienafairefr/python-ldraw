@@ -18,9 +18,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+# pylint: disable=too-few-public-methods
 
 import os
 import re
+import codecs
+
+
 import inflect
 from attrdict import AttrDict
 
@@ -28,22 +32,21 @@ from ldraw.colour import Colour
 from ldraw.geometry import Matrix, Vector
 from ldraw.lines import OptionalLine, Quadrilateral, Line, Triangle, MetaCommand, Comment, BlankLine
 from ldraw.pieces import Piece
-import codecs
-
-from ldraw.utils import camel, clean
+from ldraw.utils import camel
 
 
 class PartError(Exception):
+    """ An exception happening during Part file processing """
     pass
 
-
-p = inflect.engine()
 
 DOT_DAT = re.compile(r"\.DAT", flags=re.IGNORECASE)
 ENDS_DOT_DAT = re.compile(r"\.DAT$", flags=re.IGNORECASE)
 
 
 class Parts(object):
+    # pylint: disable=too-many-instance-attributes
+    """ Part class """
     ColourAttributes = ("CHROME", "PEARLESCENT", "RUBBER", "MATTE_METALLIC",
                         "METAL")
 
@@ -75,47 +78,21 @@ class Parts(object):
             'others': {
 
             }}
+        inflect_engine = inflect.engine()
 
-        self.minifig_descriptions = {k: camel(p.singular_noun(k)) for k in self.parts['minifig']}
+        self.minifig_descriptions = {
+            k: camel(inflect_engine.singular_noun(k)) for k in self.parts['minifig']
+        }
 
         self.load(path)
 
     def load(self, path):
+        """ load a Part from a path """
         try:
-            f = codecs.open(path, 'r', encoding='utf-8')
-            for line in f.readlines():
-                pieces = re.split(DOT_DAT, line)
-                if len(pieces) != 2:
-                    break
-                code = pieces[0]
-                description = pieces[1].strip()
-                for key, section in self.parts['minifig'].items():
-                    searched = self.minifig_descriptions[key]
-                    at = description.find(searched)
-
-                    if at != -1 and (
-                            at + len(searched) == len(description) or
-                            description[at + len(searched)] == " "):
-                        if description.startswith("Minifig "):
-                            description = description[8:]
-                            if description.startswith("(") and description.endswith(")"):
-                                description = description[1:-1]
-                            section[description] = code
-                        break
-                else:
-                    # The accessories are those Minifig items which do not fall into any
-                    # of the above categories.
-                    if description.startswith("Minifig "):
-                        description = description[8:]
-                        if description.startswith("(") and description.endswith(")"):
-                            description = description[1:-1]
-                        self.parts['minifig']['accessories'][description] = code
-                    else:
-                        self.parts['others'][description] = code
-                self.parts_by_name[description] = code
-                self.parts_by_code[code] = description
-        except IOError, e:
+            self.try_load(path)
+        except IOError:
             raise PartError("Failed to load parts file: %s" % path)
+
         # If we successfully loaded the files then record the path and look for
         # part files.
         self.path = path
@@ -136,7 +113,54 @@ class Parts(object):
         self.parts['minifig'] = AttrDict(self.parts['minifig'])
         self.parts = AttrDict(self.parts)
 
+    def try_load(self, path):
+        """ try loading a Part from a path """
+        part_file = codecs.open(path, 'r', encoding='utf-8')
+        for line in part_file.readlines():
+            pieces = re.split(DOT_DAT, line)
+            if len(pieces) != 2:
+                break
+
+            code, description = self.section_find(pieces)
+            self.parts_by_name[description] = code
+            self.parts_by_code[code] = description
+
+    def section_find(self, pieces):
+        """ returns code, description from a pieces element """
+        code = pieces[0]
+        description = pieces[1].strip()
+        for key, section in self.parts['minifig'].items():
+            searched = self.minifig_descriptions[key]
+            index_find = description.find(searched)
+
+            if index_find != -1 and (
+                    index_find + len(searched) == len(description) or
+                    description[index_find + len(searched)] == " "):
+                if description.startswith("Minifig "):
+                    description = description[8:]
+                    if description.startswith("(") and description.endswith(")"):
+                        description = description[1:-1]
+                    section[description] = code
+                break
+        else:
+            # The accessories are those Minifig items which do not fall into any
+            # of the above categories.
+            if description.startswith("Minifig "):
+                description = description[8:]
+                if description.startswith("(") and description.endswith(")"):
+                    description = description[1:-1]
+                self.parts['minifig']['accessories'][description] = code
+            else:
+                self.parts['others'][description] = code
+        return code, description
+
     def part(self, description=None, code=None):
+        """
+        Gets a Part from its description or code
+        :param description:
+        :param code:
+        :return:
+        """
         if not self.path:
             return None
         if description:
@@ -177,7 +201,6 @@ class Parts(object):
         for path in paths:
             try:
                 part = Part(path)
-                part.path = os.path.relpath(path, self.path)
             except PartError:
                 continue
             else:
@@ -190,47 +213,49 @@ class Parts(object):
         except PartError:
             return
         for obj in colours_part.objects:
-            if isinstance(obj, MetaCommand) and obj.text.startswith("!COLOUR"):
-                pieces = obj.text.split()
-                try:
-                    name = pieces[1]
-                    code = int(pieces[pieces.index("CODE") + 1])
-                    rgb = pieces[pieces.index("VALUE") + 1]
+            if not isinstance(obj, MetaCommand) or not obj.text.startswith("!COLOUR"):
+                continue
+            pieces = obj.text.split()
+            try:
+                name = pieces[1]
+                code = int(pieces[pieces.index("CODE") + 1])
+                rgb = pieces[pieces.index("VALUE") + 1]
 
-                    self.colours[name] = rgb
-                    self.colours[code] = rgb
+                self.colours[name] = rgb
+                self.colours[code] = rgb
 
-                    colour = Colour(code, name, rgb)
-                    self.colours_by_name[name] = colour
-                    self.colours_by_code[code] = colour
-
-                except (ValueError, IndexError):
-                    continue
-                try:
-                    alpha_at = pieces.index("ALPHA")
-                    alpha = int(pieces[alpha_at + 1])
-                    self.alpha_values[name] = alpha
-                    self.alpha_values[code] = alpha
-                except (IndexError, ValueError):
-                    pass
-
-                colour_attributes = []
-                for attribute in Parts.ColourAttributes:
-                    if attribute in pieces:
-                        colour_attributes.append(attribute)
-
-                self.colour_attributes[name] = colour_attributes
-                self.colour_attributes[code] = colour_attributes
-
-                colour_name = clean(camel(name))
-                colour = Colour(code, name, rgb, self.alpha_values.get(name, 255), colour_attributes)
+                colour = Colour(code, name, rgb)
                 self.colours_by_name[name] = colour
                 self.colours_by_code[code] = colour
 
+            except (ValueError, IndexError):
+                continue
+            try:
+                alpha_at = pieces.index("ALPHA")
+                alpha = int(pieces[alpha_at + 1])
+                self.alpha_values[name] = alpha
+                self.alpha_values[code] = alpha
+            except (IndexError, ValueError):
+                pass
+
+            colour_attributes = []
+            for attribute in Parts.ColourAttributes:
+                if attribute in pieces:
+                    colour_attributes.append(attribute)
+
+            self.colour_attributes[name] = colour_attributes
+            self.colour_attributes[code] = colour_attributes
+
+            alpha = self.alpha_values.get(name, 255)
+            colour = Colour(code, name, rgb,
+                            alpha, colour_attributes)
+            self.colours_by_name[name] = colour
+            self.colours_by_code[code] = colour
+
     def _load_primitives(self, path):
         try:
-            f = codecs.open(path, 'r', encoding='utf-8')
-            for line in f.readlines():
+            part_path = codecs.open(path, 'r', encoding='utf-8')
+            for line in part_path.readlines():
                 pieces = re.split(DOT_DAT, line)
                 if len(pieces) != 2:
                     break
@@ -241,102 +266,114 @@ class Parts(object):
             raise PartError("Failed to load primitives file: %s" % path)
 
 
+def colour_from_str(colour_str):
+    """ gets a Colour from a string """
+    try:
+        return int(colour_str)
+    except ValueError:
+        if colour_str.startswith('0x2'):
+            return Colour(rgb="#" + colour_str[3:], alpha=255)
+
+
+def _comment_or_meta(pieces):
+    if not pieces:
+        return Comment("")
+    elif pieces[0][:1] == "!":
+        return MetaCommand(" ".join(pieces))
+    return Comment(" ".join(pieces))
+
+
+def _sub_file(pieces):
+    if len(pieces) != 14:
+        raise PartError("Invalid part data")
+    colour = colour_from_str(pieces[0])
+    position = map(float, pieces[1:4])
+    rows = [map(float, pieces[4:7]),
+            map(float, pieces[7:10]),
+            map(float, pieces[10:13])]
+    part = pieces[13].upper()
+    if re.search(ENDS_DOT_DAT, part):
+        part = part[:-4]
+    return Piece(Colour(colour), Vector(*position), Matrix(rows), part)
+
+
+def _line(pieces):
+    if len(pieces) != 7:
+        raise PartError("Invalid line data")
+    colour = colour_from_str(pieces[0])
+    point1 = map(float, pieces[1:4])
+    point2 = map(float, pieces[4:7])
+    return Line(Colour(colour), Vector(*point1), Vector(*point2))
+
+
+def _triangle(pieces):
+    if len(pieces) != 10:
+        raise PartError("Invalid triangle data")
+    colour = colour_from_str(pieces[0])
+    point1 = map(float, pieces[1:4])
+    point2 = map(float, pieces[4:7])
+    point3 = map(float, pieces[7:10])
+    return Triangle(Colour(colour), Vector(*point1), Vector(*point2), Vector(*point3))
+
+
+def _quadrilateral(pieces):
+    if len(pieces) != 13:
+        raise PartError("Invalid quadrilateral data")
+    colour = colour_from_str(pieces[0])
+    point1 = map(float, pieces[1:4])
+    point2 = map(float, pieces[4:7])
+    point3 = map(float, pieces[7:10])
+    point4 = map(float, pieces[10:13])
+    return Quadrilateral(Colour(colour), Vector(*point1), Vector(*point2),
+                         Vector(*point3), Vector(*point4))
+
+
+def _optional_line(pieces):
+    if len(pieces) != 13:
+        raise PartError("Invalid line data")
+    colour = colour_from_str(pieces[0])
+    point1 = map(float, pieces[1:4])
+    point2 = map(float, pieces[4:7])
+    point3 = map(float, pieces[7:10])
+    point4 = map(float, pieces[10:13])
+    return OptionalLine(Colour(colour), Vector(*point1), Vector(*point2),
+                        Vector(*point3), Vector(*point4))
+
+
 class Part(object):
+    """
+    Contains data from a LDraw part file
+    """
     def __init__(self, path):
         self._handlers = {
-            "0": self._comment_or_meta,
-            "1": self._subfile,
-            "2": self._line,
-            "3": self._triangle,
-            "4": self._quadrilateral,
-            "5": self._optional_line
+            "0": _comment_or_meta,
+            "1": _sub_file,
+            "2": _line,
+            "3": _triangle,
+            "4": _quadrilateral,
+            "5": _optional_line
         }
-        self.load(path)
-
-    def load(self, path):
+        self.objects = []
         self.path = path
+
+        """ Load the Part from its path """
         try:
             lines = codecs.open(path, 'r', encoding='utf-8').readlines()
         except IOError:
             raise PartError("Failed to read part file: %s" % path)
-        objects = []
         number = 0
         for line in lines:
             number += 1
             pieces = line.split()
             if not pieces:
-                objects.append(BlankLine)
+                self.objects.append(BlankLine)
                 continue
             try:
                 handler = self._handlers[pieces[0]]
             except KeyError:
                 raise PartError("Unknown command (%s) in %s at line %i" % (path, pieces[0], number))
-            objects.append(handler(pieces[1:], number))
-        self.objects = objects
-
-    def _comment_or_meta(self, pieces, line):
-        if not pieces:
-            return Comment("")
-        elif pieces[0][:1] == "!":
-            return MetaCommand(" ".join(pieces))
-        else:
-            return Comment(" ".join(pieces))
-
-    def colour_from_str(self, colour_str):
-        try:
-            return int(colour_str)
-        except ValueError:
-            if colour_str.startswith('0x2'):
-                return Colour(rgb="#" + colour_str[3:], alpha=255)
-
-    def _subfile(self, pieces, line):
-        if len(pieces) != 14:
-            raise PartError("Invalid part data in %s at line %i" % (self.path, line))
-        colour = self.colour_from_str(pieces[0])
-        position = map(float, pieces[1:4])
-        rows = [map(float, pieces[4:7]),
-                map(float, pieces[7:10]),
-                map(float, pieces[10:13])]
-        part = pieces[13].upper()
-        if re.search(ENDS_DOT_DAT, part):
-            part = part[:-4]
-        return Piece(Colour(colour), Vector(*position), Matrix(rows), part)
-
-    def _line(self, pieces, line):
-        if len(pieces) != 7:
-            raise PartError("Invalid line data in %s at line %i" % (self.path, line))
-        colour = self.colour_from_str(pieces[0])
-        p1 = map(float, pieces[1:4])
-        p2 = map(float, pieces[4:7])
-        return Line(Colour(colour), Vector(*p1), Vector(*p2))
-
-    def _triangle(self, pieces, line):
-        if len(pieces) != 10:
-            raise PartError("Invalid triangle data in %s at line %i" % (self.path, line))
-        colour = self.colour_from_str(pieces[0])
-        p1 = map(float, pieces[1:4])
-        p2 = map(float, pieces[4:7])
-        p3 = map(float, pieces[7:10])
-        return Triangle(Colour(colour), Vector(*p1), Vector(*p2), Vector(*p3))
-
-    def _quadrilateral(self, pieces, line):
-        if len(pieces) != 13:
-            raise PartError("Invalid quadrilateral data in %s at line %i" % (self.path, line))
-        colour = self.colour_from_str(pieces[0])
-        p1 = map(float, pieces[1:4])
-        p2 = map(float, pieces[4:7])
-        p3 = map(float, pieces[7:10])
-        p4 = map(float, pieces[10:13])
-        return Quadrilateral(Colour(colour), Vector(*p1), Vector(*p2),
-                             Vector(*p3), Vector(*p4))
-
-    def _optional_line(self, pieces, line):
-        if len(pieces) != 13:
-            raise PartError("Invalid line data in %s at line %i" % (self.path, line))
-        colour = self.colour_from_str(pieces[0])
-        p1 = map(float, pieces[1:4])
-        p2 = map(float, pieces[4:7])
-        p3 = map(float, pieces[7:10])
-        p4 = map(float, pieces[10:13])
-        return OptionalLine(Colour(colour), Vector(*p1), Vector(*p2),
-                            Vector(*p3), Vector(*p4))
+            try:
+                obj = handler(pieces[1:])
+                self.objects.append(obj)
+            except PartError, parse_error:
+                raise PartError(parse_error.message + ' in %s at line %i' % (self.path, number))
