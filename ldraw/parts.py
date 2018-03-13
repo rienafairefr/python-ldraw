@@ -30,7 +30,7 @@ from attrdict import AttrDict
 
 from ldraw.colour import Colour
 from ldraw.geometry import Matrix, Vector
-from ldraw.lines import OptionalLine, Quadrilateral, Line, Triangle, MetaCommand, Comment, BlankLine
+from ldraw.lines import OptionalLine, Quadrilateral, Line, Triangle, MetaCommand, Comment
 from ldraw.pieces import Piece
 from ldraw.utils import camel
 
@@ -366,7 +366,7 @@ class Part(object):
             number += 1
             pieces = line.split()
             if not pieces:
-                self.objects.append(BlankLine)
+                # self.objects.append(BlankLine)
                 continue
             try:
                 handler = self._handlers[pieces[0]]
