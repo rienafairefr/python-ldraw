@@ -1,3 +1,6 @@
+"""
+Common code for all the Writers
+"""
 import sys
 
 from ldraw.geometry import Identity, Vector
@@ -11,6 +14,8 @@ def _current_colour(colour, current_colour):
 
 
 class Writer(object):
+    # pylint: disable=too-many-arguments, too-few-public-methods
+    """ Common logic for PNG, SVG, POV writers """
     def __init__(self, camera_position, axes, parts):
         self.camera_position = camera_position
         self.axes = axes
@@ -39,7 +44,11 @@ class Writer(object):
             if isinstance(obj, Piece) and obj.part == "LIGHT":
                 continue
             try:
-                args = (obj, top_level_piece or obj, current_matrix, current_colour, current_position)
+                args = (obj,
+                        top_level_piece or obj,
+                        current_matrix,
+                        current_colour,
+                        current_position)
                 poly = poly_handlers[type(obj)](*args)
             except KeyError:
                 continue
@@ -50,15 +59,27 @@ class Writer(object):
 
         return polygons
 
-    def _line_get_poly(self, obj, top_level_piece, current_matrix, current_colour, current_position):
+    def _line_get_poly(self,
+                       obj,
+                       top_level_piece,
+                       current_matrix,
+                       current_colour,
+                       current_position):
         pass
 
-    def _subpart_get_poly(self, obj, top_level_piece, current_matrix, current_colour, current_position):
+    def _subpart_get_poly(self,
+                          obj,
+                          top_level_piece,
+                          current_matrix,
+                          current_colour,
+                          current_position):
         colour = _current_colour(obj.colour, current_colour)
         part = self.parts.part(code=obj.part)
         if part:
             matrix = obj.matrix
-            return self._polygons_from_objects(part, top_level_piece, colour,
+            return self._polygons_from_objects(part,
+                                               top_level_piece,
+                                               colour,
                                                current_matrix * matrix,
                                                current_position + current_matrix * obj.position)
         sys.stderr.write("Part not found: %s\n" % obj.part)
@@ -78,7 +99,11 @@ class Writer(object):
 
         return self._common_get_poly(obj, top_level_piece, current_colour, points)
 
-    def _common_get_poly(self, obj, top_level_piece, current_colour, points):
+    def _common_get_poly(self,
+                         obj,
+                         top_level_piece,
+                         current_colour,
+                         points):
         x_axis, y_axis, z_axis = self.axes
         projections = [Vector(p.dot(x_axis), p.dot(y_axis), p.dot(z_axis)) for p in points]
         if any(p.z >= 0 for p in projections):
@@ -104,3 +129,5 @@ class Writer(object):
 
         return self._common_get_poly(obj, top_level_piece, current_colour, points)
 
+    def _get_polygon(self, top_level_piece, colour, projections):
+        pass
