@@ -148,7 +148,7 @@ class POVRayWriter(object):
             self.pov_file.write("}\n\n")
         elif obj.part == "LIGHT":
             obj_position = (obj.position.x, obj.position.y, obj.position.z)
-            pov_line = obj_position + (self._colour_string(obj.colour), )
+            pov_line = obj_position + (self._colour_string(obj.colour),)
             self.pov_file.write(POV_LIGHTSOURCE % pov_line)
             self.lights.append(obj)
 
@@ -260,7 +260,7 @@ class POVRayWriter(object):
         for obj in part.objects:
             if isinstance(obj, Piece):
                 # Define this piece, too.
-                ordered_objects = ordered_objects+ self._create_piece_objects(obj, objects)
+                ordered_objects = ordered_objects + self._create_piece_objects(obj, objects)
                 # Record the object as part of the piece's definition.
                 definition.append(obj)
             elif isinstance(obj, Triangle):

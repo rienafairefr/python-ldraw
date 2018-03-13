@@ -23,13 +23,13 @@ all_examples = [os.path.splitext(os.path.basename(s))[0] for s in glob.glob(os.p
 
 
 def exec_example(name, save=False):
-    script_file = os.path.join(examples_dir, '%s.py'%name)
+    script_file = os.path.join(examples_dir, '%s.py' % name)
 
     d = dict(locals(), **globals())
 
     with stdoutIO() as s:
         if name == 'stairs':
-            with mock.patch('sys.argv', ['', os.path.join('tmp','ldraw','parts.lst')]):
+            with mock.patch('sys.argv', ['', os.path.join('tmp', 'ldraw', 'parts.lst')]):
                 execfile(script_file, d, d)
         else:
             execfile(script_file, d, d)

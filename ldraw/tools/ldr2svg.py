@@ -96,7 +96,5 @@ def ldr2svg(ldraw_path, svg_path,
         writer.write(model, svg_file, svg_args)
 
 
-
-
 if __name__ == "__main__":
     main()

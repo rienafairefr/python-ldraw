@@ -46,6 +46,7 @@ def test_ldr2svg():
                                 '800x800', '100,100,100', '0,0,0',
                                 '#123456', False), '.svg')
 
+
 def test_ldr2svg_qt():
     tool_test(lambda f: ldr2svg(INPUT_PATH, f,
                                 '800x800', '100,100,100', '0,0,0',

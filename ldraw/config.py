@@ -25,7 +25,7 @@ def get_config():
         if parts_lst_path:
             config['parts.lst'] = parts_lst_path
         return config
-    except OSError:
+    except (OSError, yaml.YAMLError, IOError, EnvironmentError):
         ldraw = join(data_dir, 'ldraw')
         conf = {
             'parts': join(ldraw, 'parts'),
