@@ -33,21 +33,6 @@ def ensure_exists(path):
     return path
 
 
-# https://stackoverflow.com/a/6037657
-def unflatten(dictionary, sep='.'):
-    """ unflatten a dictionary """
-    result_dict = {}
-    for key, value in dictionary.iteritems():
-        parts = key.split(sep)
-        new_dict = result_dict
-        for part in parts[:-1]:
-            if part not in new_dict:
-                new_dict[part] = {}
-            new_dict = new_dict[part]
-        new_dict[parts[-1]] = value
-    return result_dict
-
-
 # https://stackoverflow.com/a/6027615
 def flatten(input_dict, parent_key='', sep='.'):
     """ flatten a dictionary """

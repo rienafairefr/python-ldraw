@@ -32,6 +32,7 @@ def test_library_gen_files(data_dir):
     assert content == [join('library', el) for el in library]
 
 
+# noinspection PyUnresolvedReferences, PyPackageRequirements
 def test_library_gen_import(data_dir):
     """ generated library is importable """
     library_gen_main('tests/test_ldraw/parts.lst', data_dir)

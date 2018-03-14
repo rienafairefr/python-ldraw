@@ -90,8 +90,7 @@ rover.position = Vector(-85, 45, 115)
 rover.matrix = Identity().rotate(-190, YAxis) \
     .rotate(-20, XAxis) \
     .rotate(-6, ZAxis)
-for piece in rover.pieces:
-    print piece
+print rover
 
 # Add a seated figure to the rover.
 
