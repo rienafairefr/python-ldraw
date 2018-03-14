@@ -59,7 +59,7 @@ def gen_parts(parts, output_dir):
     """
     print('generate ldraw.library.parts, this might take a long time...')
 
-    library_path = ensure_exists(os.path.join(output_dir, 'library'))
+    library_path = os.path.join(output_dir, 'library')
     parts_dir = ensure_exists(os.path.join(library_path, 'parts'))
 
     sections = _get_sections(parts)

@@ -6,6 +6,7 @@ from ldraw.dirs import get_data_dir
 from ldraw.generation.colours import gen_colours
 from ldraw.generation.parts import gen_parts
 from ldraw.parts import Parts
+from ldraw.utils import ensure_exists
 
 
 def library_gen_main(parts_lst, data_dir):
@@ -15,11 +16,12 @@ def library_gen_main(parts_lst, data_dir):
 
     parts = Parts(parts_lst)
 
+    ensure_exists(library_path)
     library__init__ = os.path.join(library_path, '__init__.py')
     with open(library__init__, 'w') as library__init__:
         library__init__.write("""\"\"\" the ldraw.library module, auto-generated \"\"\"
-    __all__ = [\'colours\']
-    """)
+__all__ = [\'colours\']
+""")
 
     gen_colours(parts, data_dir)
     gen_parts(parts, data_dir)

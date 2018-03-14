@@ -36,7 +36,7 @@ def gen_colours(parts, output_dir):
     context['colours'].sort(key=lambda r: r['code'])
 
     colours_str = pystache.render(colours_template, context=context)
-    library_path = ensure_exists(os.path.join(output_dir, 'library'))
+    library_path = os.path.join(output_dir, 'library')
 
     colours_py = os.path.join(library_path, 'colours.py')
 
