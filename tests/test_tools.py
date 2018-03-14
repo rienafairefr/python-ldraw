@@ -35,8 +35,8 @@ def test_ldr2inv():
 def test_ldr2png():
     tool_test(lambda f: ldr2png(INPUT_PATH, f,
                                 vector_position('0,0,0'),
-                                vector_position('100,100,100'),
-                                PNGArgs(50,widthxheight('800x800'), '#FF0000', '#123456')),
+                                vector_position('200,200,200'),
+                                PNGArgs(1, widthxheight('200x200'), '#FF0000', '#123456')),
               '.png')
 
 
