@@ -39,7 +39,7 @@ by their LDraw code::
 
   rover = group()
   Piece(Light_Grey, Vector(-10, -32, -90),
-            Identity(), "3957a, rover)
+            Identity(), "3957a", rover)
 
 
 When installing from the git repository,
