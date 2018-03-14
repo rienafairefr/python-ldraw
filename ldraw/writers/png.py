@@ -18,10 +18,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-# pylint: disable=too
+# pylint: disable=too-few-public-methods
 
 import numpy
-from PyQt4.QtGui import QColor, QImage, qRed, qGreen, qBlue, qRgb
+from PyQt4.QtGui import QColor, QImage, qRed, qGreen, qBlue, qRgb # pylint: disable=no-name-in-module
 
 from ldraw.geometry import Vector, Vector2D
 from ldraw.writers.common import Writer
@@ -29,6 +29,7 @@ from ldraw.writers.geometry import Z_MAX, Edge
 
 
 class PNGArgs(object):
+    """ Args for passing to a PNG writer"""
     def __init__(self, distance, image_size, stroke_colour=None, background_colour=None):
         """
         :param distance: distance of the camera
@@ -47,7 +48,6 @@ class PNGWriter(Writer):
     Renders a LDR model into a PNG
     """
 
-    # pylint: disable=too-few-public-methods
     def write(self, model, png_path, png_args):
         """
         Writes the model's polygons to the provided PNG file
@@ -108,22 +108,52 @@ class Polygon(object):
         self.projected = []
 
     def project(self, distance):
-        # px/c = x/(c + z)
-        # px = c * x / (c + z)
+        """
+        project a point on the screen
+        px/c = x/(c + z)
+        px = c * x / (c + z)
+        """
         for point in self.points:
             self.projected.append(
                 Vector((distance * point.x) / (distance + -point.z),
                        (distance * point.y) / (distance + -point.z), -point.z)
             )
 
-    def render(self, image, depth, viewport_scale, stroke_colour):
-        # Sort the edges of the polygon by their minimum projected y
-        # coordinates, discarding horizontal edges.
+    @staticmethod
+    def get_start1_start2(edge1, edge2, int_edge1_y1):
+        """
+        Calculate the starting and finishing coordinates of the span
+        at the current y coordinate.
+        """
+        gradient_1 = Vector2D(edge1.dx_dy, edge1.dz_dy)
+        start_point_1 = Vector2D(edge1.point1.x, edge1.point1.z)
+        start_1 = start_point_1 + (int_edge1_y1 - edge1.point1.y) * gradient_1
+
+        gradient_2 = Vector2D(edge2.dx_dy, edge2.dz_dy)
+        start_point_2 = Vector2D(edge2.point1.x, edge2.point1.z)
+        start_2 = start_point_2 + (int_edge1_y1 - edge2.point1.y) * gradient_2
+
+        # Do not render the span if it lies outside the image or has
+        # values that cannot be stored in the depth buffer.
+        # Truncate the span if it lies partially within the image.
+        if start_1.x > start_2.x:
+            start_2, start_1 = start_1, start_2
+        # Only calculate a depth gradient for the span if it is more than
+        # one pixel wide.
+        if start_1.y <= 0 and start_2.y <= 0:
+            return False, None, None
+        elif start_1.y >= Z_MAX and start_2.y >= Z_MAX:
+            return False, None, None
+        return True, start_1, start_2
+
+    def render(self, image, depth, viewport_scale, stroke_colour): # pylint:disable=too-many-branches
+        """
+        Sort the edges of the polygon by their minimum projected y
+        coordinates, discarding horizontal edges.
+        """
         edges = self.get_edges(image, viewport_scale)
         if not edges:
             return
-        width = image.width()
-        height = image.height()
 
         end_py = edges[-1].point2.y
         if end_py < 0:
@@ -131,7 +161,7 @@ class Polygon(object):
 
         edge1 = edges.pop(0)
 
-        if edge1.point1.y >= height:
+        if edge1.point1.y >= image.height():
             return
 
         edge2 = edges.pop(0)
@@ -140,47 +170,34 @@ class Polygon(object):
 
         if int_edge1_y1 < edge1.point1.y or int_edge1_y1 < edge2.point1.y:
             int_edge1_y1 += 1
-        while int_edge1_y1 <= end_py and int_edge1_y1 < height:
+
+        while int_edge1_y1 <= end_py and int_edge1_y1 < image.height():
             # Retrieve new edges as required.
+            if not edges:
+                if int_edge1_y1 >= edge1.point2.y \
+                        or int_edge1_y1 >= edge2.point2.y:
+                    break
+
             if int_edge1_y1 >= edge1.point2.y:
-                if not edges:
-                    break
                 edge1 = edges.pop(0)
+
             if int_edge1_y1 >= edge2.point2.y:
-                if not edges:
-                    break
                 edge2 = edges.pop(0)
+
             if int_edge1_y1 < 0:
                 int_edge1_y1 += 1
                 continue
-            # Calculate the starting and finishing coordinates of the span
-            # at the current y coordinate.
-            gradient_1 = Vector2D(edge1.dx_dy, edge1.dz_dy)
-            start_point_1 = Vector2D(edge1.point1.x, edge1.point1.z)
-            start_1 = start_point_1 + (int_edge1_y1 - edge1.point1.y) * gradient_1
 
-            gradient_2 = Vector2D(edge2.dx_dy, edge2.dz_dy)
-            start_point_2 = Vector2D(edge2.point1.x, edge2.point1.z)
-            start_2 = start_point_2 + (int_edge1_y1 - edge2.point1.y) * gradient_2
-
-            # Do not render the span if it lies outside the image or has
-            # values that cannot be stored in the depth buffer.
-            # Truncate the span if it lies partially within the image.
-            if start_1.x > start_2.x:
-                start_2, start_1 = start_1, start_2
-            # Only calculate a depth gradient for the span if it is more than
-            # one pixel wide.
-            if start_1.y <= 0 and start_2.y <= 0:
-                int_edge1_y1 += 1
-                continue
-            elif start_1.y >= Z_MAX and start_2.y >= Z_MAX:
+            okay, start_1, start_2 = self.get_start1_start2(edge1, edge2, int_edge1_y1)
+            if not okay:
                 int_edge1_y1 += 1
                 continue
 
             start_x, end_sx = int(start_1.x), int(start_2.x)
             if start_x < start_1.x:
                 start_x += 1
-            if start_x >= width:
+
+            if start_x >= image.width():
                 int_edge1_y1 += 1
                 continue
             elif end_sx < 0:
@@ -194,9 +211,10 @@ class Polygon(object):
                                           start_1,
                                           start_2,
                                           start_x,
-                                          stroke_colour, width)
+                                          stroke_colour, image.width())
 
     def get_edges(self, image, viewport_scale):
+        """ get the edges in the image"""
         width = image.width()
         height = image.height()
         edges = []
@@ -220,12 +238,15 @@ class Polygon(object):
         edges.sort(key=lambda e: e.sort_key)
         return edges
 
+    # pylint: disable=too-many-arguments, too-many-locals
     def draw_span(self,
                   depth, end_sx,
                   image, int_edge1_y1,
                   start_1, start_2,
                   start_x, stroke_colour,
                   width):
+        """ draw a span """
+
         if start_1.x != start_2.x:
             start_dz_dx = (start_2.y - start_1.y) / (start_2.x - start_1.x)
         else:
