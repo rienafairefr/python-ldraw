@@ -21,12 +21,14 @@ PARTS_TEMPLATE = os.path.join('templates', 'parts.mustache')
 PARTS_TEMPLATE = codecs.open(PARTS_TEMPLATE, 'r', encoding='utf-8')
 PARTS_TEMPLATE = pystache.parse(PARTS_TEMPLATE.read())
 
+SECTION_SEP = '|'
 
-def write_section_file(parts_dir, list_of_parts, mod_name):
+
+def write_section_file(parts_dir, list_of_parts, mod_path):
     """ Writes a single section files"""
     list_of_parts.sort(key=lambda o: o['description'])
     part_str = pystache.render(PARTS_TEMPLATE, context={'parts': list_of_parts})
-    parts_py = os.path.join(parts_dir, mod_name + '.py')
+    parts_py = os.path.join(parts_dir, mod_path)
     ensure_exists(os.path.dirname(parts_py))
     with codecs.open(parts_py, 'w', encoding='utf-8') as generated_file:
         generated_file.write(part_str)
@@ -74,7 +76,7 @@ def gen_parts(parts, output_dir):
 def _get_packages(sections):
     packages = {}
     for section_name in sections:
-        rsplitted = section_name.rsplit(os.sep, 1)
+        rsplitted = section_name.rsplit(SECTION_SEP, 1)
         package = {'module_name': rsplitted[-1]}
         if len(rsplitted) > 1:
             packages.setdefault(rsplitted[0], []).append(package)
@@ -85,11 +87,15 @@ def _get_packages(sections):
 
 def _get_sections(parts):
     sections = {}
-    for key, value in flatten(parts.parts, sep=os.sep).items():
-        rsplitted = key.rsplit(os.sep, 1)
+    for key, value in flatten(parts.parts, sep=SECTION_SEP).items():
+        rsplitted = key.rsplit(SECTION_SEP, 1)
         description = rsplitted[-1]
         sections.setdefault(rsplitted[0], {})[description] = value
     return sections
+
+
+def module_path(section):
+    return section.replace(SECTION_SEP, os.sep) + '.py'
 
 
 def generate_section(parts, parts_dir, section_name, section_parts):
@@ -108,9 +114,9 @@ def generate_section(parts, parts_dir, section_name, section_parts):
             if name is None:
                 name = 'others'
 
-            write_section_file(parts_dir, grouped, name)
+            write_section_file(parts_dir, grouped, module_path(name))
     else:
-        write_section_file(parts_dir, parts_list, section_name)
+        write_section_file(parts_dir, parts_list, module_path(section_name))
 
 
 def generate_parts__init__(library_path, modules, package_name):
