@@ -23,11 +23,8 @@ def test_load_primitives():
     p = Parts('tests/test_ldraw/parts.lst')
     assert len(p.primitives_by_name) == 4
     assert len(p.primitives_by_code) == 4
-    assert list(p.primitives_by_name.values())[0] == 'box5'
-    assert list(p.primitives_by_name.keys())[0] == 'Box with 5 Faces and All Edges'
-
-    assert list(p.primitives_by_code.keys())[0] == 'box5'
-    assert list(p.primitives_by_code.values())[0] == 'Box with 5 Faces and All Edges'
+    assert 'Box with 5 Faces and All Edges','box5' in p.primitives_by_name.items()
+    assert 'box5', 'Box with 5 Faces and All Edges' in p.primitives_by_code.items()
 
     part = p.part(code='box5')
 
