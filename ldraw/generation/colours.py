@@ -42,7 +42,3 @@ def gen_colours(parts, output_dir):
 
     with codecs.open(colours_py, 'w', encoding='utf-8') as generated_file:
         generated_file.write(colours_str)
-
-    __init__ = os.path.join(library_path, '__init__.py')
-    with open(__init__, 'w') as __init__:
-        __init__.write('__all__ = [\'colours\']\n')

@@ -15,6 +15,8 @@ def _current_colour(colour, current_colour):
 
 class Current(object):
     """ an instance of this is passed around during rendering """
+    # pylint: disable=too-few-public-methods
+
     def __init__(self, matrix, colour, position):
         self.matrix = matrix
         self.colour = colour
@@ -24,6 +26,7 @@ class Current(object):
 class Writer(object):
     # pylint: disable=too-many-arguments, too-few-public-methods
     """ Common logic for PNG, SVG, POV writers """
+
     def __init__(self, camera_position, system, parts):
         self.camera_position = camera_position
         self.system = system
@@ -103,7 +106,7 @@ class Writer(object):
                          top_level_piece,
                          current_colour,
                          points):
-        projections = [Vector(p.dot(self.system.x), p.dot(self.system.y), p.dot(self.system.z)) for p in points]
+        projections = [self.system.project(p) for p in points]
         if any(p.z >= 0 for p in projections):
             return False
         colour = _current_colour(obj.colour, current_colour)

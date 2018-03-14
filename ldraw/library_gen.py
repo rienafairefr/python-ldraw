@@ -15,6 +15,12 @@ def library_gen_main(parts_lst, data_dir):
 
     parts = Parts(parts_lst)
 
+    library__init__ = os.path.join(library_path, '__init__.py')
+    with open(library__init__, 'w') as library__init__:
+        library__init__.write("""\"\"\" the ldraw.library module, auto-generated \"\"\"
+    __all__ = [\'colours\']
+    """)
+
     gen_colours(parts, data_dir)
     gen_parts(parts, data_dir)
     shutil.copy('ldraw-license.txt', os.path.join(library_path, 'license.txt'))

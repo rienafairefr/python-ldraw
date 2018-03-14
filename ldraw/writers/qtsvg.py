@@ -24,7 +24,7 @@ from collections import OrderedDict
 from PyQt4.QtCore import QPointF, QT_VERSION
 from PyQt4.QtGui import QPainterPath, QPolygonF
 
-from ldraw.writers.svg import SVGWriter, SVG_PREAMBLE
+from ldraw.writers.svg import SVGWriter, write_preamble
 
 if QT_VERSION < 0x40400:
     raise ImportError("This module requires PyQt4, built against Qt 4.4 or higher.")
@@ -48,11 +48,8 @@ class QTSVGWriter(SVGWriter):
     # pylint: disable=too-few-public-methods
     def _write(self, shapes, svg_file, args):
 
-        svg_file.write(SVG_PREAMBLE.format(view1=0.0, view2=0.0, svg_args=args))
-        if args.background_colour is not None:
-            svg_file.write('<polygon fill="%s" ' % args.background_colour)
-            svg_file.write('points="%.6f,%.6f %.6f,%.6f %.6f,%.6f %.6f,%.6f" />\n' % (
-                0.0, 0.0, args.width, 0.0, args.width, args.height, 0.0, args.height))
+        write_preamble(args, svg_file)
+
         path = QPainterPath()
         shapes.reverse()
         new_shapes = OrderedDict()

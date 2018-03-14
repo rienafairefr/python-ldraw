@@ -95,6 +95,7 @@ def _get_sections(parts):
 
 
 def module_path(section):
+    """ gets the .py path from a section name"""
     return section.replace(SECTION_SEP, os.sep) + '.py'
 
 

@@ -19,12 +19,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from ldraw.geometry import Vector, Vector2D
+from ldraw.geometry import Vector2D
 from ldraw.writers.common import Writer
 
 
 class Polygon(object):
     """Polygon used for SVG rendering"""
+
     # pylint: disable=too-few-public-methods
 
     def __init__(self, zmin, points, colour, piece):
@@ -61,9 +62,12 @@ stroke-width="{stroke_width}" \
 opacity="{opacity:.6f}" \
 points=\""""
 
+POLYGON_FORMAT = '<polygon fill="%s" points="%.6f,%.6f %.6f,%.6f %.6f,%.6f %.6f,%.6f" />\n'
+
 
 class SVGArgs(object):
     """Data-only container for arguments passed to an SVG writer"""
+
     # pylint: disable=too-few-public-methods
 
     def __init__(self, width, height, stroke_colour=None,
@@ -95,8 +99,19 @@ def _project_polygons(width, height, polygons):
     return new_polygons
 
 
+def write_preamble(args, svg_file):
+    """ write the preamble and polygon def """
+    svg_file.write(SVG_PREAMBLE.format(view1=0.0, view2=0.0, svg_args=args))
+    if args.background_colour is not None:
+        arguments = (args.background_colour,
+                     0.0, 0.0, args.width, 0.0,
+                     args.width, args.height, 0.0, args.height)
+        svg_file.write(POLYGON_FORMAT % arguments)
+
+
 class SVGWriter(Writer):
     """Writes a model into a SVG"""
+
     # pylint: disable=too-few-public-methods
     def write(self, model, svg_file, svg_args):
         """Writes the SVG """
@@ -108,11 +123,8 @@ class SVGWriter(Writer):
     def _write(self, shapes, svg_file, args):
         stroke_width = args.stroke_width if args.stroke_width else "0.1%"
 
-        svg_file.write(SVG_PREAMBLE.format(view1=0.0, view2=0.0, svg_args=args))
-        if args.background_colour is not None:
-            svg_file.write('<polygon fill="%s" ' % args.background_colour)
-            svg_file.write('points="%.6f,%.6f %.6f,%.6f %.6f,%.6f %.6f,%.6f" />\n' % (
-                0.0, 0.0, args.width, 0.0, args.width, args.height, 0.0, args.height))
+        write_preamble(args, svg_file)
+
         shift = Vector2D(args.width / 2.0, args.height / 2.0)
         for points, polygon in shapes:
             rgb = self.parts.colours.get(polygon.colour, "#ffffff")
