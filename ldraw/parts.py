@@ -45,16 +45,13 @@ DOT_DAT = re.compile(r"\.DAT", flags=re.IGNORECASE)
 ENDS_DOT_DAT = re.compile(r"\.DAT$", flags=re.IGNORECASE)
 
 
-config = get_config()
-
-
 class Parts(object):
     # pylint: disable=too-many-instance-attributes
     """ Part class """
     ColourAttributes = ("CHROME", "PEARLESCENT", "RUBBER", "MATTE_METALLIC",
                         "METAL")
 
-    def __init__(self, path=config['parts.lst']):
+    def __init__(self, path=get_config()['parts.lst']):
         self.path = None
         self.parts_dirs = []
         self.parts_subdirs = {}
@@ -353,17 +350,6 @@ class Part(object):
     Contains data from a LDraw part file
     """
     def __init__(self, path):
-        self.category = None
-        self.comments = []
-        self.metas = []
-        self.meta = {}
-        self.comment_or_metas = []
-        self.subfiles = []
-        self.lines = []
-        self.triangles =[]
-        self.quadrilaterals = []
-        self.optional_lines = []
-
         self._handlers = {
             "0": _comment_or_meta,
             "1": _sub_file,
@@ -372,7 +358,7 @@ class Part(object):
             "4": _quadrilateral,
             "5": _optional_line
         }
-        self.path=path
+        self.path = path
         self.objects = []
 
         """ Load the Part from its path """
@@ -388,7 +374,7 @@ class Part(object):
                 # self.objects.append(BlankLine)
                 continue
             try:
-                handler, container = self._handlers[pieces[0]]
+                handler = self._handlers[pieces[0]]
             except KeyError:
                 raise PartError("Unknown command (%s) in %s at line %i" % (path, pieces[0], number))
             try:

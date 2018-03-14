@@ -11,6 +11,7 @@ from ldraw.utils import ensure_exists
 
 
 def library_gen_main(parts_lst, output_dir):
+    """ main function for the library generation """
     library_path = os.path.join(output_dir, 'library')
     ensure_exists(library_path)
     hash_path = os.path.join(library_path, '__hash__')

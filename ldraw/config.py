@@ -1,4 +1,4 @@
-
+"""
 takes care of reading and writing a configuration in config.yml
 """
 import os
@@ -15,6 +15,7 @@ def get_config_file_path():
 
 def get_config():
     """ get the configuration from config.yml, create it if not there """
+    config_file_path = get_config_file_path()
     data_dir = get_data_dir()
     try:
         config = yaml.load(open(get_config_file_path(), 'r'))

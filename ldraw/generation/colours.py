@@ -8,7 +8,7 @@ import os
 
 import pystache
 
-from ldraw.utils import clean, camel, ensure_exists
+from ldraw.utils import clean, camel
 
 
 def get_c_dict(colour):

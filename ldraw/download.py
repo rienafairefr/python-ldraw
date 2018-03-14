@@ -17,6 +17,7 @@ from ldraw.utils import ensure_exists
 
 
 def download_main(parts_lst_path):
+    """ download complete.zipn mklist, main function"""
     url = 'http://www.ldraw.org/library/updates/complete.zip'
 
     tmp_ldraw = ensure_exists(appdirs.user_cache_dir('pyldraw'))
