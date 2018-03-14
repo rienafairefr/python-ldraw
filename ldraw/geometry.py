@@ -176,8 +176,12 @@ class Vector(object):
     def __init__(self, x, y, z):
         self.x, self.y, self.z = x, y, z
 
+    @property
+    def repr(self):
+        return "%f, %f, %f" % (self.x, self.y, self.z)
+
     def __repr__(self):
-        return "<Vector: (%f, %f, %f)>" % (self.x, self.y, self.z)
+        return "<Vector: (%s)>" % (self.repr)
 
     def __hash__(self):
         return hash((self.x, self.y, self.z))

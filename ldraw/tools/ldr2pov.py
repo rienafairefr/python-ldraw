@@ -28,6 +28,38 @@ from ldraw.parts import Part, Parts, PartError
 from ldraw.tools import vector_position
 from ldraw.writers.povray import POVRayWriter
 
+SKY_SPHERE_FORMAT_STRING = """sky_sphere {
+  pigment
+  {
+    rgb <%s>
+  }
+}
+"""
+
+CAMERA_FORMAT_STRING = """camera {
+  location <%s>
+  look_at <%s>
+}
+"""
+
+LIGHT_FORMAT_STRING = """light_source {
+  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>
+}
+
+light_source {
+  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>
+}
+
+light_source {
+  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>
+}
+
+light_source {
+  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>
+}
+
+"""
+
 
 def main():
     """ ldr2pov main function """
@@ -75,41 +107,19 @@ def ldr2pov(ldraw_path, pov_path,
         writer.write(model)
 
         if not writer.lights:
-            pov_file.write(
-                "light_source {\n"
-                "  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>\n"
-                "}\n\n"
-                "light_source {\n"
-                "  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>\n"
-                "}\n\n"
-                "light_source {\n"
-                "  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>\n"
-                "}\n\n"
-                "light_source {\n"
-                "  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>\n"
-                "}\n\n" % (writer.minimum.x - 50.0, writer.maximum.y + 100.0, writer.minimum.z - 50.0,
-                           writer.maximum.x + 50.0, writer.maximum.y + 100.0, writer.minimum.z - 50.0,
-                           writer.minimum.x - 50.0, writer.maximum.y + 100.0, writer.maximum.z + 50.0,
-                           writer.maximum.x + 50.0, writer.maximum.y + 100.0, writer.maximum.z + 50.0)
-            )
+            lights = (writer.minimum.x - 50.0, writer.maximum.y + 100.0, writer.minimum.z - 50.0,
+                      writer.maximum.x + 50.0, writer.maximum.y + 100.0, writer.minimum.z - 50.0,
+                      writer.minimum.x - 50.0, writer.maximum.y + 100.0, writer.maximum.z + 50.0,
+                      writer.maximum.x + 50.0, writer.maximum.y + 100.0, writer.maximum.z + 50.0)
+            pov_file.write(LIGHT_FORMAT_STRING % lights)
 
         pov_file.write(
-            "camera {\n"
-            "  location <%s>\n"
-            "  look_at <%s>\n"
-            "}\n" % (", ".join(str(p) for p in [camera_position.x, camera_position.y, camera_position.z]),
-                     ", ".join(str(p) for p in [look_at_position.x, look_at_position.y, look_at_position.z]))
+            CAMERA_FORMAT_STRING % (camera_position.repr,
+                                    look_at_position.repr)
         )
 
         if sky:
-            pov_file.write(
-                "sky_sphere {\n"
-                "  pigment\n"
-                "  {\n"
-                "    rgb <%s>\n"
-                "  }\n"
-                "}\n" % sky
-            )
+            pov_file.write(SKY_SPHERE_FORMAT_STRING % sky)
 
     for message, part in writer.warnings:
         sys.stderr.write((message + "\n") % part)
