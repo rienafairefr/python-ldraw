@@ -24,9 +24,9 @@ class Current(object):
 class Writer(object):
     # pylint: disable=too-many-arguments, too-few-public-methods
     """ Common logic for PNG, SVG, POV writers """
-    def __init__(self, camera_position, axes, parts):
+    def __init__(self, camera_position, system, parts):
         self.camera_position = camera_position
-        self.axes = axes
+        self.system = system
         self.parts = parts
 
     def _opacity_from_colour(self, colour):
@@ -103,8 +103,7 @@ class Writer(object):
                          top_level_piece,
                          current_colour,
                          points):
-        x_axis, y_axis, z_axis = self.axes
-        projections = [Vector(p.dot(x_axis), p.dot(y_axis), p.dot(z_axis)) for p in points]
+        projections = [Vector(p.dot(self.system.x), p.dot(self.system.y), p.dot(self.system.z)) for p in points]
         if any(p.z >= 0 for p in projections):
             return False
         colour = _current_colour(obj.colour, current_colour)

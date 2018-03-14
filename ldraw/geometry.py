@@ -242,7 +242,10 @@ class Vector(object):
 
     def norm(self):
         """ normalized """
-        return self / abs(self)
+        _length = abs(self)
+        self.x = self.x / _length
+        self.y = self.y / _length
+        self.z = self.z / _length
 
 
 class Vector2D(object):
@@ -312,30 +315,9 @@ class CoordinateSystem(object):
     def __init__(self, x=Vector(1.0, 0.0, 0.0),
                  y=Vector(0.0, 1.0, 0.0),
                  z=Vector(0.0, 0.0, 1.0)):
-        self._x = x.norm()
-        self._y = y.norm()
-        self._z = z.norm()
+        self.x = x
+        self.y = y
+        self.z = z
 
-    @property
-    def x(self):
-        return self._x
-
-    @x.setter
-    def x(self, val):
-        self._x = val.norm()
-
-    @property
-    def y(self):
-        return self._y
-
-    @y.setter
-    def y(self, val):
-        self._y = val.norm()
-
-    @property
-    def z(self):
-        return self._z
-
-    @z.setter
-    def z(self, val):
-        self._z = val.norm()
+    def project(self, p):
+        return Vector(p.dot(self.x), p.dot(self.y), p.dot(self.z))

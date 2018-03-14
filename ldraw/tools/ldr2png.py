@@ -24,7 +24,7 @@ import argparse
 import sys
 
 from ldraw.config import get_config
-from ldraw.geometry import Vector
+from ldraw.geometry import Vector, CoordinateSystem
 from ldraw.parts import Part, Parts, PartError
 from ldraw.tools import widthxheight, vector_position, UP_DIRECTION
 from ldraw.writers.png import PNGWriter, PNGArgs
@@ -82,18 +82,20 @@ def ldr2png(ldraw_path, png_path, look_at_position, camera_position, png_args):
         sys.stderr.write("Camera and look-at positions are the same.\n")
         sys.exit(1)
 
-    z_axis = (camera_position - look_at_position)
-    z_axis = z_axis / abs(z_axis)
+    system = CoordinateSystem()
 
-    x_axis = UP_DIRECTION.cross(z_axis)
-    if abs(x_axis) == 0.0:
-        up_direction = Vector(1.0, 0, 0)
-        x_axis = z_axis.cross(up_direction)
+    system.z = (camera_position - look_at_position)
+    system.z.norm()
 
-    x_axis = x_axis / abs(x_axis)
-    y_axis = z_axis.cross(x_axis)
+    system.x = UP_DIRECTION.cross(system.z)
 
-    writer = PNGWriter(camera_position, (x_axis, y_axis, z_axis), parts)
+    if abs(system.x) == 0.0:
+        system.x = system.z.cross(Vector(1.0, 0, 0))
+
+    system.x.norm()
+    system.y = system.z.cross(system.x)
+
+    writer = PNGWriter(camera_position, system, parts)
     writer.write(model, png_path, png_args)
 
 

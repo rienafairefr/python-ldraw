@@ -82,26 +82,26 @@ def ldr2svg(ldraw_path, svg_path, camera_position, look_at_position, use_qt, svg
         sys.stderr.write("Camera and look-at positions are the same.\n")
         sys.exit(1)
 
-    z_axis = (camera_position - look_at_position)
-    z_axis = z_axis / abs(z_axis)
+    system = CoordinateSystem()
 
-    up = Vector(0, -1.0, 0)
+    system.z = (camera_position - look_at_position)
+    system.z.norm()
 
-    x_axis = up.cross(z_axis)
-    if abs(x_axis) == 0.0:
-        up = Vector(1.0, 0, 0)
-        x_axis = z_axis.cross(up)
+    system.x = UP_DIRECTION.cross(system.z)
 
-    x_axis = x_axis / abs(x_axis)
-    y_axis = z_axis.cross(x_axis)
+    if abs(system.x) == 0.0:
+        system.x = system.z.cross(Vector(1.0, 0, 0))
+
+    system.x.norm()
+    system.y = system.z.cross(system.x)
 
     with open(svg_path, "w") as svg_file:
         if use_qt:
             from ldraw.writers.qtsvg import QTSVGWriter
-            writer = QTSVGWriter(camera_position, (x_axis, y_axis, z_axis), parts)
+            writer = QTSVGWriter(camera_position, system, parts)
         else:
             from ldraw.writers.svg import SVGWriter
-            writer = SVGWriter(camera_position, (x_axis, y_axis, z_axis), parts)
+            writer = SVGWriter(camera_position, system, parts)
         writer.write(model, svg_file, svg_args)
 
 
