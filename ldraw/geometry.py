@@ -164,6 +164,11 @@ class Matrix(object):
                 corrected = True
         return corrected
 
+    def __eq__(self, other):
+        if not isinstance(other, Matrix):
+            return False
+        return self.rows == other.rows
+
 
 def Identity():
     """ a transformation matrix representing Identity """
