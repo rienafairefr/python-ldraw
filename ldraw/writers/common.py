@@ -35,9 +35,7 @@ class Writer(object):
     def _polygons_from_objects(self,
                                model,
                                top_level_piece=None,
-                               current_colour=White.code,
-                               current_matrix=Identity(),
-                               current_position=Vector(0, 0, 0)):
+                               current=Current(Identity(), White.code, Vector(0, 0, 0))):
         # Extract polygons from objects, filtering out those behind the camera.
         polygons = []
 
@@ -54,9 +52,7 @@ class Writer(object):
             try:
                 args = (obj,
                         top_level_piece or obj,
-                        current_matrix,
-                        current_colour,
-                        current_position)
+                        current)
                 poly = poly_handlers[type(obj)](*args)
             except KeyError:
                 continue
@@ -70,42 +66,37 @@ class Writer(object):
     def _line_get_poly(self,
                        obj,
                        top_level_piece,
-                       current_matrix,
-                       current_colour,
-                       current_position):
+                       current):
         pass
 
     def _subpart_get_poly(self,
                           obj,
                           top_level_piece,
-                          current_matrix,
-                          current_colour,
-                          current_position):
-        colour = _current_colour(obj.colour, current_colour)
+                          current):
+        colour = _current_colour(obj.colour, current.colour)
         part = self.parts.part(code=obj.part)
         if part:
             matrix = obj.matrix
+            new_current = Current(current.matrix * matrix,
+                                  colour,
+                                  current.position + current.matrix * obj.position)
             return self._polygons_from_objects(part,
                                                top_level_piece,
-                                               colour,
-                                               current_matrix * matrix,
-                                               current_position + current_matrix * obj.position)
+                                               new_current)
         sys.stderr.write("Part not found: %s\n" % obj.part)
         return False
 
     def _triangle_get_poly(self,
                            obj,
                            top_level_piece,
-                           current_matrix,
-                           current_colour,
-                           current_position):
+                           current):
         camera_position = self.camera_position
 
-        points = [current_matrix * p + current_position - camera_position for p in obj.points]
+        points = [current.matrix * p + current.position - camera_position for p in obj.points]
         if abs((points[2] - points[0]).cross(points[1] - points[0])) == 0:
             return False
 
-        return self._common_get_poly(obj, top_level_piece, current_colour, points)
+        return self._common_get_poly(obj, top_level_piece, current.colour, points)
 
     def _common_get_poly(self,
                          obj,
@@ -123,19 +114,17 @@ class Writer(object):
     def _quadrilateral_get_poly(self,
                                 obj,
                                 top_level_piece,
-                                current_matrix,
-                                current_colour,
-                                current_position):
+                                current):
         camera_position = self.camera_position
 
-        points = [current_matrix * p + current_position - camera_position for p in obj.points]
+        points = [current.matrix * p + current.position - camera_position for p in obj.points]
 
         if abs((points[2] - points[0]).cross(points[1] - points[0])) == 0:
             return False
         if abs((points[2] - points[0]).cross(points[3] - points[0])) == 0:
             return False
 
-        return self._common_get_poly(obj, top_level_piece, current_colour, points)
+        return self._common_get_poly(obj, top_level_piece, current.colour, points)
 
     def _get_polygon(self, top_level_piece, colour, projections):
         pass

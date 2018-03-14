@@ -137,14 +137,12 @@ class SVGWriter(Writer):
 
     def _line_get_poly(self, obj,
                        top_level_piece,
-                       current_matrix,
-                       current_colour,
-                       current_position):
+                       current):
         camera_position = self.camera_position
 
-        points = [current_matrix * p + current_position - camera_position for p in obj.points]
+        points = [current.matrix * p + current.position - camera_position for p in obj.points]
 
-        return self._common_get_poly(obj, top_level_piece, current_colour, points)
+        return self._common_get_poly(obj, top_level_piece, current.colour, points)
 
     def _get_polygon(self, top_level_piece, colour, projections):  # pylint: disable=no-self-use
         return [Polygon(min(p.z for p in projections),
