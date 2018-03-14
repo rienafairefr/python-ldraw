@@ -4,9 +4,9 @@ Takes care of downloading the complete.zip from LDraw.org
 And generating the parts.lst from it
 """
 from __future__ import print_function
-import shutil
 import zipfile
 import os
+from distutils.dir_util import copy_tree
 
 import appdirs
 from mklist.generate import generate_parts_lst
@@ -38,9 +38,7 @@ def download_main(parts_lst_path):
 
         output_dir = ensure_exists(os.path.abspath(os.path.join(parts_lst_path, '..')))
 
-        shutil.move(os.path.join(tmp_ldraw, 'ldraw', 'parts'), output_dir)
-        shutil.move(os.path.join(tmp_ldraw, 'ldraw', 'p'), output_dir)
-        shutil.move(os.path.join(tmp_ldraw, 'ldraw', 'LDConfig.ldr'), output_dir)
+        copy_tree(os.path.join(tmp_ldraw, 'ldraw'), os.path.join(output_dir))
 
         if not os.path.exists(parts_lst_path):
             print('mklist...')

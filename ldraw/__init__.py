@@ -68,7 +68,7 @@ class CustomImporter(object):
     """ Added to sys.meta_path as an import hook """
     virtual_module = 'ldraw.library'
 
-    def find_module(self, fullname, path=None):
+    def find_module(self, fullname, path=None): # pylint:disable=unused-argument
         """
         This method is called by Python if this class
         is on sys.path. fullname is the fully-qualified
@@ -80,7 +80,6 @@ class CustomImporter(object):
         statement is detected (or __import__ is called), before
         Python's built-in package/module-finding code kicks in.
         """
-        print(path)
         if fullname.startswith(self.virtual_module):
             # As per PEP #302 (which implemented the sys.meta_path protocol),
             # if fullname is the name of a module/package that we want to
