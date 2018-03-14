@@ -24,37 +24,49 @@ import argparse
 import sys
 
 from ldraw.config import get_config
-from ldraw.geometry import Vector
+from ldraw.geometry import Vector, CoordinateSystem
 from ldraw.parts import Part, Parts, PartError
-from ldraw.tools import widthxheight, vector_position
+from ldraw.tools import widthxheight, vector_position, UP_DIRECTION
 from ldraw.writers.svg import SVGArgs
 
 
 def main():
     """ ldr2svg main function """
-    parser = argparse.ArgumentParser(description="Converts the LDraw file to a SVG file.\n\n"
-                                                 "The viewport size is specified as a pair of floating point numbers representing\n"
-                                                 "lengths in LDraw scene coordinates separated by an \"x\" character.\n\n"
-                                                 "The camera and look-at positions are x,y,z argument in LDraw scene coordinates\n"
-                                                 "where each coordinate should be specified as a floating point number.\n\n"
-                                                 "The optional sky background colour is an SVG colour, either specified as\n"
-                                                 "#rrggbb or as a named colour.\n\n"
-                                                 "This tool requires PyQt4, built against Qt 4.4 or higher.\n\n")
+    description = """Converts the LDraw file to a SVG file.
+    
+The viewport size is specified as a pair of floating point numbers representing
+lengths in LDraw scene coordinates separated by an \"x\" character.
+
+The camera and look-at positions are x,y,z argument in LDraw scene coordinates
+where each coordinate should be specified as a floating point number.
+
+The optional sky background colour is an SVG colour, either specified as
+#rrggbb or as a named colour.
+
+This tool requires PyQt4, built against Qt 4.4 or higher.
+
+"""
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument('ldraw_file')
     parser.add_argument('svg_file')
     parser.add_argument('viewport_size', type=widthxheight)
     parser.add_argument('camera_position', type=vector_position)
-    parser.add_argument('look_at_position', type=vector_position, required=False, default=vector_position("0,0,0"))
+    parser.add_argument('look_at_position', type=vector_position,
+                        required=False, default=vector_position("0,0,0"))
     parser.add_argument('--sky')
     parser.add_argument('--qt', default=True)
 
     args = parser.parse_args()
+    svg_args = SVGArgs(args.viewport_size[0],
+                       args.viewport_size[1],
+                       background_colour=args.background_colour)
+
     ldr2svg(args.ldraw_file, args.svg_file,
-            args.viewport_size, args.camera_position, args.look_at_position, args.sky, args.qt)
+            args.camera_position, args.look_at_position, args.qt, svg_args)
 
 
-def ldr2svg(ldraw_path, svg_path,
-            viewport_size, camera_position, look_at_position, background_colour, qt):
+def ldr2svg(ldraw_path, svg_path, camera_position, look_at_position, use_qt, svg_args): # pylint: disable=too-many-arguments
+    """ ldr2svg actual implementation """
     config = get_config()
     parts_path = config['parts.lst']
 
@@ -84,8 +96,7 @@ def ldr2svg(ldraw_path, svg_path,
     y_axis = z_axis.cross(x_axis)
 
     with open(svg_path, "w") as svg_file:
-        svg_args = SVGArgs(viewport_size[0], viewport_size[1], background_colour=background_colour)
-        if qt:
+        if use_qt:
             from ldraw.writers.qtsvg import QTSVGWriter
             writer = QTSVGWriter(camera_position, (x_axis, y_axis, z_axis), parts)
         else:

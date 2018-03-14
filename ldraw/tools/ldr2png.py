@@ -26,7 +26,7 @@ import sys
 from ldraw.config import get_config
 from ldraw.geometry import Vector
 from ldraw.parts import Part, Parts, PartError
-from ldraw.tools import widthxheight, vector_position
+from ldraw.tools import widthxheight, vector_position, UP_DIRECTION
 from ldraw.writers.png import PNGWriter, PNGArgs
 
 
@@ -85,9 +85,7 @@ def ldr2png(ldraw_path, png_path, look_at_position, camera_position, png_args):
     z_axis = (camera_position - look_at_position)
     z_axis = z_axis / abs(z_axis)
 
-    up_direction = Vector(0, -1.0, 0)
-
-    x_axis = up_direction.cross(z_axis)
+    x_axis = UP_DIRECTION.cross(z_axis)
     if abs(x_axis) == 0.0:
         up_direction = Vector(1.0, 0, 0)
         x_axis = z_axis.cross(up_direction)

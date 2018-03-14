@@ -16,3 +16,5 @@ def vector_position(input_str):
     if len(position) != 3:
         raise argparse.ArgumentTypeError("Expecting comma-separated elements for the position")
     return Vector(*map(float, position))
+
+UP_DIRECTION = Vector(0, -1.0, 0)

@@ -71,6 +71,7 @@ def _rows_multiplication(r1, r2):
 
 class Matrix(object):
     """ a transformation matrix """
+
     def __init__(self, rows):
         self.rows = rows
 
@@ -171,6 +172,7 @@ def Identity():
 
 class Vector(object):
     """ a Vector in 3D"""
+
     def __init__(self, x, y, z):
         self.x, self.y, self.z = x, y, z
 
@@ -238,9 +240,14 @@ class Vector(object):
         """ dot product"""
         return self.x * other.x + self.y * other.y + self.z * other.z
 
+    def norm(self):
+        """ normalized """
+        return self / abs(self)
+
 
 class Vector2D(object):
     """ a Vector in 2D """
+
     def __init__(self, x, y):
         self.x, self.y = x, y
 
@@ -299,3 +306,36 @@ class Vector2D(object):
     def dot(self, other):
         """ dot product """
         return self.x * other.x + self.y * other.y
+
+
+class CoordinateSystem(object):
+    def __init__(self, x=Vector(1.0, 0.0, 0.0),
+                 y=Vector(0.0, 1.0, 0.0),
+                 z=Vector(0.0, 0.0, 1.0)):
+        self._x = x.norm()
+        self._y = y.norm()
+        self._z = z.norm()
+
+    @property
+    def x(self):
+        return self._x
+
+    @x.setter
+    def x(self, val):
+        self._x = val.norm()
+
+    @property
+    def y(self):
+        return self._y
+
+    @y.setter
+    def y(self, val):
+        self._y = val.norm()
+
+    @property
+    def z(self):
+        return self._z
+
+    @z.setter
+    def z(self, val):
+        self._z = val.norm()
