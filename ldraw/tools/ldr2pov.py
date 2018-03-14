@@ -23,9 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import argparse
 import sys
 
-from ldraw.config import get_config
-from ldraw.parts import Part, Parts, PartError
-from ldraw.tools import vector_position
+from ldraw.tools import vector_position, get_model
 from ldraw.writers.povray import POVRayWriter
 
 SKY_SPHERE_FORMAT_STRING = """sky_sphere {
@@ -91,15 +89,8 @@ each component should be specified as a floating point number between
 
 def ldr2pov(ldraw_path, pov_path,
             camera_position, look_at_position, sky):
-    config = get_config()
-    ldraw_parts_path = config['parts.lst']
-    parts = Parts(ldraw_parts_path)
-
-    try:
-        model = Part(ldraw_path)
-    except PartError:
-        sys.stderr.write("Failed to read LDraw file: %s\n" % ldraw_path)
-        sys.exit(1)
+    """ actual ldr2pov implementation """
+    model, parts = get_model(ldraw_path)
 
     with open(pov_path, "w") as pov_file:
         pov_file.write('#include "colors.inc"\n\n')

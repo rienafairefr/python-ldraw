@@ -21,12 +21,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import argparse
-import sys
 
-from ldraw.config import get_config
-from ldraw.geometry import Vector, CoordinateSystem
-from ldraw.parts import Part, Parts, PartError
-from ldraw.tools import widthxheight, vector_position, UP_DIRECTION
+from ldraw.tools import (widthxheight, vector_position, get_model,
+                         get_coordinate_system, verify_camera_look_at)
 from ldraw.writers.png import PNGWriter, PNGArgs
 
 
@@ -67,33 +64,11 @@ The optional sky background and stroke colours are PNG colours, either specified
 
 def ldr2png(ldraw_path, png_path, look_at_position, camera_position, png_args):
     """ Implementation of ldr2png """
-    config = get_config()
-    parts_path = config['parts.lst']
+    verify_camera_look_at(camera_position, look_at_position)
 
-    parts = Parts(parts_path)
+    model, parts = get_model(ldraw_path)
 
-    try:
-        model = Part(ldraw_path)
-    except PartError:
-        sys.stderr.write("Failed to read LDraw file: %s\n" % ldraw_path)
-        sys.exit(1)
-
-    if camera_position == look_at_position:
-        sys.stderr.write("Camera and look-at positions are the same.\n")
-        sys.exit(1)
-
-    system = CoordinateSystem()
-
-    system.z = (camera_position - look_at_position)
-    system.z.norm()
-
-    system.x = UP_DIRECTION.cross(system.z)
-
-    if abs(system.x) == 0.0:
-        system.x = system.z.cross(Vector(1.0, 0, 0))
-
-    system.x.norm()
-    system.y = system.z.cross(system.x)
+    system = get_coordinate_system(camera_position, look_at_position)
 
     writer = PNGWriter(camera_position, system, parts)
     writer.write(model, png_path, png_args)
