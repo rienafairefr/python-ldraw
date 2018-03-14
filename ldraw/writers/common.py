@@ -13,6 +13,14 @@ def _current_colour(colour, current_colour):
     return current_colour if colour == Main_Colour else colour.code
 
 
+class Current(object):
+    """ an instance of this is passed around during rendering """
+    def __init__(self, matrix, colour, position):
+        self.matrix = matrix
+        self.colour = colour
+        self.position = position
+
+
 class Writer(object):
     # pylint: disable=too-many-arguments, too-few-public-methods
     """ Common logic for PNG, SVG, POV writers """

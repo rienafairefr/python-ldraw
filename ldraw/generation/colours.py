@@ -45,4 +45,4 @@ def gen_colours(parts, output_dir):
 
     __init__ = os.path.join(library_path, '__init__.py')
     with open(__init__, 'w') as __init__:
-        __init__.write('__all__ = [\'colours\']')
+        __init__.write('__all__ = [\'colours\']\n')
