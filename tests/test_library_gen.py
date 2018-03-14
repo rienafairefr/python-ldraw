@@ -20,15 +20,15 @@ def test_library_gen_files(data_dir):
     """ generated library contains the right files """
     library_gen_main('tests/test_ldraw/parts.lst', data_dir)
 
-    content = [os.path.relpath(os.path.join(dp, f), data_dir) for dp, dn, fn in os.walk(data_dir) for f in fn]
+    content = {os.path.relpath(os.path.join(dp, f), data_dir) for dp, dn, fn in os.walk(data_dir) for f in fn}
 
-    library = ['__init__.py',
+    library = {'__init__.py',
                'colours.py',
                'license.txt',
                join('parts', '__init__.py'),
-               join('parts', 'others.py')]
+               join('parts', 'others.py')}
 
-    assert content == [join('library', el) for el in library]
+    assert content == {join('library', el) for el in library}
 
 
 # noinspection PyUnresolvedReferences, PyPackageRequirements
