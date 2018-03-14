@@ -131,22 +131,22 @@ class Polygon(object):
 
         edge1 = edges.pop(0)
 
-        if edge1.y1 >= height:
+        if edge1.point1.y >= height:
             return
 
         edge2 = edges.pop(0)
 
-        int_edge1_y1 = int(edge1.y1)
+        int_edge1_y1 = int(edge1.point1.y)
 
-        if int_edge1_y1 < edge1.y1 or int_edge1_y1 < edge2.y1:
+        if int_edge1_y1 < edge1.point1.y or int_edge1_y1 < edge2.point1.y:
             int_edge1_y1 += 1
         while int_edge1_y1 <= end_py and int_edge1_y1 < height:
             # Retrieve new edges as required.
-            if int_edge1_y1 >= edge1.y2:
+            if int_edge1_y1 >= edge1.point2.y:
                 if not edges:
                     break
                 edge1 = edges.pop(0)
-            if int_edge1_y1 >= edge2.y2:
+            if int_edge1_y1 >= edge2.point2.y:
                 if not edges:
                     break
                 edge2 = edges.pop(0)
@@ -156,12 +156,12 @@ class Polygon(object):
             # Calculate the starting and finishing coordinates of the span
             # at the current y coordinate.
             gradient_1 = Vector2D(edge1.dx_dy, edge1.dz_dy)
-            start_point_1 = Vector2D(edge1.x1, edge1.z1)
-            start_1 = start_point_1 + (int_edge1_y1 - edge1.y1) * gradient_1
+            start_point_1 = Vector2D(edge1.point1.x, edge1.point1.z)
+            start_1 = start_point_1 + (int_edge1_y1 - edge1.point1.y) * gradient_1
 
             gradient_2 = Vector2D(edge2.dx_dy, edge2.dz_dy)
-            start_point_2 = Vector2D(edge2.x1, edge2.z1)
-            start_2 = start_point_2 + (int_edge1_y1 - edge2.y1) * gradient_2
+            start_point_2 = Vector2D(edge2.point1.x, edge2.point1.z)
+            start_2 = start_point_2 + (int_edge1_y1 - edge2.point1.y) * gradient_2
 
             # Do not render the span if it lies outside the image or has
             # values that cannot be stored in the depth buffer.

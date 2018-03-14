@@ -14,4 +14,4 @@ def get_data_dir():
 
 def get_config_dir():
     """ get the directory where the config is """
-    return ensure_exists(appdirs.user_config_dir)
+    return ensure_exists(appdirs.user_config_dir())

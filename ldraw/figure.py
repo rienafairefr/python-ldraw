@@ -20,7 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 #pylint: disable=missing-docstring
 from ldraw.geometry import Vector, Identity, XAxis, YAxis, ZAxis
+from ldraw.library.parts.minifig.accessories import Airtanks, HipsAndLegs, Hips
+from ldraw.library.parts.minifig.arms import ArmLeft, ArmRight
+from ldraw.library.parts.minifig.hands import Hand
+from ldraw.library.parts.minifig.legs import LegLeft, LegRight
+from ldraw.library.parts.minifig.torsos import Torso
 from ldraw.pieces import Piece
+from ldraw.library.parts.minifig.heads import HeadWithSwSmirkAndBrownEyebrowsPattern as Head
 
 
 class Person(object):
@@ -31,8 +37,8 @@ class Person(object):
         self.pieces_info = {}
         self.group = group
 
-    def head(self, colour, angle=0, part="3626BPS5"):
-        # Displacement from torso
+    def head(self, colour, angle=0, part=Head):
+        """ Displacement from torso """
         displacement = self.matrix * Vector(0, -24, 0)
         piece = Piece(colour, self.position + displacement,
                       self.matrix * Identity().rotate(angle, YAxis), part,
@@ -50,29 +56,30 @@ class Person(object):
         piece = Piece(colour, displacement, head.matrix, part, self.group)
         return piece
 
-    def torso(self, colour, part="973"):
+    def torso(self, colour, part=Torso):
+        """ torso piece """
         return Piece(colour, self.position, self.matrix, part, self.group)
 
-    def backpack(self, colour, displacement=Vector(0, 0, 0), part="3838"):
-        # Displacement from torso
+    def backpack(self, colour, displacement=Vector(0, 0, 0), part=Airtanks):
+        """ Displacement from torso """
         displacement = self.matrix * displacement
         return Piece(colour, self.position + displacement, self.matrix, part,
                      self.group)
 
-    def hips_and_legs(self, colour, part="970C00"):
-        # Displacement from torso
+    def hips_and_legs(self, colour, part=HipsAndLegs):
+        """ Displacement from torso """
         displacement = self.matrix * Vector(0, 32, 0)
         return Piece(colour, self.position + displacement, self.matrix, part,
                      self.group)
 
-    def hips(self, colour, part="970"):
-        # Displacement from torso
+    def hips(self, colour, part=Hips):
+        """ Displacement from torso """
         displacement = self.matrix * Vector(0, 32, 0)
         return Piece(colour, self.position + displacement, self.matrix, part,
                      self.group)
 
-    def left_arm(self, colour, angle=0, part="981"):
-        # Displacement from torso
+    def left_arm(self, colour, angle=0, part=ArmLeft):
+        """ Displacement from torso """
         displacement = self.matrix * Vector(15, 8, 0)
         piece = Piece(colour, self.position + displacement,
                       self.matrix * Identity().rotate(-10, ZAxis) *
@@ -80,7 +87,7 @@ class Person(object):
         self.pieces_info["left arm"] = piece
         return piece
 
-    def left_hand(self, colour, angle=0, part="983"):
+    def left_hand(self, colour, angle=0, part=Hand):
         try:
             left_arm = self.pieces_info["left arm"]
         except KeyError:
@@ -93,6 +100,7 @@ class Person(object):
         return piece
 
     def left_hand_item(self, colour, displacement, angle=0, part=None):
+        """ Displacement from left hand """
         if not part:
             return None
         try:
@@ -105,8 +113,8 @@ class Person(object):
         piece = Piece(colour, displacement, matrix, part, self.group)
         return piece
 
-    def right_arm(self, colour, angle=0, part="982"):
-        # Displacement from torso
+    def right_arm(self, colour, angle=0, part=ArmRight):
+        """ Displacement from torso """
         displacement = self.matrix * Vector(-15, 8, 0)
         piece = Piece(colour, self.position + displacement,
                       self.matrix * Identity().rotate(10, ZAxis) *
@@ -114,7 +122,7 @@ class Person(object):
         self.pieces_info["right arm"] = piece
         return piece
 
-    def right_hand(self, colour, angle=0, part="983"):
+    def right_hand(self, colour, angle=0, part=Hand):
         try:
             right_arm = self.pieces_info["right arm"]
         except KeyError:
@@ -127,6 +135,7 @@ class Person(object):
         return piece
 
     def right_hand_item(self, colour, displacement, angle=0, part=None):
+        """ Add a right hand item"""
         if not part:
             return None
         try:
@@ -139,16 +148,18 @@ class Person(object):
         piece = Piece(colour, displacement, matrix, part, self.group)
         return piece
 
-    def left_leg(self, colour, angle=0, part="972"):
-        # Displacement from torso
+    def left_leg(self, colour, angle=0, part=LegLeft):
+        """ Add a left leg """
         displacement = self.matrix * Vector(0, 44, 0)
         piece = Piece(colour, self.position + displacement,
-                      self.matrix * Identity().rotate(angle, XAxis), part,
+                      self.matrix * Identity()
+                      .rotate(angle, XAxis), part,
                       self.group)
         self.pieces_info["left leg"] = piece
         return piece
 
     def left_shoe(self, colour, angle=0, part=None):
+        """ Add a shoe on the left"""
         if not part:
             return None
         try:
@@ -161,16 +172,18 @@ class Person(object):
         piece = Piece(colour, displacement, matrix, part, self.group)
         return piece
 
-    def right_leg(self, colour, angle=0, part="971"):
-        # Displacement from torso
+    def right_leg(self, colour, angle=0, part=LegRight):
+        """" Add a right leg"""
         displacement = self.matrix * Vector(0, 44, 0)
         piece = Piece(colour, self.position + displacement,
-                      self.matrix * Identity().rotate(angle, XAxis), part,
+                      self.matrix * Identity()
+                      .rotate(angle, XAxis), part,
                       self.group)
         self.pieces_info["right leg"] = piece
         return piece
 
     def right_shoe(self, colour, angle=0, part=None):
+        """ Add a shoe on the right """
         if not part:
             return None
         try:

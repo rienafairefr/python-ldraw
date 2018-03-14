@@ -130,12 +130,12 @@ class POVRayWriter(object):
         self.pov_file.write(POV_POSTAMBLE)
 
     def _write_triangle_2(self, obj):
-        if abs((obj.p3 - obj.p1).cross(obj.p4 - obj.p1)) != 0:
-            self._write_triangle(obj.colour, obj.p3, obj.p4, obj.p1)
+        if abs((obj.point3 - obj.point1).cross(obj.point4 - obj.point1)) != 0:
+            self._write_triangle(obj.colour, obj.point3, obj.point4, obj.point1)
 
     def _write_triangle_1(self, obj):
-        if abs((obj.p3 - obj.p1).cross(obj.p2 - obj.p1)) != 0:
-            self._write_triangle(obj.colour, obj.p1, obj.p2, obj.p3)
+        if abs((obj.point3 - obj.point1).cross(obj.point2 - obj.point1)) != 0:
+            self._write_triangle(obj.colour, obj.point1, obj.point2, obj.point3)
 
     def _write_piece(self, obj, objects):
         if obj.part in objects:
@@ -233,8 +233,8 @@ class POVRayWriter(object):
             if isinstance(obj, Piece):
                 self._write_piece_2(obj)
             elif isinstance(obj, Triangle):
-                if abs((obj.p3 - obj.p1).cross(obj.p2 - obj.p1)) != 0:
-                    self._write_triangle(obj.colour, obj.p1, obj.p2, obj.p3)
+                if abs((obj.point3 - obj.point1).cross(obj.point2 - obj.point1)) != 0:
+                    self._write_triangle(obj.colour, obj.point1, obj.point2, obj.point3)
         self.pov_file.write("}\n\n")
         return True
 
@@ -268,8 +268,8 @@ class POVRayWriter(object):
                 definition.append(obj)
             elif isinstance(obj, Quadrilateral):
                 # Split the quadrilateral into two triangles.
-                triangle1 = Triangle(obj.colour, obj.p1, obj.p2, obj.p3)
-                triangle2 = Triangle(obj.colour, obj.p3, obj.p4, obj.p1)
+                triangle1 = Triangle(obj.colour, obj.point1, obj.point2, obj.point3)
+                triangle2 = Triangle(obj.colour, obj.point3, obj.point4, obj.point1)
                 definition.append(triangle1)
                 definition.append(triangle2)
         if definition:
