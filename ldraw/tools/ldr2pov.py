@@ -25,24 +25,30 @@ import sys
 
 from ldraw.config import get_config
 from ldraw.parts import Part, Parts, PartError
+from ldraw.tools import vector_position
 from ldraw.writers.povray import POVRayWriter
 
 
 def main():
-    # "<LDraw parts file> <LDraw file> <POV-Ray file> <camera position> [<look at position>] [--sky <sky colour>]"
+    """ ldr2pov main function """
 
-    parser = argparse.ArgumentParser(description="Converts the LDraw file to a POV-Ray file.\n\n"
-                                                 "The camera position is a single x,y,z argument where each coordinate\n"
-                                                 "should be specified as a floating point number.\n"
-                                                 "The look at position is a single x,y,z argument where each coordinate\n"
-                                                 "should be specified as a floating point number.\n"
-                                                 "The optional sky colour is a single red,green,blue argument where\n"
-                                                 "each component should be specified as a floating point number between\n"
-                                                 "0.0 and 1.0 inclusive.\n\n")
+    description = """Converts the LDraw file to a POV-Ray file.
+    
+The camera position is a single x,y,z argument where each coordinate
+should be specified as a floating point number.
+The look at position is a single x,y,z argument where each coordinate
+should be specified as a floating point number.
+The optional sky colour is a single red,green,blue argument where
+each component should be specified as a floating point number between
+0.0 and 1.0 inclusive.
+
+"""
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument('ldraw_file')
     parser.add_argument('pov_file')
-    parser.add_argument('camera_position')
-    parser.add_argument('look_at_position', required=False, default="0,0,0")
+    parser.add_argument('camera_position', type=vector_position)
+    parser.add_argument('look_at_position', type=vector_position, required=False,
+                        default=vector_position("0,0,0"))
     parser.add_argument('--sky')
 
     args = parser.parse_args()
@@ -91,8 +97,8 @@ def ldr2pov(ldraw_path, pov_path,
             "camera {\n"
             "  location <%s>\n"
             "  look_at <%s>\n"
-            "}\n" % (", ".join(camera_position.split(",")),
-                     ", ".join(look_at_position.split(",")))
+            "}\n" % (", ".join(str(p) for p in [camera_position.x, camera_position.y, camera_position.z]),
+                     ", ".join(str(p) for p in [look_at_position.x, look_at_position.y, look_at_position.z]))
         )
 
         if sky:

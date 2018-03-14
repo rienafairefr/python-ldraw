@@ -26,11 +26,12 @@ import sys
 from ldraw.config import get_config
 from ldraw.geometry import Vector
 from ldraw.parts import Part, Parts, PartError
+from ldraw.tools import widthxheight, vector_position
 from ldraw.writers.svg import SVGArgs
 
 
 def main():
-    # "<LDraw parts file> <LDraw file> <SVG file> <viewport size> <camera position> [<look-at position>] [--sky <background colour>]"
+    """ ldr2svg main function """
     parser = argparse.ArgumentParser(description="Converts the LDraw file to a SVG file.\n\n"
                                                  "The viewport size is specified as a pair of floating point numbers representing\n"
                                                  "lengths in LDraw scene coordinates separated by an \"x\" character.\n\n"
@@ -41,9 +42,9 @@ def main():
                                                  "This tool requires PyQt4, built against Qt 4.4 or higher.\n\n")
     parser.add_argument('ldraw_file')
     parser.add_argument('svg_file')
-    parser.add_argument('viewport_size')
-    parser.add_argument('camera_position')
-    parser.add_argument('look_at_position', required=False, default="0,0,0")
+    parser.add_argument('viewport_size', type=widthxheight)
+    parser.add_argument('camera_position', type=vector_position)
+    parser.add_argument('look_at_position', type=vector_position, required=False, default=vector_position("0,0,0"))
     parser.add_argument('--sky')
     parser.add_argument('--qt', default=True)
 
@@ -56,9 +57,6 @@ def ldr2svg(ldraw_path, svg_path,
             viewport_size, camera_position, look_at_position, background_colour, qt):
     config = get_config()
     parts_path = config['parts.lst']
-    viewport_size = map(float, viewport_size.split("x"))
-    camera_position = Vector(*map(float, camera_position.split(",")))
-    look_at_position = Vector(*map(float, look_at_position.split(",")))
 
     parts = Parts(parts_path)
 

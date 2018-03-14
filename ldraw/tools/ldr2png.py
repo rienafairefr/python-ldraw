@@ -26,55 +26,49 @@ import sys
 from ldraw.config import get_config
 from ldraw.geometry import Vector
 from ldraw.parts import Part, Parts, PartError
+from ldraw.tools import widthxheight, vector_position
 from ldraw.writers.png import PNGWriter, PNGArgs
 
 
 def main():
-    # "<LDraw parts file> <LDraw file> <PNG file> <image size> <camera position> [<look-at position>] [--distance <eye to viewport distance>] [--stroke-colour <stroke colour>] [--sky <background colour>]"
+    """ ldr2png main function """
+    description = """Converts the LDraw file to a PNG file.
+    
+The image size must be specified in the format <width>x<height> where the width
+and height are measured in pixels.
 
-    parser = argparse.ArgumentParser(description="Converts the LDraw file to a PNG file.\n\n"
-                                                 "The image size must be specified in the format <width>x<height> where the width\n"
-                                                 "and height are measured in pixels.\n\n"
-                                                 "The camera and look-at positions are x,y,z arguments in LDraw scene coordinates\n"
-                                                 "where each coordinate should be specified as a floating point number.\n\n"
-                                                 "The eye to viewport distance is specified as a floating point number representing\n"
-                                                 "a length in LDraw scene coordinates. Its default value is 1.0.\n\n"
-                                                 "The optional sky background and stroke colours are PNG colours, either specified as\n"
-                                                 "#rrggbb or as a named colour.\n\n")
+The camera and look-at positions are x,y,z arguments in LDraw scene coordinates
+where each coordinate should be specified as a floating point number.
+
+The eye to viewport distance is specified as a floating point number representing
+a length in LDraw scene coordinates. Its default value is 1.0.
+
+The optional sky background and stroke colours are PNG colours, either specified as
+#rrggbb or as a named colour.
+
+"""
+
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument('ldraw_file')
     parser.add_argument('png_file')
-    parser.add_argument('image_size')
-    parser.add_argument('camera_position')
-    parser.add_argument('look_at_position', required=False, default="0,0,0")
+    parser.add_argument('image_size', type=widthxheight)
+    parser.add_argument('camera_position', type=vector_position)
+    parser.add_argument('look_at_position', required=False, default=vector_position('0,0,0'))
     parser.add_argument('--distance', type=float, default=1.0)
     parser.add_argument('--stroke-colour', dest='stroke_colour')
-    parser.add_argument('--sky')
+    parser.add_argument('--sky', default='#000000')
 
     args = parser.parse_args()
 
-    ldr2png(args.ldraw_file, args.png_file,
-            args.distance, args.image_size, args.camera_position, args.look_at_position,
-            args.sky, args.stroke_colour)
+    png_args = PNGArgs(args.distance, args.image_size, args.stroke_colour, args.sky)
+
+    ldr2png(args.ldraw_file, args.png_file, args.look_at_position, args.camera_position, png_args)
 
 
-def ldr2png(ldraw_path, png_path,
-            distance, image_size, camera_position, look_at_position,
-            sky, stroke_colour):
+def ldr2png(ldraw_path, png_path, look_at_position, camera_position, png_args):
+    """ Implementation of ldr2png """
     config = get_config()
     parts_path = config['parts.lst']
-
-    image_dimensions = image_size.split("x")
-    if len(image_dimensions) != 2:
-        sys.stderr.write("Incorrect number of values specified for the image size: %s\n" % image_size)
-        sys.exit(1)
-    try:
-        image_size = map(int, image_dimensions)
-    except ValueError:
-        sys.stderr.write("Non-integer value specified for the image size: %s\n" % image_size)
-        sys.exit(1)
-
-    camera_position = Vector(*map(float, camera_position.split(",")))
-    look_at_position = Vector(*map(float, look_at_position.split(",")))
 
     parts = Parts(parts_path)
 
@@ -84,11 +78,6 @@ def ldr2png(ldraw_path, png_path,
         sys.stderr.write("Failed to read LDraw file: %s\n" % ldraw_path)
         sys.exit(1)
 
-    if sky:
-        background_colour = sky
-    else:
-        background_colour = "#000000"
-
     if camera_position == look_at_position:
         sys.stderr.write("Camera and look-at positions are the same.\n")
         sys.exit(1)
@@ -96,18 +85,17 @@ def ldr2png(ldraw_path, png_path,
     z_axis = (camera_position - look_at_position)
     z_axis = z_axis / abs(z_axis)
 
-    up = Vector(0, -1.0, 0)
+    up_direction = Vector(0, -1.0, 0)
 
-    x_axis = up.cross(z_axis)
+    x_axis = up_direction.cross(z_axis)
     if abs(x_axis) == 0.0:
-        up = Vector(1.0, 0, 0)
-        x_axis = z_axis.cross(up)
+        up_direction = Vector(1.0, 0, 0)
+        x_axis = z_axis.cross(up_direction)
 
     x_axis = x_axis / abs(x_axis)
     y_axis = z_axis.cross(x_axis)
 
     writer = PNGWriter(camera_position, (x_axis, y_axis, z_axis), parts)
-    png_args = PNGArgs(distance, image_size, stroke_colour, background_colour)
     writer.write(model, png_path, png_args)
 
 

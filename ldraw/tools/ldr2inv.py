@@ -31,6 +31,7 @@ from ldraw.pieces import Piece
 
 
 def main():
+    """ Main function for ldr2inv """
     parser = argparse.ArgumentParser()
     parser.add_argument('ldraw_file')
     parser.add_argument('output')
@@ -41,6 +42,7 @@ def main():
 
 
 def ldr2inv(ldraw_path, inventory_path):
+    """ Actual ldr2inv implementation """
     config = get_config()
     parts = Parts(config['parts.lst'])
 
@@ -73,13 +75,13 @@ def ldr2inv(ldraw_path, inventory_path):
     length += (4 - (length % 4))
 
     try:
-        with codecs.open(inventory_path, 'w', encoding='utf-8') as f:
+        with codecs.open(inventory_path, 'w', encoding='utf-8') as inv_file:
             items = inventory.items()
             items.sort()
 
             for name, number in items:
                 padding = " " * (length - len(name))
-                f.write("%s%s%i\n" % (name, padding, number))
+                inv_file.write("%s%s%i\n" % (name, padding, number))
 
     except IOError:
         sys.stderr.write("Failed to write inventory file: %s\n" % inventory_path)
