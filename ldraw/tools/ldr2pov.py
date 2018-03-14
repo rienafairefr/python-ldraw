@@ -23,26 +23,62 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import argparse
 import sys
 
-from ldraw.config import get_config
-from ldraw.parts import Part, Parts, PartError
+from ldraw.tools import vector_position, get_model
 from ldraw.writers.povray import POVRayWriter
+
+SKY_SPHERE_FORMAT_STRING = """sky_sphere {
+  pigment
+  {
+    rgb <%s>
+  }
+}
+"""
+
+CAMERA_FORMAT_STRING = """camera {
+  location <%s>
+  look_at <%s>
+}
+"""
+
+LIGHT_FORMAT_STRING = """light_source {
+  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>
+}
+
+light_source {
+  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>
+}
+
+light_source {
+  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>
+}
+
+light_source {
+  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>
+}
+
+"""
 
 
 def main():
-    # "<LDraw parts file> <LDraw file> <POV-Ray file> <camera position> [<look at position>] [--sky <sky colour>]"
+    """ ldr2pov main function """
 
-    parser = argparse.ArgumentParser(description="Converts the LDraw file to a POV-Ray file.\n\n"
-                                                 "The camera position is a single x,y,z argument where each coordinate\n"
-                                                 "should be specified as a floating point number.\n"
-                                                 "The look at position is a single x,y,z argument where each coordinate\n"
-                                                 "should be specified as a floating point number.\n"
-                                                 "The optional sky colour is a single red,green,blue argument where\n"
-                                                 "each component should be specified as a floating point number between\n"
-                                                 "0.0 and 1.0 inclusive.\n\n")
+    description = """Converts the LDraw file to a POV-Ray file.
+    
+The camera position is a single x,y,z argument where each coordinate
+should be specified as a floating point number.
+The look at position is a single x,y,z argument where each coordinate
+should be specified as a floating point number.
+The optional sky colour is a single red,green,blue argument where
+each component should be specified as a floating point number between
+0.0 and 1.0 inclusive.
+
+"""
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument('ldraw_file')
     parser.add_argument('pov_file')
-    parser.add_argument('camera_position')
-    parser.add_argument('look_at_position', required=False, default="0,0,0")
+    parser.add_argument('camera_position', type=vector_position)
+    parser.add_argument('look_at_position', type=vector_position, required=False,
+                        default=vector_position("0,0,0"))
     parser.add_argument('--sky')
 
     args = parser.parse_args()
@@ -53,15 +89,8 @@ def main():
 
 def ldr2pov(ldraw_path, pov_path,
             camera_position, look_at_position, sky):
-    config = get_config()
-    ldraw_parts_path = config['parts.lst']
-    parts = Parts(ldraw_parts_path)
-
-    try:
-        model = Part(ldraw_path)
-    except PartError:
-        sys.stderr.write("Failed to read LDraw file: %s\n" % ldraw_path)
-        sys.exit(1)
+    """ actual ldr2pov implementation """
+    model, parts = get_model(ldraw_path)
 
     with open(pov_path, "w") as pov_file:
         pov_file.write('#include "colors.inc"\n\n')
@@ -69,43 +98,21 @@ def ldr2pov(ldraw_path, pov_path,
         writer.write(model)
 
         if not writer.lights:
-            pov_file.write(
-                "light_source {\n"
-                "  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>\n"
-                "}\n\n"
-                "light_source {\n"
-                "  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>\n"
-                "}\n\n"
-                "light_source {\n"
-                "  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>\n"
-                "}\n\n"
-                "light_source {\n"
-                "  <%1.3f, %1.3f, %1.3f>, rgb <1.0, 1.0, 1.0>\n"
-                "}\n\n" % (writer.minimum.x - 50.0, writer.maximum.y + 100.0, writer.minimum.z - 50.0,
-                           writer.maximum.x + 50.0, writer.maximum.y + 100.0, writer.minimum.z - 50.0,
-                           writer.minimum.x - 50.0, writer.maximum.y + 100.0, writer.maximum.z + 50.0,
-                           writer.maximum.x + 50.0, writer.maximum.y + 100.0, writer.maximum.z + 50.0)
-            )
+            lights = (writer.minimum.x - 50.0, writer.maximum.y + 100.0, writer.minimum.z - 50.0,
+                      writer.maximum.x + 50.0, writer.maximum.y + 100.0, writer.minimum.z - 50.0,
+                      writer.minimum.x - 50.0, writer.maximum.y + 100.0, writer.maximum.z + 50.0,
+                      writer.maximum.x + 50.0, writer.maximum.y + 100.0, writer.maximum.z + 50.0)
+            pov_file.write(LIGHT_FORMAT_STRING % lights)
 
         pov_file.write(
-            "camera {\n"
-            "  location <%s>\n"
-            "  look_at <%s>\n"
-            "}\n" % (", ".join(camera_position.split(",")),
-                     ", ".join(look_at_position.split(",")))
+            CAMERA_FORMAT_STRING % (camera_position.repr,
+                                    look_at_position.repr)
         )
 
         if sky:
-            pov_file.write(
-                "sky_sphere {\n"
-                "  pigment\n"
-                "  {\n"
-                "    rgb <%s>\n"
-                "  }\n"
-                "}\n" % sky
-            )
+            pov_file.write(SKY_SPHERE_FORMAT_STRING % sky)
 
-    for message, part in writer.warnings.keys():
+    for message, part in writer.warnings:
         sys.stderr.write((message + "\n") % part)
 
 

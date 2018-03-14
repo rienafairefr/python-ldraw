@@ -1,7 +1,11 @@
 #!/usr/bin/env python
+"""
+Takes care of downloading the complete.zip from LDraw.org
+And generating the parts.lst from it
+"""
+from __future__ import print_function
 import zipfile
 import os
-
 
 from mklist.generate import generate_parts_lst
 
@@ -11,7 +15,7 @@ from ldraw.utils import ensure_exists
 
 
 def download_main(output_dir):
-
+    """ Main function for the downloading/mklist """
     ensure_exists(output_dir)
 
     url = 'http://www.ldraw.org/library/updates/complete.zip'

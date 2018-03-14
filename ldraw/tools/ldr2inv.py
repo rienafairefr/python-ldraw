@@ -24,13 +24,13 @@ import codecs
 import sys
 import argparse
 
-from ldraw.config import get_config
-from ldraw.parts import Part, Parts, PartError
 from ldraw.lines import Comment
 from ldraw.pieces import Piece
+from ldraw.tools import get_model
 
 
 def main():
+    """ Main function for ldr2inv """
     parser = argparse.ArgumentParser()
     parser.add_argument('ldraw_file')
     parser.add_argument('output')
@@ -41,14 +41,8 @@ def main():
 
 
 def ldr2inv(ldraw_path, inventory_path):
-    config = get_config()
-    parts = Parts(config['parts.lst'])
-
-    try:
-        model = Part(ldraw_path)
-    except PartError:
-        sys.stderr.write("Failed to read LDraw file: %s\n" % ldraw_path)
-        sys.exit(1)
+    """ Actual ldr2inv implementation """
+    model, parts = get_model(ldraw_path)
 
     inventory = {}
     length = 0
@@ -73,17 +67,20 @@ def ldr2inv(ldraw_path, inventory_path):
     length += (4 - (length % 4))
 
     try:
-        with codecs.open(inventory_path, 'w', encoding='utf-8') as f:
+        with codecs.open(inventory_path, 'w', encoding='utf-8') as inv_file:
             items = inventory.items()
             items.sort()
 
             for name, number in items:
                 padding = " " * (length - len(name))
-                f.write("%s%s%i\n" % (name, padding, number))
+                inv_file.write("%s%s%i\n" % (name, padding, number))
 
     except IOError:
         sys.stderr.write("Failed to write inventory file: %s\n" % inventory_path)
         sys.exit(1)
+
+
+
 
 
 if __name__ == "__main__":

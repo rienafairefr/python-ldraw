@@ -16703,8 +16703,8 @@ light_source {
 }
 
 camera {
-  location <100, 100, 100>
-  look_at <0, 0, 0>
+  location <100.000000, 100.000000, 100.000000>
+  look_at <0.000000, 0.000000, 0.000000>
 }
 sky_sphere {
   pigment

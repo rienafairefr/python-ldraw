@@ -18,9 +18,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+# pylint: disable=invalid-name, too-few-public-methods, missing-docstring
 import copy
 import math
+from numbers import Number
 
 
 class MatrixError(Exception):
@@ -55,34 +56,37 @@ class Degrees(AngleUnits):
     pass
 
 
+def _rows_multiplication(r1, r2):
+    rows = [[r1[0][0] * r2[0][0] + r1[0][1] * r2[1][0] + r1[0][2] * r2[2][0],
+             r1[0][0] * r2[0][1] + r1[0][1] * r2[1][1] + r1[0][2] * r2[2][1],
+             r1[0][0] * r2[0][2] + r1[0][1] * r2[1][2] + r1[0][2] * r2[2][2]],
+            [r1[1][0] * r2[0][0] + r1[1][1] * r2[1][0] + r1[1][2] * r2[2][0],
+             r1[1][0] * r2[0][1] + r1[1][1] * r2[1][1] + r1[1][2] * r2[2][1],
+             r1[1][0] * r2[0][2] + r1[1][1] * r2[1][2] + r1[1][2] * r2[2][2]],
+            [r1[2][0] * r2[0][0] + r1[2][1] * r2[1][0] + r1[2][2] * r2[2][0],
+             r1[2][0] * r2[0][1] + r1[2][1] * r2[1][1] + r1[2][2] * r2[2][1],
+             r1[2][0] * r2[0][2] + r1[2][1] * r2[1][2] + r1[2][2] * r2[2][2]]]
+    return rows
+
+
 class Matrix(object):
+    """ a transformation matrix """
+
     def __init__(self, rows):
         self.rows = rows
 
     def __repr__(self):
         values = reduce(lambda x, y: x + y, self.rows)
-        format = ("((%f, %f, %f),\n"
-                  " (%f, %f, %f),\n"
-                  " (%f, %f, %f))")
-        return format % tuple(values)
-
-    def ___mul___(self, r1, r2):
-        rows = [[r1[0][0] * r2[0][0] + r1[0][1] * r2[1][0] + r1[0][2] * r2[2][0],
-                 r1[0][0] * r2[0][1] + r1[0][1] * r2[1][1] + r1[0][2] * r2[2][1],
-                 r1[0][0] * r2[0][2] + r1[0][1] * r2[1][2] + r1[0][2] * r2[2][2]],
-                [r1[1][0] * r2[0][0] + r1[1][1] * r2[1][0] + r1[1][2] * r2[2][0],
-                 r1[1][0] * r2[0][1] + r1[1][1] * r2[1][1] + r1[1][2] * r2[2][1],
-                 r1[1][0] * r2[0][2] + r1[1][1] * r2[1][2] + r1[1][2] * r2[2][2]],
-                [r1[2][0] * r2[0][0] + r1[2][1] * r2[1][0] + r1[2][2] * r2[2][0],
-                 r1[2][0] * r2[0][1] + r1[2][1] * r2[1][1] + r1[2][2] * r2[2][1],
-                 r1[2][0] * r2[0][2] + r1[2][1] * r2[1][2] + r1[2][2] * r2[2][2]]]
-        return rows
+        format_string = ("((%f, %f, %f),\n"
+                         " (%f, %f, %f),\n"
+                         " (%f, %f, %f))")
+        return format_string % tuple(values)
 
     def __mul__(self, other):
         if isinstance(other, Matrix):
             r1 = self.rows
             r2 = other.rows
-            return Matrix(self.___mul___(r1, r2))
+            return Matrix(_rows_multiplication(r1, r2))
         elif isinstance(other, Vector):
             r = self.rows
             x, y, z = other.x, other.y, other.z
@@ -96,7 +100,7 @@ class Matrix(object):
         if isinstance(other, Matrix):
             r1 = other.rows
             r2 = self.rows
-            return Matrix(self.___mul___(r1, r2))
+            return Matrix(_rows_multiplication(r1, r2))
         elif isinstance(other, Vector):
             r = self.rows
             x, y, z = other.x, other.y, other.z
@@ -107,9 +111,11 @@ class Matrix(object):
             raise MatrixError
 
     def copy(self):
+        """ make a copy of this matrix """
         return Matrix(copy.deepcopy(self.rows))
 
     def rotate(self, angle, axis, units=Degrees):
+        """ rotate the matrix by an angle around an axis """
         if units == Degrees:
             c = math.cos(angle / 180.0 * math.pi)
             s = math.sin(angle / 180.0 * math.pi)
@@ -127,15 +133,18 @@ class Matrix(object):
         return self * rotation
 
     def scale(self, sx, sy, sz):
+        """ scale the matrix by a number"""
         return Matrix([[sx, 0, 0], [0, sy, 0], [0, 0, sz]]) * self
 
     def transpose(self):
+        """ transpose """
         r = self.rows
         return Matrix([[r[0][0], r[1][0], r[2][0]],
                        [r[0][1], r[1][1], r[2][1]],
                        [r[0][2], r[1][2], r[2][2]]])
 
     def det(self):
+        """ determinant of the matrix """
         r = self.rows
         terms = [r[0][0] * (r[1][1] * r[2][2] - r[1][2] * r[2][1]),
                  r[0][1] * (r[1][2] * r[2][0] - r[1][0] * r[2][2]),
@@ -143,19 +152,36 @@ class Matrix(object):
         return sum(terms)
 
     def flatten(self):
+        """ flatten the matrix """
         return tuple(reduce(lambda x, y: x + y, self.rows))
+
+    def fix_diagonal(self):
+        """ POV-Ray does not like matrices with zero diagonal elements. """
+        corrected = False
+        for i in range(3):
+            if self.rows[i][i] == 0.0:
+                self.rows[i][i] = 0.001
+                corrected = True
+        return corrected
 
 
 def Identity():
+    """ a transformation matrix representing Identity """
     return Matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
 
 class Vector(object):
+    """ a Vector in 3D"""
+
     def __init__(self, x, y, z):
         self.x, self.y, self.z = x, y, z
 
+    @property
+    def repr(self):
+        return "%f, %f, %f" % (self.x, self.y, self.z)
+
     def __repr__(self):
-        return "<Vector: (%f, %f, %f)>" % (self.x, self.y, self.z)
+        return "<Vector: (%s)>" % (self.repr)
 
     def __hash__(self):
         return hash((self.x, self.y, self.z))
@@ -192,12 +218,12 @@ class Vector(object):
         return (self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5
 
     def __rmul__(self, other):
-        if isinstance(other, float) or isinstance(other, int):
+        if isinstance(other, Number):
             return Vector(self.x * other, self.y * other, self.z * other)
         raise ValueError("Cannot multiply %s with %s" % (self.__class__, type(other)))
 
     def __div__(self, other):
-        if isinstance(other, float) or isinstance(other, int):
+        if isinstance(other, Number):
             return Vector(self.x / other, self.y / other, self.z / other)
         raise ValueError("Cannot divide %s with %s" % (self.__class__, type(other)))
 
@@ -209,9 +235,93 @@ class Vector(object):
         return Vector(self.x, self.y, self.z)
 
     def cross(self, other):
+        """ cross product """
         return Vector(self.y * other.z - self.z * other.y,
                       self.z * other.x - self.x * other.z,
                       self.x * other.y - self.y * other.x)
 
     def dot(self, other):
+        """ dot product"""
         return self.x * other.x + self.y * other.y + self.z * other.z
+
+    def norm(self):
+        """ normalized """
+        _length = abs(self)
+        self.x = self.x / _length
+        self.y = self.y / _length
+        self.z = self.z / _length
+
+
+class Vector2D(object):
+    """ a Vector in 2D """
+
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+    def __repr__(self):
+        return "<Vector2D: (%f, %f) >" % (self.x, self.y)
+
+    def __hash__(self):
+        return hash((self.x, self.y))
+
+    def __add__(self, other):
+        x = self.x + other.x
+        y = self.y + other.y
+        # Return a new object.
+        return Vector2D(x, y)
+
+    __radd__ = __add__
+
+    def __sub__(self, other):
+        x = self.x - other.x
+        y = self.y - other.y
+        # Return a new object.
+        return Vector2D(x, y)
+
+    def __rsub__(self, other):
+        x = other.x - self.x
+        y = other.y - self.y
+        # Return a new object.
+        return Vector2D(x, y)
+
+    def __cmp__(self, other):
+        # This next expression will only return zero (equals) if all
+        # expressions are false.
+        return self.x != other.x or self.y != other.y
+
+    def __abs__(self):
+        return (self.x ** 2 + self.y ** 2) ** 0.5
+
+    def __rmul__(self, other):
+        if isinstance(other, Number):
+            return Vector2D(self.x * other, self.y * other)
+        raise ValueError("Cannot multiply %s with %s" % (self.__class__, type(other)))
+
+    def __div__(self, other):
+        if isinstance(other, Number):
+            return Vector2D(self.x / other, self.y / other)
+        raise ValueError("Cannot divide %s with %s" % (self.__class__, type(other)))
+
+    def copy(self):
+        """
+        vector = copy(self)
+        Copy the vector so that new vectors containing the same values
+        are passed around rather than references to the same object.
+        """
+        return Vector2D(self.x, self.y)
+
+    def dot(self, other):
+        """ dot product """
+        return self.x * other.x + self.y * other.y
+
+
+class CoordinateSystem(object):
+    def __init__(self, x=Vector(1.0, 0.0, 0.0),
+                 y=Vector(0.0, 1.0, 0.0),
+                 z=Vector(0.0, 0.0, 1.0)):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def project(self, p):
+        return Vector(p.dot(self.x), p.dot(self.y), p.dot(self.z))
