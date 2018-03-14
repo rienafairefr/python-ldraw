@@ -32,12 +32,13 @@ def download_main(output_dir):
         zip_ref.extractall(output_dir)
         zip_ref.close()
 
-    parts_lst_path = os.path.join(output_dir, 'ldraw', 'parts.lst')
-    if not os.path.exists(parts_lst_path):
-        print('mklist...')
-        generate_parts_lst('description',
-                           os.path.join(output_dir, 'ldraw', 'parts'),
-                           parts_lst_path)
+    parts_lst_path = os.path.join(output_dir, 'ldraw', '%s.lst')
+    for name in ['parts', 'p']:
+        if not os.path.exists(parts_lst_path % name):
+            print('parts.lst mklist...')
+            generate_parts_lst('description',
+                               os.path.join(output_dir, 'ldraw', name),
+                               parts_lst_path% name)
 
 
 if __name__ == '__main__':

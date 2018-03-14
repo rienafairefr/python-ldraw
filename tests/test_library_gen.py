@@ -4,7 +4,6 @@ import os
 
 from os.path import join
 
-import imp
 import pytest
 import sys
 

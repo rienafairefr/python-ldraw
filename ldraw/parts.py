@@ -57,6 +57,9 @@ class Parts(object):
         self.parts_by_name = {}
         self.parts_by_code = {}
 
+        self.primitives_by_name = {}
+        self.primitives_by_code = {}
+
         self.colours = {}
         self.alpha_values = {}
         self.colour_attributes = {}
@@ -261,7 +264,8 @@ class Parts(object):
                     break
                 code = pieces[0]
                 description = pieces[1].strip()
-                self.parts_by_name[description] = code
+                self.primitives_by_name[description] = code
+                self.primitives_by_code[code] = description
         except IOError:
             raise PartError("Failed to load primitives file: %s" % path)
 
