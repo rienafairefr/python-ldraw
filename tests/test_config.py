@@ -1,9 +1,11 @@
 import os
+import tempfile
 
+import yaml
 from mock import patch
 from yaml import YAMLError
 
-from ldraw.config import get_config
+from ldraw.config import get_config, write_config
 from ldraw.dirs import get_data_dir
 
 
@@ -31,5 +33,10 @@ def test_config_can_load(yaml_load_mock):
 
 
 @patch('ldraw.config.get_config_file_path')
-def write_config(config_file_path_mock):
-    pass
+def test_write_config(config_file_path_mock):
+    tmp = tempfile.mktemp()
+    config_file_path_mock.side_effect = lambda: tmp
+    data = {'parts.lst':'2468'}
+    write_config(data)
+
+    assert yaml.load(open(tmp, 'r')) == data
