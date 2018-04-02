@@ -1,7 +1,12 @@
+import pytest
+
+from ldraw.figure import Person
 from ldraw.geometry import Vector, Identity
-from ldraw.library.colours import White
+from ldraw.library.colours import White, Yellow, Light_Grey, Black
 from ldraw.library.parts.others import Brick1X1
 from ldraw.pieces import Piece, Group
+from ldraw.library.parts.minifig.accessories import HelmetClassicWithThickChinGuardAndVisorDimples as HelmetClassic, \
+    Flipper, CameraMovie
 
 
 def test_add_piece():
@@ -16,3 +21,48 @@ def test_add_piece():
 
     assert piece in group2.pieces
     assert piece not in group1.pieces
+
+
+@pytest.fixture()
+def figure():
+    return Person(Vector(0, 0, -10))
+
+
+@pytest.fixture()
+def full_figure(figure):
+    figure.left_arm(Yellow, -45)
+    figure.left_hand(Yellow, 10)
+    figure.right_arm(Yellow, -45)
+    figure.right_hand(Yellow, 10)
+    figure.left_leg(Yellow, -10)
+    figure.right_leg(Yellow, -10)
+    return figure
+
+
+def test_add_hat_valid_head(figure):
+    assert figure.hat(White, HelmetClassic) is None
+
+
+def test_add_hat_no_head(figure):
+    assert figure.head(Yellow, 30) is not None
+    assert figure.hat(White, HelmetClassic) is not None
+
+
+def test_add_lh_item_nopart(figure, full_figure):
+    assert full_figure.left_hand_item(Light_Grey, Vector(0, 0, -12), -15) is None
+    assert full_figure.left_hand_item(Light_Grey, Vector(0, 0, -12), -15, CameraMovie) is not None
+
+
+def test_add_rh_item_nopart(figure, full_figure):
+    assert full_figure.right_hand_item(Light_Grey, Vector(0, 0, -12), -15) is None
+    assert full_figure.right_hand_item(Light_Grey, Vector(0, 0, -12), -15, CameraMovie) is not None
+
+
+def test_add_ls_item_nopart(figure, full_figure):
+    assert full_figure.left_shoe(Black, 10) is None
+    assert full_figure.left_shoe(Black, 10, Flipper) is not None
+
+
+def test_add_rs_item_nopart(figure, full_figure):
+    assert full_figure.right_shoe(Black, 10) is None
+    assert full_figure.right_shoe(Black, 10, Flipper) is not None

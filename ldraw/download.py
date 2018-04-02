@@ -14,23 +14,23 @@ from ldraw.dirs import get_data_dir
 from ldraw.utils import ensure_exists
 
 
+LDRAW_URL = 'http://www.ldraw.org/library/updates/complete.zip'
+
+
 def download_main(output_dir):
     """ Main function for the downloading/mklist """
     ensure_exists(output_dir)
-
-    url = 'http://www.ldraw.org/library/updates/complete.zip'
 
     retrieved = os.path.join(output_dir, "complete.zip")
 
     if not os.path.exists(retrieved):
         print('retrieve the complete.zip from ldraw.org ...')
-        urlretrieve(url, filename=retrieved)
+        urlretrieve(LDRAW_URL, filename=retrieved)
 
     if not os.path.exists(os.path.join(output_dir, 'ldraw')):
         print('unzipping the complete.zip ...')
-        zip_ref = zipfile.ZipFile(retrieved, 'r')
-        zip_ref.extractall(output_dir)
-        zip_ref.close()
+        with zipfile.ZipFile(retrieved, 'r') as zip_ref:
+            zip_ref.extractall(output_dir)
 
     parts_lst_path = os.path.join(output_dir, 'ldraw', '%s.lst')
     for name in ['parts', 'p']:
