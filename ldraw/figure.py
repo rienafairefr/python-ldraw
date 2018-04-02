@@ -29,6 +29,18 @@ from ldraw.pieces import Piece
 from ldraw.library.parts.minifig.heads import HeadWithSwSmirkAndBrownEyebrowsPattern as Head
 
 
+def dependent_piece(dep):
+    def decorator(fn):
+        def wrapped(self, *args, **kwargs):
+            try:
+                dependent_object = self.pieces_info[dep]
+                return fn(self, dependent_object, *args, **kwargs)
+            except KeyError:
+                return None
+        return wrapped
+    return decorator
+
+
 class Person(object):
     def __init__(self, position=Vector(0, 0, 0), matrix=Identity(),
                  group=None):
@@ -46,11 +58,8 @@ class Person(object):
         self.pieces_info["head"] = piece
         return piece
 
-    def hat(self, colour, part="3901"):
-        try:
-            head = self.pieces_info["head"]
-        except KeyError:
-            return None
+    @dependent_piece('head')
+    def hat(self, head, colour, part="3901"):
         # Displacement from head
         displacement = head.position + head.matrix * Vector(0, 0, 0)
         piece = Piece(colour, displacement, head.matrix, part, self.group)
@@ -87,11 +96,8 @@ class Person(object):
         self.pieces_info["left arm"] = piece
         return piece
 
-    def left_hand(self, colour, angle=0, part=Hand):
-        try:
-            left_arm = self.pieces_info["left arm"]
-        except KeyError:
-            return None
+    @dependent_piece('left arm')
+    def left_hand(self, left_arm, colour, angle=0, part=Hand):
         # Displacement from left hand
         displacement = left_arm.position + left_arm.matrix * Vector(4, 17, -9)
         matrix = left_arm.matrix * Identity().rotate(40, XAxis) * Identity().rotate(angle, ZAxis)
@@ -99,13 +105,10 @@ class Person(object):
         self.pieces_info["left hand"] = piece
         return piece
 
-    def left_hand_item(self, colour, displacement, angle=0, part=None):
+    @dependent_piece('left hand')
+    def left_hand_item(self, left_hand, colour, displacement, angle=0, part=None):
         """ Displacement from left hand """
         if not part:
-            return None
-        try:
-            left_hand = self.pieces_info["left hand"]
-        except KeyError:
             return None
         # Displacement from left hand
         displacement = left_hand.position + left_hand.matrix * displacement
@@ -122,11 +125,8 @@ class Person(object):
         self.pieces_info["right arm"] = piece
         return piece
 
-    def right_hand(self, colour, angle=0, part=Hand):
-        try:
-            right_arm = self.pieces_info["right arm"]
-        except KeyError:
-            return None
+    @dependent_piece('right arm')
+    def right_hand(self, right_arm, colour, angle=0, part=Hand):
         # Displacement from right arm
         displacement = right_arm.position + right_arm.matrix * Vector(-4, 17, -9)
         matrix = right_arm.matrix * Identity().rotate(40, XAxis) * Identity().rotate(angle, ZAxis)
@@ -134,13 +134,10 @@ class Person(object):
         self.pieces_info["right hand"] = piece
         return piece
 
-    def right_hand_item(self, colour, displacement, angle=0, part=None):
+    @dependent_piece('right hand')
+    def right_hand_item(self, right_hand, colour, displacement, angle=0, part=None):
         """ Add a right hand item"""
         if not part:
-            return None
-        try:
-            right_hand = self.pieces_info["right hand"]
-        except KeyError:
             return None
         # Displacement from right hand
         displacement = right_hand.position + right_hand.matrix * displacement
@@ -158,13 +155,10 @@ class Person(object):
         self.pieces_info["left leg"] = piece
         return piece
 
-    def left_shoe(self, colour, angle=0, part=None):
+    @dependent_piece('left leg')
+    def left_shoe(self, left_leg, colour, angle=0, part=None):
         """ Add a shoe on the left"""
         if not part:
-            return None
-        try:
-            left_leg = self.pieces_info["left leg"]
-        except KeyError:
             return None
         # Displacement from left leg
         displacement = left_leg.position + left_leg.matrix * Vector(10, 28, 0)
@@ -182,13 +176,10 @@ class Person(object):
         self.pieces_info["right leg"] = piece
         return piece
 
-    def right_shoe(self, colour, angle=0, part=None):
+    @dependent_piece('right leg')
+    def right_shoe(self, right_leg, colour, angle=0, part=None):
         """ Add a shoe on the right """
         if not part:
-            return None
-        try:
-            right_leg = self.pieces_info["right leg"]
-        except KeyError:
             return None
         # Displacement from right leg
         displacement = right_leg.position + right_leg.matrix * Vector(-10, 28, 0)
