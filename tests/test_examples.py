@@ -44,6 +44,4 @@ def exec_example(name):
 
 @pytest.mark.parametrize('example', all_examples, ids=all_examples)
 def test_examples(example):
-    if example == 'mandelbrot':
-        return
     exec_example(example)
