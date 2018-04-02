@@ -15,8 +15,8 @@ from ldraw import download_main, library_gen_main, try_write_lib
 def mocked_parts_lst():
     parts_lst_path = os.path.join('tmp', 'ldraw', 'parts.lst')
     download_main(parts_lst_path)
-    try_write_lib()
     with mock.patch('ldraw.get_config', side_effect=lambda: {'parts.lst': parts_lst_path}):
+        try_write_lib()
         yield parts_lst_path
 
 
@@ -30,7 +30,7 @@ def stdoutIO(stdout=None):
     sys.stdout = old
 
 
-examples_dir = os.path.join(os.path.dirname(__file__), '..', 'examples')
+examples_dir = 'examples'
 all_examples = [os.path.splitext(os.path.basename(s))[0] for s in glob.glob(os.path.join(examples_dir, '*.py'))]
 
 
@@ -40,11 +40,7 @@ def exec_example(name, save=False):
     d = dict(locals(), **globals())
 
     with stdoutIO() as s:
-        if name == 'stairs':
-            with mock.patch('sys.argv', ['', os.path.join('tmp', 'ldraw', 'parts.lst')]):
-                execfile(script_file, d, d)
-        else:
-            execfile(script_file, d, d)
+        execfile(script_file, d, d)
     content = s.getvalue()
     expected_path = os.path.join('tests', 'test_data', 'examples', '%s.ldr' % name)
     # uncomment to save
