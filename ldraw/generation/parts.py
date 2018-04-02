@@ -10,14 +10,15 @@ import itertools
 from progress.bar import Bar
 import pystache
 
+from ldraw.resources import get_resource
 from ldraw.utils import clean, camel, ensure_exists, flatten
 from ldraw.parts import PartError
 
-PARTS__INIT__TEMPLATE = os.path.join('templates', 'parts__init__.mustache')
+PARTS__INIT__TEMPLATE = get_resource(os.path.join('templates', 'parts__init__.mustache'))
 PARTS__INIT__TEMPLATE = codecs.open(PARTS__INIT__TEMPLATE, 'r', encoding='utf-8')
 PARTS__INIT__TEMPLATE = pystache.parse(PARTS__INIT__TEMPLATE.read())
 
-PARTS_TEMPLATE = os.path.join('templates', 'parts.mustache')
+PARTS_TEMPLATE = get_resource(os.path.join('templates', 'parts.mustache'))
 PARTS_TEMPLATE = codecs.open(PARTS_TEMPLATE, 'r', encoding='utf-8')
 PARTS_TEMPLATE = pystache.parse(PARTS_TEMPLATE.read())
 

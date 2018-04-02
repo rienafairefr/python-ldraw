@@ -8,6 +8,7 @@ import os
 
 import pystache
 
+from ldraw.resources import get_resource
 from ldraw.utils import clean, camel
 
 
@@ -28,7 +29,7 @@ def gen_colours(parts, output_dir):
     """
     print('generate ldraw.library.colours...')
 
-    colours_mustache = os.path.join('templates', 'colours.mustache')
+    colours_mustache = get_resource(os.path.join('templates', 'colours.mustache'))
     colours_template_file = codecs.open(colours_mustache, 'r', encoding='utf-8')
     colours_template = pystache.parse(colours_template_file.read())
 

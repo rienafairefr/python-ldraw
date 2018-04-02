@@ -1,0 +1,4 @@
+include README.rst
+include COPYIN
+recursive-include templates *
+recursive-include examples *
