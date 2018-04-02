@@ -52,16 +52,21 @@ def load_lib(fullname):
 
 
 def try_write_lib():
-    """ try to write the library to ldraw package folder (can work if user-writeable) """
+    # Generate the library
     config = get_config()
     parts_lst_path = config['parts.lst']
-    ldraw_path = os.path.abspath(os.path.dirname(__file__))
     data_dir = get_data_dir()
-    try:
-        library_gen_main(parts_lst_path, ldraw_path)
-    except (OSError, IOError):
-        # Failed, then write it to data_dir
-        library_gen_main(parts_lst_path, data_dir)
+    library_path = config.get('library')
+    if library_path is not None:
+        library_gen_main(parts_lst_path, library_path)
+    else:
+        try:
+            # try to write the library to ldraw package folder (can work if user-writeable)
+            ldraw_path = os.path.abspath(os.path.dirname(__file__))
+            library_gen_main(parts_lst_path, ldraw_path)
+        except (OSError, IOError):
+            # Failed, then write it to data_dir
+            library_gen_main(parts_lst_path, data_dir)
 
 
 class CustomImporter(object):

@@ -2,7 +2,7 @@ import os
 import tempfile
 
 import yaml
-from mock import patch
+from mock import patch, mock_open
 from yaml import YAMLError
 
 from ldraw.config import get_config, write_config
@@ -27,9 +27,14 @@ def test_config_cant_load(yaml_load_mock):
     assert get_config()['parts.lst'] == expected
 
 
-@patch('yaml.load', side_effect=lambda o: {'parts.lst': '54321'})
-def test_config_can_load(yaml_load_mock):
-    assert get_config() == {'parts.lst': '54321'}
+@patch("ldraw.config.open", side_effect=mock_open(read_data="parts.lst: C:\\file_path"))
+def test_config_can_load_Win(open_mock):
+    assert get_config() == {'parts.lst': 'C:\\file_path'}
+
+
+@patch("ldraw.config.open", side_effect=mock_open(read_data="parts.lst: /home/file_path"))
+def test_config_can_load(open_mock):
+    assert get_config() == {'parts.lst': '/home/file_path'}
 
 
 @patch('ldraw.config.get_config_file_path')

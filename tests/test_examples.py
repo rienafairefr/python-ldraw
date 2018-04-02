@@ -3,11 +3,21 @@ import glob
 import os
 import StringIO
 import sys
+import tempfile
 
 import pytest
 from mock import mock
 
-from tests.utils import with_mocked_parts_lst
+from ldraw import download_main, library_gen_main, try_write_lib
+
+
+@pytest.fixture
+def mocked_parts_lst():
+    parts_lst_path = os.path.join('tmp', 'ldraw', 'parts.lst')
+    download_main(parts_lst_path)
+    try_write_lib()
+    with mock.patch('ldraw.get_config', side_effect=lambda: {'parts.lst': parts_lst_path}):
+        yield parts_lst_path
 
 
 @contextlib.contextmanager
@@ -23,7 +33,7 @@ def stdoutIO(stdout=None):
 examples_dir = os.path.join(os.path.dirname(__file__), '..', 'examples')
 all_examples = [os.path.splitext(os.path.basename(s))[0] for s in glob.glob(os.path.join(examples_dir, '*.py'))]
 
-@with_mocked_parts_lst
+
 def exec_example(name, save=False):
     script_file = os.path.join(examples_dir, '%s.py' % name)
 
@@ -45,5 +55,5 @@ def exec_example(name, save=False):
 
 
 @pytest.mark.parametrize('example', all_examples, ids=all_examples)
-def test_examples(example):
+def test_examples(mocked_parts_lst, example):
     exec_example(example)

@@ -20,7 +20,7 @@ def get_config():
     try:
         config = yaml.load(open(get_config_file_path(), 'r'))
         return config
-    except (OSError, yaml.YAMLError, IOError, EnvironmentError):
+    except (OSError, yaml.YAMLError, IOError, EnvironmentError) as e:
         parts_lst_path = os.environ.get('LDRAW_PARTS_LST')
         if parts_lst_path:
             return {
