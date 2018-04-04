@@ -18,25 +18,8 @@ def mocked_parts_lst():
         yield parts_lst_path
 
 
-def test_dynamic_colours_parts_1(mocked_parts_lst):
-    from ldraw.library.colours import Black
-    from ldraw.library.parts.others import Brick1X1
-    assert Black == Colour(0, "Black", "#05131D", 255, [])
-    assert Brick1X1 == "3005"
-
-
-
-def test_dynamic_colours_parts_2(mocked_parts_lst):
-    import ldraw.library
-    from ldraw.library.colours import Black
-    from ldraw.library.parts.others import Brick1X1
-    assert Black == Colour(0, "Black", "#05131D", 255, [])
-    assert Brick1X1 == "3005"
-
-
-def test_dynamic_colours_parts_3(mocked_parts_lst):
-    from ldraw import library
-    from ldraw.library.colours import Black
-    from ldraw.library.parts.others import Brick1X1
-    assert Black == Colour(0, "Black", "#05131D", 255, [])
-    assert Brick1X1 == "3005"
+def test_dynamic_import(mocked_parts_lst):
+    from ldraw.library.colours import Reddish_Gold
+    from ldraw.library.parts.others import Brick2X4
+    assert Reddish_Gold == Colour(189, "Reddish_Gold", "#AC8247", 255, ['PEARLESCENT'])
+    assert Brick2X4 == "3001"
