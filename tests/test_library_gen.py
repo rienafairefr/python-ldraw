@@ -13,7 +13,8 @@ from ldraw.library_gen import library_gen_main
 @pytest.fixture
 def tests_parts_lst_path():
     returnvalue = 'tests/test_ldraw/parts.lst'
-    with mock.patch('ldraw.get_config', side_effect=lambda: {'parts.lst': returnvalue}):
+    library_path = tempfile.mkdtemp()
+    with mock.patch('ldraw.get_config', side_effect=lambda: {'parts.lst': returnvalue, 'library': library_path}):
         yield returnvalue
 
 
@@ -39,7 +40,6 @@ def test_library_gen_files(data_dir):
     assert content == {join('library', el) for el in library}
 
 
-# noinspection PyUnresolvedReferences, PyPackageRequirements
 def test_library_gen_import(data_dir):
     """ generated library is importable """
     from ldraw import library

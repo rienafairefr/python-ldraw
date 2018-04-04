@@ -40,9 +40,9 @@ def get_part_dict(parts, description):
 
     try:
         code = parts.parts_by_name[description]
-        part = parts.part(code=code)
+        #part = parts.part(code=code)
         return {
-            'path': part.path,
+         #   'path': part.path,
             'description': description,
             'class_name': clean(camel(description)),
             'code': code

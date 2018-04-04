@@ -5,23 +5,15 @@ import StringIO
 import sys
 import tempfile
 
+import mock
 import pytest
-from mock import mock
-
-from ldraw import download_main, library_gen_main, try_download_generate_lib
 
 
 @pytest.fixture
 def mocked_parts_lst():
-    parts_lst_path = os.path.join('tmp', 'ldraw', 'parts.lst')
-
-    def get_config():
-        return {
-        'parts.lst': parts_lst_path,
-    }
-
-    with mock.patch('ldraw.get_config', side_effect=get_config):
-        try_download_generate_lib()
+    parts_lst_path = os.path.join('tests', 'test_ldraw2', 'parts.lst')
+    library_path = tempfile.mkdtemp()
+    with mock.patch('ldraw.get_config', side_effect=lambda: {'parts.lst': parts_lst_path, 'library': library_path}):
         yield parts_lst_path
 
 
@@ -44,6 +36,7 @@ def exec_example(name, save=False):
 
     d = dict(locals(), **globals())
 
+    import ldraw.library
     with stdoutIO() as s:
         execfile(script_file, d, d)
     content = s.getvalue()
