@@ -11,24 +11,18 @@ from ldraw.library_gen import library_gen_main
 
 
 @pytest.fixture
-def tests_parts_lst_path():
-    returnvalue = 'tests/test_ldraw/parts.lst'
+def mocked_library_path():
+    part_lst_path = os.path.join('tests', 'test_ldraw', 'parts.lst')
     library_path = tempfile.mkdtemp()
-    with mock.patch('ldraw.get_config', side_effect=lambda: {'parts.lst': returnvalue, 'library': library_path}):
-        yield returnvalue
+    library_gen_main(part_lst_path, library_path)
+    with mock.patch('ldraw.get_config', side_effect=lambda: {'parts.lst': part_lst_path, 'library': library_path}):
+        yield library_path
 
 
-@pytest.fixture
-def data_dir(tests_parts_lst_path):
-    returnvalue = tempfile.mkdtemp()
-    library_gen_main(tests_parts_lst_path, returnvalue)
-    yield returnvalue
-    shutil.rmtree(returnvalue)
-
-
-def test_library_gen_files(data_dir):
+def test_library_gen_files(mocked_library_path):
     """ generated library contains the right files """
-    content = {os.path.relpath(os.path.join(dp, f), data_dir) for dp, dn, fn in os.walk(data_dir) for f in fn}
+    content = {os.path.relpath(os.path.join(dp, f), mocked_library_path) for dp, dn, fn in os.walk(mocked_library_path)
+               for f in fn}
 
     library = {'__init__.py',
                'colours.py',
@@ -40,21 +34,21 @@ def test_library_gen_files(data_dir):
     assert content == {join('library', el) for el in library}
 
 
-def test_library_gen_import(data_dir):
+def test_library_gen_import(mocked_library_path):
     """ generated library is importable """
     from ldraw import library
 
     assert library.__all__ == ['colours']
 
-    from library.parts import *
+    from ldraw.library.parts import *
 
     assert library.parts.__all__ == ['others']
 
-    from library.parts.others import *
+    from ldraw.library.parts.others import *
 
     assert Brick2X4 == "3001"
 
-    from library.colours import *
+    from ldraw.library.colours import *
 
     expected_color = Colour(189, "Reddish_Gold", "#AC8247", 255, ['PEARLESCENT'])
 
