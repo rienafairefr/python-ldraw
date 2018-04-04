@@ -1,6 +1,5 @@
 from ldraw.colour import Colour
 
-
 def test_colour_equality():
 
     c1 = Colour(code=12)

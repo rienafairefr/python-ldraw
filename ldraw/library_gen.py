@@ -27,7 +27,7 @@ def library_gen_main(parts_lst, output_dir):
         md5 = open(hash_path, 'r').read()
         if md5 == md5_parts_lst:
             return
-    print('generating library in %s ...' % output_dir)
+    print('generating library in %s from %s...' % (output_dir, parts_lst))
 
     parts = Parts(parts_lst)
 

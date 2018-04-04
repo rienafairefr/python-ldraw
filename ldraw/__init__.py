@@ -41,32 +41,31 @@ def load_lib_from(fullname, library_dir):
     return library_module
 
 
-def load_lib(fullname):
-    """ try to load from ldraw dir, then data_dir """
-    ldraw_path = os.path.abspath(os.path.dirname(__file__))
-    data_dir = get_data_dir()
-    try:
-        return load_lib_from(fullname, ldraw_path)
-    except ImportError:
-        return load_lib_from(fullname, data_dir)
+def load_lib(library_path, fullname):
+    """ try to load from library """
+    return load_lib_from(fullname, library_path)
 
 
-def try_write_lib():
-    # Generate the library
+def try_download_generate_lib():
+    # Download the library and generate it, if needed
     config = get_config()
     parts_lst_path = config['parts.lst']
+    download_main(parts_lst_path)
     data_dir = get_data_dir()
     library_path = config.get('library')
     if library_path is not None:
         library_gen_main(parts_lst_path, library_path)
+        return library_path
     else:
         try:
             # try to write the library to ldraw package folder (can work if user-writeable)
             ldraw_path = os.path.abspath(os.path.dirname(__file__))
             library_gen_main(parts_lst_path, ldraw_path)
+            return ldraw_path
         except (OSError, IOError):
             # Failed, then write it to data_dir
             library_gen_main(parts_lst_path, data_dir)
+            return data_dir
 
 
 class CustomImporter(object):
@@ -113,8 +112,8 @@ class CustomImporter(object):
 
         # if the library already exists and correctly generated,
         # the __hash__ will prevent re-generation
-        try_write_lib()
-        return load_lib(fullname)
+        generated_library_path = try_download_generate_lib()
+        return load_lib(generated_library_path, fullname)
 
 
 if not any(isinstance(o, CustomImporter) for o in sys.meta_path):

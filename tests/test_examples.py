@@ -8,15 +8,20 @@ import tempfile
 import pytest
 from mock import mock
 
-from ldraw import download_main, library_gen_main, try_write_lib
+from ldraw import download_main, library_gen_main, try_download_generate_lib
 
 
 @pytest.fixture
 def mocked_parts_lst():
     parts_lst_path = os.path.join('tmp', 'ldraw', 'parts.lst')
-    download_main(parts_lst_path)
-    with mock.patch('ldraw.get_config', side_effect=lambda: {'parts.lst': parts_lst_path}):
-        try_write_lib()
+
+    def get_config():
+        return {
+        'parts.lst': parts_lst_path,
+    }
+
+    with mock.patch('ldraw.get_config', side_effect=get_config):
+        try_download_generate_lib()
         yield parts_lst_path
 
 
