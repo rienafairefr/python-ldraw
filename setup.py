@@ -15,6 +15,9 @@ setup(
     author_email="rienairefr@gmail.com, david@boddie.org.uk",
     version=os.environ.get('TAG_NAME', os.environ.get('TRAVIS_TAG', 'dev')),
     packages=find_packages(),
+    package_data={
+        'ldraw': ['templates/*.mustache']
+    },
     entry_points={
         'console_scripts': [
             'ldr2inv = ldraw.tools.ldr2inv:main',

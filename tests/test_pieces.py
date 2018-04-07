@@ -1,12 +1,18 @@
 import pytest
 
+from ldraw.colour import Colour
 from ldraw.figure import Person
 from ldraw.geometry import Vector, Identity
-from ldraw.library.colours import White, Yellow, Light_Grey, Black
-from ldraw.library.parts.others import Brick1X1
 from ldraw.pieces import Piece, Group
-from ldraw.library.parts.minifig.accessories import HelmetClassicWithThickChinGuardAndVisorDimples as HelmetClassic, \
-    Flipper, CameraMovie
+
+White = Colour(15, "White", "#FFFFFF", 255, [])
+Yellow = Colour(14, "Yellow", "#F2CD37", 255, [])
+Light_Grey = Colour(7, "Light_Grey", "#9BA19D", 255, [])
+Black = Colour(0, "Black", "#05131D", 255, [])
+Brick1X1 = "3005"
+HelmetClassic = "3842b"
+Flipper = "2599"
+CameraMovie = "30148"
 
 
 def test_add_piece():

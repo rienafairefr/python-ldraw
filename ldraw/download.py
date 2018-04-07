@@ -6,40 +6,42 @@ And generating the parts.lst from it
 from __future__ import print_function
 import zipfile
 import os
+from distutils.dir_util import copy_tree
 
+import appdirs
 from mklist.generate import generate_parts_lst
 
 from ldraw.compat import urlretrieve
 from ldraw.dirs import get_data_dir
 from ldraw.utils import ensure_exists
 
-
 LDRAW_URL = 'http://www.ldraw.org/library/updates/complete.zip'
 
 
-def download_main(output_dir):
-    """ Main function for the downloading/mklist """
-    ensure_exists(output_dir)
+def download_main(parts_lst_path):
+    """ download complete.zip, mklist, main function"""
+    tmp_ldraw = ensure_exists(appdirs.user_cache_dir('pyldraw'))
 
-    retrieved = os.path.join(output_dir, "complete.zip")
+    if not os.path.exists(parts_lst_path):
+        retrieved = os.path.join(tmp_ldraw, "complete.zip")
 
-    if not os.path.exists(retrieved):
         print('retrieve the complete.zip from ldraw.org ...')
         urlretrieve(LDRAW_URL, filename=retrieved)
 
-    if not os.path.exists(os.path.join(output_dir, 'ldraw')):
         print('unzipping the complete.zip ...')
-        with zipfile.ZipFile(retrieved, 'r') as zip_ref:
-            zip_ref.extractall(output_dir)
+        zip_ref = zipfile.ZipFile(retrieved, 'r')
+        zip_ref.extractall(tmp_ldraw)
+        zip_ref.close()
 
-    parts_lst_path = os.path.join(output_dir, 'ldraw', '%s.lst')
-    for name in ['parts', 'p']:
-        if not os.path.exists(parts_lst_path % name):
-            print('parts.lst mklist...')
-            generate_parts_lst('description',
-                               os.path.join(output_dir, 'ldraw', name),
-                               parts_lst_path% name)
+        output_dir = ensure_exists(os.path.abspath(os.path.join(parts_lst_path, '..')))
+
+        copy_tree(os.path.join(tmp_ldraw, 'ldraw'), os.path.join(output_dir))
+
+        print('mklist...')
+        generate_parts_lst('description',
+                           os.path.join(output_dir, 'parts'),
+                           parts_lst_path)
 
 
 if __name__ == '__main__':
-    download_main(get_data_dir())
+    download_main(os.path.join(get_data_dir(), 'ldraw', 'parts.lst'))

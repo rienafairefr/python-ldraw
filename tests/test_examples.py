@@ -3,9 +3,18 @@ import glob
 import os
 import StringIO
 import sys
+import tempfile
 
+import mock
 import pytest
-from mock import mock
+
+
+@pytest.fixture
+def mocked_parts_lst():
+    parts_lst_path = os.path.join('tests', 'test_ldraw2', 'parts.lst')
+    library_path = tempfile.mkdtemp()
+    with mock.patch('ldraw.get_config', side_effect=lambda: {'parts.lst': parts_lst_path, 'library': library_path}):
+        yield parts_lst_path
 
 
 @contextlib.contextmanager
@@ -18,21 +27,18 @@ def stdoutIO(stdout=None):
     sys.stdout = old
 
 
-examples_dir = os.path.join(os.path.dirname(__file__), '..', 'examples')
+examples_dir = 'examples'
 all_examples = [os.path.splitext(os.path.basename(s))[0] for s in glob.glob(os.path.join(examples_dir, '*.py'))]
 
 
-def exec_example(name):
+def exec_example(name, save=False):
     script_file = os.path.join(examples_dir, '%s.py' % name)
 
     d = dict(locals(), **globals())
 
+    import ldraw.library
     with stdoutIO() as s:
-        if name == 'stairs':
-            with mock.patch('sys.argv', ['', os.path.join('tmp', 'ldraw', 'parts.lst')]):
-                execfile(script_file, d, d)
-        else:
-            execfile(script_file, d, d)
+        execfile(script_file, d, d)
     content = s.getvalue()
     expected_path = os.path.join('tests', 'test_data', 'examples', '%s.ldr' % name)
     # uncomment to save
@@ -43,5 +49,5 @@ def exec_example(name):
 
 
 @pytest.mark.parametrize('example', all_examples, ids=all_examples)
-def test_examples(example):
+def test_examples(mocked_parts_lst, example):
     exec_example(example)

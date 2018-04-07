@@ -29,6 +29,7 @@ import inflect
 from attrdict import AttrDict
 
 from ldraw.colour import Colour
+from ldraw.config import get_config
 from ldraw.geometry import Matrix, Vector
 from ldraw.lines import OptionalLine, Quadrilateral, Line, Triangle, MetaCommand, Comment
 from ldraw.pieces import Piece
@@ -50,7 +51,7 @@ class Parts(object):
     ColourAttributes = ("CHROME", "PEARLESCENT", "RUBBER", "MATTE_METALLIC",
                         "METAL")
 
-    def __init__(self, path):
+    def __init__(self, path=get_config()['parts.lst']):
         self.path = None
         self.parts_dirs = []
         self.parts_subdirs = {}
@@ -357,8 +358,8 @@ class Part(object):
             "4": _quadrilateral,
             "5": _optional_line
         }
-        self.objects = []
         self.path = path
+        self.objects = []
 
         """ Load the Part from its path """
         try:
