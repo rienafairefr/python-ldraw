@@ -1,7 +1,0 @@
-appdirs
-pymklist
-progress
-pystache
-inflect
-attrdict
-PyYaml
