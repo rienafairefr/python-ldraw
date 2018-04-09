@@ -20,7 +20,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+from __future__ import print_function
 import random
 from ldraw.library.colours import *
 from ldraw.figure import *
@@ -30,26 +30,25 @@ from ldraw.pieces import Piece
 
 figure = Person(Vector(0, 0, -10),
                 Identity().rotate(-15, ZAxis).rotate(20, XAxis))
-print figure.head(Yellow, -15)
-print figure.hat(Black, DiverMask)
-print figure.hat(Black, HairMale)
-print figure.torso(Yellow, Torso)
-print figure.backpack(Black, Vector(0, -2, 0), Airtanks)
-print figure.hips(Green)
-print figure.left_leg(Yellow, 30)
-print figure.left_shoe(Black, 10, Flipper)
-print figure.right_leg(Yellow, -10)
-print figure.right_shoe(Black, -10, Flipper)
-print figure.left_arm(Yellow, -45)
-print figure.left_hand(Yellow, 10)
-print figure.left_hand_item(Light_Grey,
-                            Vector(0, 0, -12), -15, CameraMovie)  # Camera Movie
-print figure.right_arm(Yellow, 60)
-print figure.right_hand(Yellow, 0)
-print
-
-print Piece(White, Vector(-50, -200, -50), Identity(), "LIGHT")
-print Piece(White, Vector(50, -200, 0), Identity(), "LIGHT")
-print Piece(White, Vector(0, -200, 50), Identity(), "LIGHT")
+print(figure.head(Yellow, -15))
+print(figure.hat(Black, DiverMask))
+print(figure.hat(Black, HairMale))
+print(figure.torso(Yellow, Torso))
+print(figure.backpack(Black, Vector(0, -2, 0), Airtanks))
+print(figure.hips(Green))
+print(figure.left_leg(Yellow, 30))
+print(figure.left_shoe(Black, 10, Flipper))
+print(figure.right_leg(Yellow, -10))
+print(figure.right_shoe(Black, -10, Flipper))
+print(figure.left_arm(Yellow, -45))
+print(figure.left_hand(Yellow, 10))
+print(figure.left_hand_item(Light_Grey,
+                            Vector(0, 0, -12), -15, CameraMovie))  # Camera Movie
+print(figure.right_arm(Yellow, 60))
+print(figure.right_hand(Yellow, 0))
+print('')
+print(Piece(White, Vector(-50, -200, -50), Identity(), "LIGHT"))
+print(Piece(White, Vector(50, -200, 0), Identity(), "LIGHT"))
+print(Piece(White, Vector(0, -200, 50), Identity(), "LIGHT"))
 
 # Camera should be at 120.0,40.0,-200.0 in LDraw coordinates.

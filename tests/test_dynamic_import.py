@@ -5,7 +5,7 @@ import os
 import mock
 import pytest
 
-from ldraw import download_main
+from ldraw import download_main, CustomImporter
 from ldraw.colour import Colour
 
 
@@ -22,3 +22,5 @@ def test_dynamic_import(mocked_parts_lst):
     from ldraw.library.parts.others import Brick2X4
     assert Reddish_Gold == Colour(189, "Reddish_Gold", "#AC8247", 255, ['PEARLESCENT'])
     assert Brick2X4 == "3001"
+
+    CustomImporter.clean()

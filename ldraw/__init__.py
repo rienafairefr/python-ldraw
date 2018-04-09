@@ -72,6 +72,13 @@ class CustomImporter(object):
     """ Added to sys.meta_path as an import hook """
     virtual_module = 'ldraw.library'
 
+    @classmethod
+    def valid_module(cls, fullname):
+        if fullname.startswith(cls.virtual_module):
+            rest = fullname[len(cls.virtual_module):]
+            if not rest or rest.startswith('.'):
+                return True
+
     def find_module(self, fullname, path=None): # pylint:disable=unused-argument
         """
         This method is called by Python if this class
@@ -84,7 +91,7 @@ class CustomImporter(object):
         statement is detected (or __import__ is called), before
         Python's built-in package/module-finding code kicks in.
         """
-        if fullname.startswith(self.virtual_module):
+        if self.valid_module(fullname):
             # As per PEP #302 (which implemented the sys.meta_path protocol),
             # if fullname is the name of a module/package that we want to
             # report as found, then we need to return a loader object.
@@ -97,6 +104,15 @@ class CustomImporter(object):
 
         return None
 
+    @classmethod
+    def clean(cls):
+        for fullname in list(sys.modules.keys()):
+            if cls.valid_module(fullname):
+                del sys.modules[fullname]
+
+    def get_code(self, fullname):
+        return None
+
     def load_module(self, fullname):
         """
         This method is called by Python if CustomImporter.find_module
@@ -104,7 +120,7 @@ class CustomImporter(object):
         of the module/package that was requested.
         """
 
-        if not fullname.startswith(self.virtual_module):
+        if not self.valid_module(fullname):
             # Raise ImportError as per PEP #302 if the requested module/package
             # couldn't be loaded. This should never be reached in this
             # simple example, but it's included here for completeness. :)
@@ -113,9 +129,11 @@ class CustomImporter(object):
         # if the library already exists and correctly generated,
         # the __hash__ will prevent re-generation
         generated_library_path = try_download_generate_lib()
-        return load_lib(generated_library_path, fullname)
+        mod = load_lib(generated_library_path, fullname)
+        sys.modules[fullname] = mod
+        return mod
 
 
 if not any(isinstance(o, CustomImporter) for o in sys.meta_path):
     # Add our import hook to sys.meta_path
-    sys.meta_path.append(CustomImporter())
+    sys.meta_path.insert(0, CustomImporter())

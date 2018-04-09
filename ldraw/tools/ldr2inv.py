@@ -68,7 +68,7 @@ def ldr2inv(ldraw_path, inventory_path):
 
     try:
         with codecs.open(inventory_path, 'w', encoding='utf-8') as inv_file:
-            items = inventory.items()
+            items = list(inventory.items())
             items.sort()
 
             for name, number in items:

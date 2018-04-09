@@ -20,7 +20,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+from __future__ import print_function
 from ldraw.figure import *
 from ldraw.geometry import Identity
 from ldraw.library.colours import *
@@ -50,7 +50,7 @@ figure.right_leg(Black, -40)
 group.position = Vector(-100, 40, -120)
 group.matrix = Identity().rotate(-30, ZAxis).rotate(90, YAxis)
 for piece in group.pieces:
-    print piece
+    print(piece)
 
 stairs = Group()
 
@@ -65,28 +65,28 @@ for i in range(0, steps):
               Identity(), Brick2X3, group=stairs)
 
 for piece in stairs.pieces:
-    print piece
+    print(piece)
 
 staircases = 7
 for i in range(1, staircases + 1):
     stairs.position = Vector(0, i * (8 + steps * 24), 0)
     stairs.matrix = Identity().rotate(-90 * i, YAxis)
     for piece in stairs.pieces:
-        print piece
+        print(piece)
 
 top_y = y - (steps * 24) - 8
-print Piece(Dark_Blue, Vector(120, top_y, -120), Identity(), Plate6X6)
+print(Piece(Dark_Blue, Vector(120, top_y, -120), Identity(), Plate6X6))
 
 for i in range(1, 5):
-    print Piece(Dark_Red, Vector(170, top_y - (i * 24), -170),
-                Identity(), Brick1X1)
-    print Piece(Dark_Red, Vector(70, top_y - (i * 24), -170),
-                Identity(), Brick1X1)
+    print(Piece(Dark_Red, Vector(170, top_y - (i * 24), -170),
+                Identity(), Brick1X1))
+    print(Piece(Dark_Red, Vector(70, top_y - (i * 24), -170),
+                Identity(), Brick1X1))
 
-print Piece(Dark_Red, Vector(120, top_y - (5 * 24), -170),
-            Identity(), Arch1X6)
+print(Piece(Dark_Red, Vector(120, top_y - (5 * 24), -170),
+            Identity(), Arch1X6))
 
-print Piece(White, Vector(200, -200, 200), Identity(), "LIGHT")
-print Piece(White, Vector(200, -200, -200), Identity(), "LIGHT")
-print Piece(White, Vector(-200, -200, 200), Identity(), "LIGHT")
-print Piece(White, Vector(-200, -200, -200), Identity(), "LIGHT")
+print(Piece(White, Vector(200, -200, 200), Identity(), "LIGHT"))
+print(Piece(White, Vector(200, -200, -200), Identity(), "LIGHT"))
+print(Piece(White, Vector(-200, -200, 200), Identity(), "LIGHT"))
+print(Piece(White, Vector(-200, -200, -200), Identity(), "LIGHT"))

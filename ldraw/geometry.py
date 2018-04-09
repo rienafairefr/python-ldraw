@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import copy
 import math
 from numbers import Number
+from ldraw.compat import reduce
 
 
 class MatrixError(Exception):
@@ -218,6 +219,11 @@ class Vector(object):
         # This next expression will only return zero (equals) if all
         # expressions are false.
         return self.x != other.x or self.y != other.y or self.z != other.z
+
+    def __eq__(self, other):
+        if not isinstance(other, Vector):
+            return False
+        return self.x == other.x and self.y == other.y and self.z == other.z
 
     def __abs__(self):
         return (self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5

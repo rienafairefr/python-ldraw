@@ -20,7 +20,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+from __future__ import print_function
 from ldraw.library.colours import (Blue_Violet, Blue, Light_Blue,
                                    Light_Green, Green, Yellow,
                                    Orange, Red, Magenta, Purple,
@@ -56,7 +56,7 @@ def draw_mandelbrot(x1, z1, x2, z2, r1, i1, r2, i2):
             else:
                 colour = colours[count]
 
-            print Piece(colour, Vector(x * 20, y, z * 20), Identity(), Brick1X1)
+            print(Piece(colour, Vector(x * 20, y, z * 20), Identity(), Brick1X1))
             x += 1
 
         z += 1
@@ -64,4 +64,4 @@ def draw_mandelbrot(x1, z1, x2, z2, r1, i1, r2, i2):
 
 draw_mandelbrot(-16, -12, 16, 12, -2.4, -1.2, 0.8, 1.2)
 
-print Piece(White, Vector(150, -100, 150), Identity(), "LIGHT")
+print(Piece(White, Vector(150, -100, 150), Identity(), "LIGHT"))
