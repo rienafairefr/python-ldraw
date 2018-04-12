@@ -5,14 +5,18 @@ apt:
   - dos2unix
 python:
 - 2.7
+- 3.4
+- 3.5
+- 3.6
 install:
 - PACKAGE_VERSION=`python setup.py --version`
 - TAG_NAME=v$PACKAGE_VERSION
 - pip install tox-travis
 - pip install -r dev-requirements.txt
+- python -m ldraw.download
+- python -m ldraw.library_gen
 before_install:
 - sudo apt-get -qq update
-- sudo apt-get install dos2unix python-pip python2.7-dev python3-pyqt4 libxext-dev python-qt4 qt4-dev-tools build-essential
 - export TRAVIS_COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
 - echo "$TRAVIS_COMMIT_MESSAGE"
 script:

@@ -20,7 +20,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+from __future__ import print_function
 import random
 from ldraw.library.colours import *
 from ldraw.figure import *
@@ -31,23 +31,23 @@ from ldraw.pieces import Group, Piece
 group = Group(Vector(0, 0, 0), Identity())
 
 figure = Person(group=group)
-print figure.head(Yellow)
-print figure.hat(Green, CapWithLongFlatPeak)  # Cap
-print figure.torso(Red, Torso)  # Torso
-print figure.left_arm(Red)
-print figure.left_hand(Yellow)
-print figure.right_arm(Red, -60)
-print figure.right_hand(Yellow, -10)
-print figure.right_hand_item(Black,
-                             Vector(0, -1, -10), 0, GunRevolver)  # Gun Revolver
-print figure.hips(Blue)
-print figure.left_leg(Blue)
-print figure.right_leg(Blue, -30)
+print(figure.head(Yellow))
+print(figure.hat(Green, CapWithLongFlatPeak))  # Cap
+print(figure.torso(Red, Torso))  # Torso
+print(figure.left_arm(Red))
+print(figure.left_hand(Yellow))
+print(figure.right_arm(Red, -60))
+print(figure.right_hand(Yellow, -10))
+print(figure.right_hand_item(Black,
+                             Vector(0, -1, -10), 0, GunRevolver))  # Gun Revolver
+print(figure.hips(Blue))
+print(figure.left_leg(Blue))
+print(figure.right_leg(Blue, -30))
 
 group.position = Vector(60, 0, 0)
 group.matrix = Identity().rotate(30, YAxis)
 for piece in group.pieces:
-    print piece
+    print(piece)
 
 # print Piece(Grey, Vector(0, 72, 0), Identity(), "3867")
 

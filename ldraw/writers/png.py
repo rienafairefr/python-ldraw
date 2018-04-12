@@ -19,10 +19,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 # pylint: disable=no-name-in-module, too-few-public-methods, too-many-locals, too-many-branches
-
+from PIL import Image, ImageColor
 import numpy
-
-from PyQt4.QtGui import QColor, QImage, qRed, qGreen, qBlue, qRgb
+from PIL.ImageDraw import Draw
 
 from ldraw.geometry import Vector, Vector2D
 from ldraw.writers.common import Writer
@@ -31,6 +30,7 @@ from ldraw.writers.geometry import Z_MAX, Edge
 
 class PNGArgs(object):
     """ Args to pass to a PNG writer"""
+
     def __init__(self, distance, image_size, stroke_colour=None, background_colour=None):
         """
         :param distance: distance of the camera
@@ -40,7 +40,7 @@ class PNGArgs(object):
         """
         self.distance = distance
         self.image_size = image_size
-        self.stroke_colour = stroke_colour
+        self.stroke_colour = stroke_colour + (255, )
         self.background_colour = background_colour
 
 
@@ -66,14 +66,15 @@ class PNGWriter(Writer):
         image_size = png_args.image_size
         stroke_colour = png_args.stroke_colour
         background_colour = png_args.background_colour
-        image = QImage(image_size[0], image_size[1], QImage.Format_RGB16)
+        args = ('RGBA', tuple(image_size))
+        if background_colour is not None:
+            args += (background_colour,)
+        image = Image.new(*args)
+
         depth = numpy.empty((image_size[0], image_size[1]), "f")
         depth[:] = 1 << 32 - 1
         polygons = self._polygons_from_objects(model)
-        if stroke_colour:
-            stroke_colour = QColor(stroke_colour).rgb()
-        if background_colour is not None:
-            image.fill(QColor(background_colour).rgb())
+
         viewport_scale = min(float(image_size[0]), float(image_size[1]))
         # Draw opaque polygons first.
         for polygon in polygons:
@@ -100,13 +101,9 @@ class Polygon(object):
 
     def __init__(self, points, rgb, alpha):
         self.points = points
-        colour = QColor(rgb)
-        self.red = colour.red()
-        self.green = colour.green()
-        self.blue = colour.blue()
-        colour.setAlphaF(alpha)
+        self.rgb = ImageColor.getrgb(rgb)
         self.alpha = alpha
-        self.rgba = colour.rgb()
+        self.rgba = self.rgb + (int(255 * alpha),)
         self.projected = []
 
     def project(self, distance):
@@ -129,8 +126,7 @@ class Polygon(object):
         edges = self.get_edges(image, viewport_scale)
         if not edges:
             return
-        width = image.width()
-        height = image.height()
+        width, height = image.size
 
         end_py = edges[-1].point2.y
         if end_py < 0:
@@ -207,8 +203,7 @@ class Polygon(object):
         """
         get edges for rendering
         """
-        width = image.width()
-        height = image.height()
+        width, height = image.size
         edges = []
         len_points = len(self.points)
         for i in range(len_points):
@@ -251,22 +246,19 @@ class Polygon(object):
             start_z = start_1.y + start_dz_dx * (start_x - start_1.x)
             if 0 < start_z <= depth[int(start_x)][int(int_edge1_y1)]:
                 if self.alpha < 1.0:
-                    pixel = image.pixel(start_x, int_edge1_y1)
-                    dred = qRed(pixel)
-                    dgreen = qGreen(pixel)
-                    dblue = qBlue(pixel)
-                    red = (1 - self.alpha) * dred + self.alpha * self.red
-                    green = (1 - self.alpha) * dgreen + self.alpha * self.green
-                    blue = (1 - self.alpha) * dblue + self.alpha * self.blue
-                    image.setPixel(start_x, int_edge1_y1, qRgb(red, green, blue))
+                    pixel = image.getpixel((start_x, int_edge1_y1))
+                    rgb = int((1 - self.alpha) * pixel[0] + self.alpha * self.rgb[0]), \
+                          int((1 - self.alpha) * pixel[1] + self.alpha * self.rgb[1]), \
+                          int((1 - self.alpha) * pixel[2] + self.alpha * self.rgb[2]), 255
+                    image.putpixel((start_x, int_edge1_y1), rgb)
                 else:
                     depth[int(start_x)][int(int_edge1_y1)] = start_z
-                    image.setPixel(start_x, int_edge1_y1, self.rgba)
+                    image.putpixel((start_x, int_edge1_y1), self.rgba)
             start_x += 1
         if stroke_colour:
             if 0 <= start_1.x < width and 0 < start_1.y <= depth[int(start_1.x)][int(int_edge1_y1)]:
-                image.setPixel(start_1.x, int_edge1_y1, stroke_colour)
+                image.putpixel((int(start_1.x), int_edge1_y1), stroke_colour)
             if 0 <= start_2.x < width and 0 < start_2.y <= depth[int(start_2.x)][int(int_edge1_y1)]:
-                image.setPixel(start_2.x, int_edge1_y1, stroke_colour)
+                image.putpixel((int(start_2.x), int_edge1_y1), stroke_colour)
         int_edge1_y1 += 1
         return int_edge1_y1

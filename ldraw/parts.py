@@ -292,10 +292,10 @@ def _sub_file(pieces):
     if len(pieces) != 14:
         raise PartError("Invalid part data")
     colour = colour_from_str(pieces[0])
-    position = map(float, pieces[1:4])
-    rows = [map(float, pieces[4:7]),
-            map(float, pieces[7:10]),
-            map(float, pieces[10:13])]
+    position = list(map(float, pieces[1:4]))
+    rows = [list(map(float, pieces[4:7])),
+            list(map(float, pieces[7:10])),
+            list(map(float, pieces[10:13]))]
     part = pieces[13].upper()
     if re.search(ENDS_DOT_DAT, part):
         part = part[:-4]
@@ -380,5 +380,5 @@ class Part(object):
             try:
                 obj = handler(pieces[1:])
                 self.objects.append(obj)
-            except PartError, parse_error:
+            except PartError as parse_error:
                 raise PartError(parse_error.message + ' in %s at line %i' % (self.path, number))

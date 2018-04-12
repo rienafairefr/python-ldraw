@@ -1,27 +1,31 @@
 import contextlib
 import glob
 import os
-import StringIO
 import sys
 import tempfile
 
 import mock
 import pytest
 
+from ldraw import CustomImporter
+from ldraw.compat import StringIO, do_execfile, PY2
 
-@pytest.fixture
+
+@pytest.fixture(scope='module')
 def mocked_parts_lst():
     parts_lst_path = os.path.join('tests', 'test_ldraw2', 'parts.lst')
     library_path = tempfile.mkdtemp()
     with mock.patch('ldraw.get_config', side_effect=lambda: {'parts.lst': parts_lst_path, 'library': library_path}):
         yield parts_lst_path
 
+    CustomImporter.clean()
+
 
 @contextlib.contextmanager
 def stdoutIO(stdout=None):
     old = sys.stdout
     if stdout is None:
-        stdout = StringIO.StringIO()
+        stdout = StringIO()
     sys.stdout = stdout
     yield stdout
     sys.stdout = old
@@ -38,9 +42,12 @@ def exec_example(name, save=False):
 
     import ldraw.library
     with stdoutIO() as s:
-        execfile(script_file, d, d)
+        do_execfile(script_file, d, d)
     content = s.getvalue()
     expected_path = os.path.join('tests', 'test_data', 'examples', '%s.ldr' % name)
+    expected_path_py3 = os.path.join('tests', 'test_data', 'examples', '%s.py3.ldr' % name)
+    if not PY2 and os.path.exists(expected_path_py3):
+        expected_path = expected_path_py3
     # uncomment to save
     # open(expected_path, 'w').write(content)
 

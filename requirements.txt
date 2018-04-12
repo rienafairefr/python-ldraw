@@ -1,0 +1,9 @@
+appdirs
+numpy
+pymklist
+pystache
+attrdict
+inflect
+progress
+PyYaml
+Pillow

@@ -20,30 +20,29 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+from __future__ import print_function
 from ldraw.library.colours import *
 from ldraw.figure import *
 from ldraw.library.parts.minifig.accessories import HairMale
 from ldraw.library.parts.minifig.torsos import Torso
 
 figure = Person()
-print figure.head(Yellow, 35)
-print figure.hat(Black, HairMale)  # Hair Male
-print figure.torso(Red, Torso)  # Torso
-print figure.hips(Blue)
-print figure.left_leg(Blue, 5)
-print figure.right_leg(Blue, 20)
-print figure.left_arm(Red, 0)
-print figure.left_hand(Yellow, 0)
-print figure.right_arm(Red, -90)
-print figure.right_hand(Yellow, 0)
-print
-
-print Piece(White, Vector(150, -100, -150),
-            Identity(), "LIGHT")
-print Piece(White, Vector(-150, -100, -150),
-            Identity(), "LIGHT")
-print Piece(White, Vector(0, -100, 150),
-            Identity(), "LIGHT")
+print(figure.head(Yellow, 35))
+print(figure.hat(Black, HairMale))  # Hair Male
+print(figure.torso(Red, Torso))  # Torso
+print(figure.hips(Blue))
+print(figure.left_leg(Blue, 5))
+print(figure.right_leg(Blue, 20))
+print(figure.left_arm(Red, 0))
+print(figure.left_hand(Yellow, 0))
+print(figure.right_arm(Red, -90))
+print(figure.right_hand(Yellow, 0))
+print()
+print(Piece(White, Vector(150, -100, -150),
+            Identity(), "LIGHT"))
+print(Piece(White, Vector(-150, -100, -150),
+            Identity(), "LIGHT"))
+print(Piece(White, Vector(0, -100, 150),
+            Identity(), "LIGHT"))
 
 # Camera should be at 120.0,-20.0,-140.0 in LDraw coordinates.

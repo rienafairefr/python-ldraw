@@ -6,6 +6,7 @@ import tempfile
 import mock
 import pytest
 
+from ldraw import CustomImporter
 from ldraw.colour import Colour
 from ldraw.library_gen import library_gen_main
 
@@ -40,15 +41,15 @@ def test_library_gen_import(mocked_library_path):
 
     assert library.__all__ == ['colours']
 
-    from ldraw.library.parts import *
+    from ldraw.library.parts import others
 
     assert library.parts.__all__ == ['others']
 
-    from ldraw.library.parts.others import *
+    from ldraw.library.parts.others import Brick2X4
 
     assert Brick2X4 == "3001"
 
-    from ldraw.library.colours import *
+    from ldraw.library.colours import Reddish_Gold, ColoursByName, ColoursByCode
 
     expected_color = Colour(189, "Reddish_Gold", "#AC8247", 255, ['PEARLESCENT'])
 

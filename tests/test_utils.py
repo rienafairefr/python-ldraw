@@ -1,5 +1,5 @@
 from ldraw.utils import clean
-
+import random
 
 def test_clean():
     assert clean('%unclean') == '_unclean'
