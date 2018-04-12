@@ -1,15 +1,22 @@
 #! /usr/bin/env python
 # coding=utf-8
-
+import codecs
+import datetime
 from distutils.core import setup
 
 import os
 from setuptools import find_packages
+from setuptools_scm import get_version
+
+
+def get_readme():
+    return codecs.open('README.rst', encoding='utf-8').read()
+
 
 setup(
     name="pyldraw",
     description="A package for working with LDraw format files.",
-    long_description=open('README.rst').read(),
+    long_description=get_readme(),
     author=" David Boddie <david@boddie.org.uk>",
     maintainer="Matthieu Berthomé <rienafairefr@gmail.com>",
     author_email="rienairefr@gmail.com, david@boddie.org.uk",
@@ -19,6 +26,8 @@ setup(
     package_data={
         'ldraw': ['templates/*.mustache']
     },
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
     entry_points={
         'console_scripts': [
             'ldr2inv = ldraw.tools.ldr2inv:main',

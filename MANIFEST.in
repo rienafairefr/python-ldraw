@@ -1,4 +1,4 @@
 include README.rst
-include COPYIN
-recursive-include templates *
+include COPYING
+recursive-include ldraw/templates *
 recursive-include examples *

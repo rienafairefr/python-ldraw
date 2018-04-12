@@ -13,8 +13,6 @@ pyldraw Python Package
 ======================
 
 :Author: `rienafairefr`_ code originally from `David Boddie`_
-:Date: 2018-02-22
-:Version: 0.5.1
 
 .. contents::
 

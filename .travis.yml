@@ -9,10 +9,10 @@ python:
 - 3.5
 - 3.6
 install:
+- pip install -r dev-requirements.txt
+- pip install tox-travis
 - PACKAGE_VERSION=`python setup.py --version`
 - TAG_NAME=v$PACKAGE_VERSION
-- pip install tox-travis
-- pip install -r dev-requirements.txt
 - python -m ldraw.download
 - python -m ldraw.library_gen
 before_install:

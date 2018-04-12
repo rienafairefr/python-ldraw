@@ -30,6 +30,14 @@ from ldraw.dirs import get_data_dir, get_config_dir
 from ldraw.download import download_main
 
 
+from pkg_resources import get_distribution, DistributionNotFound
+try:
+    __version__ = get_distribution(__name__).version
+except DistributionNotFound:
+    # package is not installed
+    pass
+
+
 def load_lib_from(fullname, library_dir):
     """ load library from a dir """
     dot_split = fullname.split('.')

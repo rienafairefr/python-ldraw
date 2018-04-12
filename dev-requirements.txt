@@ -10,3 +10,4 @@ pystache
 attrdict
 inflect
 progress
+setuptools_scm
