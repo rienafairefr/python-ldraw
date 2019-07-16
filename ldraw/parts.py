@@ -387,6 +387,10 @@ class Part(object):
                 raise PartError(parse_error.message + ' in %s at line %i' % (self.path, number))
 
     @property
+    def description(self):
+        return self.objects[0].text
+
+    @property
     def category(self):
         if self._category is None:
             for obj in self.objects:
