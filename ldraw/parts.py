@@ -362,6 +362,7 @@ class Part(object):
     def __init__(self, path):
         self.path = path
         self.objects = []
+        self._category = None
 
         """ Load the Part from its path """
         try:
@@ -384,3 +385,14 @@ class Part(object):
                 self.objects.append(obj)
             except PartError as parse_error:
                 raise PartError(parse_error.message + ' in %s at line %i' % (self.path, number))
+
+    @property
+    def category(self):
+        if self._category is None:
+            for obj in self.objects:
+                if isinstance(obj, MetaCommand) and obj.type == 'CATEGORY':
+                    self._category = obj.text
+                    break
+            else:
+                self._category = 'others'
+        return self._category
