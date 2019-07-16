@@ -345,19 +345,21 @@ def _optional_line(pieces):
                         Vector(*point3), Vector(*point4))
 
 
+HANDLERS = {
+    "0": _comment_or_meta,
+    "1": _sub_file,
+    "2": _line,
+    "3": _triangle,
+    "4": _quadrilateral,
+    "5": _optional_line
+}
+
+
 class Part(object):
     """
     Contains data from a LDraw part file
     """
     def __init__(self, path):
-        self._handlers = {
-            "0": _comment_or_meta,
-            "1": _sub_file,
-            "2": _line,
-            "3": _triangle,
-            "4": _quadrilateral,
-            "5": _optional_line
-        }
         self.path = path
         self.objects = []
 
@@ -374,7 +376,7 @@ class Part(object):
                 # self.objects.append(BlankLine)
                 continue
             try:
-                handler = self._handlers[pieces[0]]
+                handler = HANDLERS[pieces[0]]
             except KeyError:
                 raise PartError("Unknown command (%s) in %s at line %i" % (path, pieces[0], number))
             try:
