@@ -9,6 +9,7 @@ python:
 - 3.5
 - 3.6
 install:
+- pip install -r requirements.txt
 - pip install -r dev-requirements.txt
 - pip install tox-travis
 - PACKAGE_VERSION=`python setup.py --version`
