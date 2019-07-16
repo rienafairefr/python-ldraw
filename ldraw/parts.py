@@ -171,7 +171,7 @@ class Parts(object):
             try:
                 code = self.parts_by_name[description]
             except KeyError:
-                return None
+                pass
         elif not code:
             return None
         return self._load_part(code)
@@ -217,11 +217,11 @@ class Parts(object):
         except PartError:
             return
         for obj in colours_part.objects:
-            if not isinstance(obj, MetaCommand) or not obj.text.startswith("!COLOUR"):
+            if not isinstance(obj, MetaCommand) or not obj.type == "COLOUR":
                 continue
             pieces = obj.text.split()
             try:
-                name = pieces[1]
+                name = pieces[0]
                 code = int(pieces[pieces.index("CODE") + 1])
                 rgb = pieces[pieces.index("VALUE") + 1]
 
@@ -236,7 +236,7 @@ class Parts(object):
                 continue
             try:
                 alpha_at = pieces.index("ALPHA")
-                alpha = int(pieces[alpha_at + 1])
+                alpha = int(pieces[alpha_at])
                 self.alpha_values[name] = alpha
                 self.alpha_values[code] = alpha
             except (IndexError, ValueError):
@@ -284,7 +284,7 @@ def _comment_or_meta(pieces):
     if not pieces:
         return Comment("")
     elif pieces[0][:1] == "!":
-        return MetaCommand(" ".join(pieces))
+        return MetaCommand(pieces[0][1:], " ".join(pieces[1:]))
     return Comment(" ".join(pieces))
 
 
@@ -345,21 +345,24 @@ def _optional_line(pieces):
                         Vector(*point3), Vector(*point4))
 
 
+HANDLERS = {
+    "0": _comment_or_meta,
+    "1": _sub_file,
+    "2": _line,
+    "3": _triangle,
+    "4": _quadrilateral,
+    "5": _optional_line
+}
+
+
 class Part(object):
     """
     Contains data from a LDraw part file
     """
     def __init__(self, path):
-        self._handlers = {
-            "0": _comment_or_meta,
-            "1": _sub_file,
-            "2": _line,
-            "3": _triangle,
-            "4": _quadrilateral,
-            "5": _optional_line
-        }
         self.path = path
         self.objects = []
+        self._category = None
 
         """ Load the Part from its path """
         try:
@@ -374,7 +377,7 @@ class Part(object):
                 # self.objects.append(BlankLine)
                 continue
             try:
-                handler = self._handlers[pieces[0]]
+                handler = HANDLERS[pieces[0]]
             except KeyError:
                 raise PartError("Unknown command (%s) in %s at line %i" % (path, pieces[0], number))
             try:
@@ -382,3 +385,18 @@ class Part(object):
                 self.objects.append(obj)
             except PartError as parse_error:
                 raise PartError(parse_error.message + ' in %s at line %i' % (self.path, number))
+
+    @property
+    def description(self):
+        return self.objects[0].text
+
+    @property
+    def category(self):
+        if self._category is None:
+            for obj in self.objects:
+                if isinstance(obj, MetaCommand) and obj.type == 'CATEGORY':
+                    self._category = obj.text
+                    break
+            else:
+                self._category = 'others'
+        return self._category

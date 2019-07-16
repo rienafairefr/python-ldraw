@@ -62,7 +62,8 @@ class Triangle(object):
 class MetaCommand(object):
     """ a metacommand """
 
-    def __init__(self, text):
+    def __init__(self, type, text):
+        self.type = type
         self.text = text
 
 
