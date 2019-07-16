@@ -1,12 +1,10 @@
 #! /usr/bin/env python
 # coding=utf-8
 import codecs
-import datetime
 from distutils.core import setup
 
 import os
 from setuptools import find_packages
-from setuptools_scm import get_version
 
 
 def get_readme():
