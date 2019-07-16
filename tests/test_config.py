@@ -44,4 +44,4 @@ def test_write_config(config_file_path_mock):
     data = {'parts.lst':'2468'}
     write_config(data)
 
-    assert yaml.load(open(tmp, 'r')) == data
+    assert yaml.load(open(tmp, 'r'), Loader=yaml.SafeLoader) == data

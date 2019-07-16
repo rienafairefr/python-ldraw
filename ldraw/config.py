@@ -19,7 +19,7 @@ def get_config():
     """ get the configuration from config.yml, create it if not there """
     data_dir = get_data_dir()
     try:
-        config = yaml.load(open(get_config_file_path(), 'r'))
+        config = yaml.load(open(get_config_file_path(), 'r'), Loader=yaml.SafeLoader)
         return config
     except (OSError, yaml.YAMLError, IOError, EnvironmentError) as e:
         parts_lst_path = os.environ.get('LDRAW_PARTS_LST')
