@@ -171,7 +171,7 @@ class Parts(object):
             try:
                 code = self.parts_by_name[description]
             except KeyError:
-                return None
+                pass
         elif not code:
             return None
         return self._load_part(code)
