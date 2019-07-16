@@ -221,7 +221,7 @@ class Parts(object):
                 continue
             pieces = obj.text.split()
             try:
-                name = pieces[1]
+                name = pieces[0]
                 code = int(pieces[pieces.index("CODE") + 1])
                 rgb = pieces[pieces.index("VALUE") + 1]
 
@@ -284,7 +284,7 @@ def _comment_or_meta(pieces):
     if not pieces:
         return Comment("")
     elif pieces[0][:1] == "!":
-        return MetaCommand(" ".join(pieces))
+        return MetaCommand(pieces[0][1:], " ".join(pieces[1:]))
     return Comment(" ".join(pieces))
 
 
