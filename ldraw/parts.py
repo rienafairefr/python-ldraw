@@ -217,7 +217,7 @@ class Parts(object):
         except PartError:
             return
         for obj in colours_part.objects:
-            if not isinstance(obj, MetaCommand) or not obj.text.startswith("!COLOUR"):
+            if not isinstance(obj, MetaCommand) or not obj.type == "COLOUR":
                 continue
             pieces = obj.text.split()
             try:
@@ -236,7 +236,7 @@ class Parts(object):
                 continue
             try:
                 alpha_at = pieces.index("ALPHA")
-                alpha = int(pieces[alpha_at + 1])
+                alpha = int(pieces[alpha_at])
                 self.alpha_values[name] = alpha
                 self.alpha_values[code] = alpha
             except (IndexError, ValueError):
