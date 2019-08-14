@@ -6,16 +6,15 @@ import tempfile
 import mock
 import pytest
 
-from ldraw import CustomImporter
+from ldraw import CustomImporter, generate
 from ldraw.colour import Colour
-from ldraw.library_gen import library_gen_main
 
 
 @pytest.fixture
 def mocked_library_path():
     part_lst_path = os.path.join('tests', 'test_ldraw', 'parts.lst')
     library_path = tempfile.mkdtemp()
-    library_gen_main(part_lst_path, library_path)
+    generate(part_lst_path, library_path)
     with mock.patch('ldraw.get_config', side_effect=lambda: {'parts.lst': part_lst_path, 'library': library_path}):
         yield library_path
 

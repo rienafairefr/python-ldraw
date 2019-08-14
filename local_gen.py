@@ -2,10 +2,11 @@
 import os
 
 from ldraw.dirs import get_data_dir
-from ldraw.download import download_main
-from ldraw.library_gen import library_gen_main
+from ldraw import generate, download
+
 # useful for autocompletion in some IDEs
 
-parts_lst = os.path.join(get_data_dir(), 'ldraw', 'parts.lst')
-download_main(parts_lst)
-library_gen_main(parts_lst, 'ldraw')
+output_dir = os.path.join(get_data_dir(), 'ldraw')
+parts_lst = os.path.join(output_dir, 'parts.lst')
+download(output_dir)
+generate(parts_lst, 'ldraw')

@@ -22,15 +22,9 @@ def get_config():
         config = yaml.load(open(get_config_file_path(), 'r'), Loader=yaml.SafeLoader)
         return config
     except (OSError, yaml.YAMLError, IOError, EnvironmentError) as e:
-        parts_lst_path = os.environ.get('LDRAW_PARTS_LST')
-        if parts_lst_path:
-            return {
-                'parts.lst': parts_lst_path
-            }
-        else:
-            return {
-                'parts.lst': join(data_dir, 'ldraw', 'parts.lst')
-            }
+        return {
+            'parts.lst': join(data_dir, 'ldraw', 'parts.lst')
+        }
 
 
 def write_config(config_dict):

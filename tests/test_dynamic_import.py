@@ -5,7 +5,7 @@ import os
 import mock
 import pytest
 
-from ldraw import download_main, CustomImporter
+from ldraw import download, CustomImporter
 from ldraw.colour import Colour
 
 

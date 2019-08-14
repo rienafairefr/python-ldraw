@@ -18,7 +18,7 @@ def tool_test(func, suffix):
     func(file)
     content = open(file, 'rb').read()
     # uncomment to save content to expected
-    open('tests/test_data/car' + suffix, 'wb').write(content)
+    # open('tests/test_data/car' + suffix, 'wb').write(content)
 
     expected_file = 'tests/test_data/car' + suffix
     shutil.copy(expected_file, filee)

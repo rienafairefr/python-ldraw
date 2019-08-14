@@ -14,12 +14,6 @@ def fails(*args, **kwargs):
 
 
 @patch('yaml.load', side_effect=fails)
-@patch.dict(os.environ, {'LDRAW_PARTS_LST': '12345'})
-def test_config_env_parts_lst(yaml_load_mock):
-    assert get_config()['parts.lst'] == '12345'
-
-
-@patch('yaml.load', side_effect=fails)
 def test_config_cant_load(yaml_load_mock):
     yaml_load_mock.side_effect = fails
     expected = os.path.join(get_data_dir(), 'ldraw', 'parts.lst')
