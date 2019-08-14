@@ -206,13 +206,10 @@ class Parts(object):
             paths.append(os.path.join(parts_dir, code.lower()) + os.extsep + "dat")
             paths.append(os.path.join(parts_dir, code.upper()) + os.extsep + "DAT")
         for path in paths:
-            try:
-                part = Part(path)
-            except PartError:
-                continue
-            else:
-                return part
-        return None
+            if os.path.exists(path):
+                return Part(path)
+            continue
+        raise PartError('part file not found: %s' % code)
 
     def _load_colours(self, path):
         try:
@@ -362,19 +359,24 @@ class Part(object):
     """
     Contains data from a LDraw part file
     """
+
     def __init__(self, path):
         self.path = path
-        self.objects = []
         self._category = None
+        self._description = None
 
-        """ Load the Part from its path """
+    @property
+    def lines(self):
         try:
-            lines = codecs.open(path, 'r', encoding='utf-8').readlines()
+            for line in codecs.open(self.path, 'r', encoding='utf-8'):
+                yield line
         except IOError:
-            raise PartError("Failed to read part file: %s" % path)
-        number = 0
-        for line in lines:
-            number += 1
+            raise PartError("Failed to read part file: %s" % self.path)
+
+    @property
+    def objects(self):
+        """ Load the Part from its path """
+        for number, line in enumerate(self.lines):
             pieces = line.split()
             if not pieces:
                 # self.objects.append(BlankLine)
@@ -382,24 +384,27 @@ class Part(object):
             try:
                 handler = HANDLERS[pieces[0]]
             except KeyError:
-                raise PartError("Unknown command (%s) in %s at line %i" % (path, pieces[0], number))
+                raise PartError("Unknown command (%s) in %s at line %i" % (self.path, pieces[0], number))
             try:
-                obj = handler(pieces[1:])
-                self.objects.append(obj)
+                yield handler(pieces[1:])
             except PartError as parse_error:
                 raise PartError(parse_error.message + ' in %s at line %i' % (self.path, number))
 
     @property
     def description(self):
-        return self.objects[0].text
+        if self._description is None:
+            self._description = ' '.join(next(self.lines).split()[1:])
+        return self._description
 
     @property
     def category(self):
         if self._category is None:
             for obj in self.objects:
-                if isinstance(obj, MetaCommand) and obj.type == 'CATEGORY':
+                if not isinstance(obj, Comment) and not isinstance(obj, MetaCommand):
+                    self._category = None
+                    break
+                elif isinstance(obj, MetaCommand) and obj.type == 'CATEGORY':
                     self._category = obj.text
                     break
-            else:
-                self._category = 'others'
+
         return self._category
