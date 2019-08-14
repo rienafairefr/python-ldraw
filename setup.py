@@ -40,7 +40,6 @@ setup(
         'pymklist',
         'pystache',
         'attrdict',
-        'inflect',
         'progress',
         'PyYaml',
         'Pillow'

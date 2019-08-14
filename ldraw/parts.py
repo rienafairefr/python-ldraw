@@ -24,8 +24,6 @@ import os
 import re
 import codecs
 
-
-import inflect
 from attrdict import AttrDict
 
 from ldraw.colour import Colour
@@ -33,7 +31,6 @@ from ldraw.config import get_config
 from ldraw.geometry import Matrix, Vector
 from ldraw.lines import OptionalLine, Quadrilateral, Line, Triangle, MetaCommand, Comment
 from ldraw.pieces import Piece
-from ldraw.utils import camel
 
 
 class PartError(Exception):
@@ -82,10 +79,16 @@ class Parts(object):
             'others': {
 
             }}
-        inflect_engine = inflect.engine()
 
         self.minifig_descriptions = {
-            k: camel(inflect_engine.singular_noun(k)) for k in self.parts['minifig']
+            'torsos': 'Torso',
+            'hips': 'Hip',
+            'arms': 'Arm',
+            'heads': 'Head',
+            'accessories': 'Accessory',
+            'hands': 'Hand',
+            'hats': 'Hat',
+            'legs': 'Leg'
         }
 
         self.load(path)
