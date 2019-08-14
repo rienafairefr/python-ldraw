@@ -14,8 +14,7 @@ install:
 - pip install tox-travis
 - PACKAGE_VERSION=`python setup.py --version`
 - TAG_NAME=v$PACKAGE_VERSION
-- python -m ldraw.download
-- python -m ldraw.library_gen
+- python local_gen.py
 before_install:
 - sudo apt-get -qq update
 - export TRAVIS_COMMIT_MESSAGE=$(git log --format=%B -n 1 $TRAVIS_COMMIT)
