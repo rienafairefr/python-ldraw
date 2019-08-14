@@ -28,11 +28,11 @@ import imp
 import os
 import zipfile
 from distutils.dir_util import copy_tree
-from urllib.request import urlretrieve
 
 from mklist.generate import generate_parts_lst
 
 from ldraw.config import get_config, write_config
+from ldraw.compat import urlretrieve
 from ldraw.dirs import get_data_dir, get_config_dir, get_cache_dir
 
 from pkg_resources import get_distribution, DistributionNotFound
