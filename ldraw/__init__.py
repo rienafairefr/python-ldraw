@@ -160,7 +160,7 @@ class CustomImporter(object):
         return mod
 
 
-def generate(parts_lst, output_dir):
+def generate(parts_lst, output_dir, force=False):
     """ main function for the library generation """
     library_path = os.path.join(output_dir, 'library')
     ensure_exists(library_path)
@@ -170,7 +170,7 @@ def generate(parts_lst, output_dir):
 
     if os.path.exists(hash_path):
         md5 = open(hash_path, 'r').read()
-        if md5 == md5_parts_lst:
+        if md5 == md5_parts_lst and not force:
             return
 
     parts = Parts(parts_lst)
