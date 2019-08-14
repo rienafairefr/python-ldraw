@@ -8,5 +8,6 @@ from ldraw import generate, download
 
 output_dir = os.path.join(get_data_dir(), 'ldraw')
 parts_lst = os.path.join(output_dir, 'parts.lst')
-download(output_dir)
+if not os.path.exists(output_dir):
+    download(output_dir)
 generate(parts_lst, 'ldraw')
