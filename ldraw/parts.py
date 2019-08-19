@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import re
 import codecs
+from collections import defaultdict
 
 from attrdict import AttrDict
 
@@ -48,12 +49,13 @@ class Parts(object):
     ColourAttributes = ("CHROME", "PEARLESCENT", "RUBBER", "MATTE_METALLIC",
                         "METAL")
 
-    def __init__(self, path=get_config()['parts.lst']):
+    def __init__(self, parts_lst=get_config()['parts.lst']):
         self.path = None
         self.parts_dirs = []
         self.parts_subdirs = {}
         self.parts_by_name = {}
         self.parts_by_code = {}
+        self.parts_by_code_name = {}
 
         self.primitives_by_name = {}
         self.primitives_by_code = {}
@@ -75,9 +77,6 @@ class Parts(object):
                 'arms': {},
                 'hands': {},
                 'accessories': {},
-            },
-            'others': {
-
             }}
 
         self.minifig_descriptions = {
@@ -91,18 +90,32 @@ class Parts(object):
             'legs': 'Leg'
         }
 
-        self.load(path)
+        self.parts_by_category = defaultdict(lambda: {})
 
-    def load(self, path):
-        """ load a Part from a path """
+        self.load(parts_lst)
+
+        self.parts['minifig'][''] = self.parts_by_category.pop('minifig', {})
+
+        for k in list(self.parts_by_category.keys()):
+            split = k.split()
+            if len(split) == 1:
+                value = self.parts_by_category.pop(k)
+                if k in self.parts:
+                    self.parts[k][''] = value
+                else:
+                    self.parts[k] = value
+        pass
+
+    def load(self, parts_lst):
+        """ load parts from a path """
         try:
-            self.try_load(path)
+            self.try_load(parts_lst)
         except IOError:
-            raise PartError("Failed to load parts file: %s" % path)
+            raise PartError("Failed to load parts file: %s" % parts_lst)
 
         # If we successfully loaded the files then record the path and look for
         # part files.
-        self.path = path
+        self.path = parts_lst
         directory = os.path.split(self.path)[0]
         for item in os.listdir(directory):
             obj = os.path.join(directory, item)
@@ -117,13 +130,22 @@ class Parts(object):
             elif item.lower() == "p" + os.extsep + "lst" and os.path.isfile(obj):
                 self._load_primitives(obj)
 
-        self.parts['minifig'] = AttrDict(self.parts['minifig'])
-        self.parts = AttrDict(self.parts)
+        def get_category(part_description):
+            return part_description.strip(' ~=_').split()[0]
 
-    def try_load(self, path):
-        """ try loading a Part from a path """
-        part_file = codecs.open(path, 'r', encoding='utf-8')
-        for line in part_file.readlines():
+        for code, description in self.parts_by_code_name:
+            part = self.part(code=code)
+            self.parts_by_code_name[(code, description)] = part
+            default_category = get_category(description)
+            category = part.category
+            self.parts_by_category[default_category.lower()][description] = code
+            if category:
+                self.parts_by_category[category.lower()][description] = code
+
+    def try_load(self, parts_lst):
+        """ try loading parts from a parts.lst file """
+        parts_lst_file = codecs.open(parts_lst, 'r', encoding='utf-8')
+        for line in parts_lst_file.readlines():
             pieces = re.split(DOT_DAT, line)
             if len(pieces) != 2:
                 break
@@ -131,6 +153,7 @@ class Parts(object):
             code, description = self.section_find(pieces)
             self.parts_by_name[description] = code
             self.parts_by_code[code] = description
+            self.parts_by_code_name[(code, description)] = None
 
     def section_find(self, pieces):
         """ returns code, description from a pieces element """
@@ -157,8 +180,6 @@ class Parts(object):
                 if description.startswith("(") and description.endswith(")"):
                     description = description[1:-1]
                 self.parts['minifig']['accessories'][description] = code
-            else:
-                self.parts['others'][description] = code
         return code, description
 
     def part(self, description=None, code=None):
