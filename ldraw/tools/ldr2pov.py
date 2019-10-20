@@ -77,7 +77,7 @@ each component should be specified as a floating point number between
     parser.add_argument('ldraw_file')
     parser.add_argument('pov_file')
     parser.add_argument('camera_position', type=vector_position)
-    parser.add_argument('look_at_position', type=vector_position, required=False,
+    parser.add_argument('--look_at_position', type=vector_position, required=False,
                         default=vector_position("0,0,0"))
     parser.add_argument('--sky')
 

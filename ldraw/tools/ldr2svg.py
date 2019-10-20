@@ -47,7 +47,7 @@ The optional sky background colour is an SVG colour, either specified as
     parser.add_argument('svg_file')
     parser.add_argument('viewport_size', type=widthxheight)
     parser.add_argument('camera_position', type=vector_position)
-    parser.add_argument('look_at_position', type=vector_position,
+    parser.add_argument('--look_at_position', type=vector_position,
                         required=False, default=vector_position("0,0,0"))
     parser.add_argument('--sky')
 

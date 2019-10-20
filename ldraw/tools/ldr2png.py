@@ -52,7 +52,7 @@ The optional sky background and stroke colours are PNG colours, either specified
     parser.add_argument('png_file')
     parser.add_argument('image_size', type=widthxheight)
     parser.add_argument('camera_position', type=vector_position)
-    parser.add_argument('look_at_position', required=False, default=vector_position('0,0,0'))
+    parser.add_argument('--look_at_position', required=False, default=vector_position('0,0,0'))
     parser.add_argument('--distance', type=float, default=1.0)
     parser.add_argument('--stroke-colour', dest='stroke_colour', type=ImageColor.getrgb)
     parser.add_argument('--sky', default=ImageColor.getrgb('#000000'), type=ImageColor.getrgb)
