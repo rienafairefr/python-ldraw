@@ -94,6 +94,11 @@ class Parts(object):
 
         self.load(parts_lst)
 
+        # relatively useless categories
+        for k in list(self.parts_by_category.keys()):
+            if len(self.parts_by_category.get(k)) <= 5:
+                self.parts_by_category['others'].update(self.parts_by_category.pop(k))
+
         self.parts['minifig'][''] = self.parts_by_category.pop('minifig', {})
 
         for k in list(self.parts_by_category.keys()):
