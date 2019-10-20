@@ -99,6 +99,10 @@ class Parts(object):
             if len(self.parts_by_category.get(k)) <= 5:
                 self.parts_by_category['others'].update(self.parts_by_category.pop(k))
 
+        # reference in others
+        for v in self.parts_by_category.values():
+            self.parts_by_category['others'].update(v)
+
         self.parts['minifig'][''] = self.parts_by_category.pop('minifig', {})
 
         for k in list(self.parts_by_category.keys()):
