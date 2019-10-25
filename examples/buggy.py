@@ -21,14 +21,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
-import random
-from ldraw.library.colours import *
-from ldraw.library.colours import Light_Grey as Grey
+
 from ldraw.figure import *
 from ldraw.geometry import YAxis
+from ldraw.library.colours import *
+from ldraw.library.parts.antenna import Antenna4HWithRoundedTop
+from ldraw.library.parts.baseplate import Baseplate16X16
+from ldraw.library.parts.brick import Brick1X2WithClassicSpaceLogoPattern
+from ldraw.library.parts.car import CarSteeringStandAndWheel_Complete_
 from ldraw.library.parts.minifig.accessories import Seat2X2
-from ldraw.library.parts.others import Plate2X2WithRedWheels_Complete_, Tyre6_50X8OffsetTread, Plate2X2, Baseplate16X16, \
-    Brick1X2WithClassicSpaceLogoPattern, Antenna4HWithRoundedTop, CarSteeringStandAndWheel_Complete_, SlopeBrick452X2
+from ldraw.library.parts.plate import Plate2X2WithRedWheels_Complete_, Plate2X2
+from ldraw.library.parts.slope import SlopeBrick452X2
+from ldraw.library.parts.tyre import Tyre6_50X8OffsetTread
 from ldraw.pieces import Group, Piece
 
 # figure = Person(Vector(0, 0, -10))

@@ -49,7 +49,12 @@ class Parts(object):
     ColourAttributes = ("CHROME", "PEARLESCENT", "RUBBER", "MATTE_METALLIC",
                         "METAL")
 
-    def __init__(self, parts_lst=get_config()['parts.lst']):
+    def __init__(self, parts_lst=None, others_threshold=None):
+        config = get_config()
+        if parts_lst is None:
+            parts_lst = config['parts.lst']
+        if others_threshold is None:
+            others_threshold = config.get('others_threshold', 5)
         self.path = None
         self.parts_dirs = []
         self.parts_subdirs = {}
@@ -67,17 +72,18 @@ class Parts(object):
         self.colours_by_name = {}
         self.colours_by_code = {}
 
-        self.parts = {
-            'minifig': {
-                'hats': {},
-                'heads': {},
-                'torsos': {},
-                'hips': {},
-                'legs': {},
-                'arms': {},
-                'hands': {},
-                'accessories': {},
-            }}
+        self.parts = AttrDict(
+            minifig=AttrDict(
+                hats={},
+                heads={},
+                torsos={},
+                hips={},
+                legs={},
+                arms={},
+                hands={},
+                accessories={}
+            )
+        )
 
         self.minifig_descriptions = {
             'torsos': 'Torso',
@@ -96,14 +102,12 @@ class Parts(object):
 
         # relatively useless categories
         for k in list(self.parts_by_category.keys()):
-            if len(self.parts_by_category.get(k)) <= 5:
+            if len(self.parts_by_category.get(k)) < others_threshold:
                 self.parts_by_category['others'].update(self.parts_by_category.pop(k))
 
         # reference in others
         for v in self.parts_by_category.values():
             self.parts_by_category['others'].update(v)
-
-        self.parts['minifig'][''] = self.parts_by_category.pop('minifig', {})
 
         for k in list(self.parts_by_category.keys()):
             split = k.split()

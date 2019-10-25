@@ -123,7 +123,7 @@ to take the ``figures.py`` example file, create an LDraw model file (``temp.ldr`
 and convert that to a POV-Ray scene file (``temp.pov``)::
 
   python examples/figures.py > temp.ldr
-  ldr2pov /path/to/parts.lst models/figures.ldr temp.pov 160.0,80.0,-240.0
+  ldr2pov models/figures.ldr temp.pov 160.0,80.0,-240.0
   povray +Itemp.pov +FN16 +Otemp.png +Q6
 
 Finally, POV-Ray is used to process the scene description and create a PNG

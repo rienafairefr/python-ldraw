@@ -21,12 +21,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from __future__ import print_function
-import random
-from ldraw.library.colours import *
+
 from ldraw.figure import *
+from ldraw.library.colours import *
 from ldraw.library.parts.minifig.accessories import GunRevolver, CapWithLongFlatPeak
 from ldraw.library.parts.minifig.torsos import Torso
-from ldraw.pieces import Group, Piece
+from ldraw.pieces import Group
 
 group = Group(Vector(0, 0, 0), Identity())
 
