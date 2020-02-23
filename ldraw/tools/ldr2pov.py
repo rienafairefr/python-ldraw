@@ -23,6 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import argparse
 import sys
 
+from PIL import ImageColor
+
 from ldraw.tools import vector_position, get_model
 from ldraw.writers.povray import POVRayWriter
 
@@ -79,7 +81,7 @@ each component should be specified as a floating point number between
     parser.add_argument('camera_position', type=vector_position)
     parser.add_argument('--look_at_position', type=vector_position, required=False,
                         default=vector_position("0,0,0"))
-    parser.add_argument('--sky')
+    parser.add_argument('--sky', type=ImageColor.getrgb)
 
     args = parser.parse_args()
 
