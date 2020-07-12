@@ -1,0 +1,109 @@
+name: Python package
+
+on: [push, pull_request]
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.6
+      - uses: dschep/install-pipenv-action@v1
+      - name: Install dependencies
+        run: pipenv install --python 3.6
+      - name: generate code
+        run: python local_gen.py
+      - uses: actions/upload-artifact@master
+        with:
+          name: generated-ldraw-library
+          path: ldraw/library
+
+  test:
+    needs: generate
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.5, 3.6, 3.7]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - uses: dschep/install-pipenv-action@v1
+    - name: Install dependencies
+      run: pipenv install --python ${{ matrix.python-version }}
+
+    - uses: actions/download-artifact@master
+      with:
+        name: generated-ldraw-library
+        path: ldraw/library
+
+    - name: install for test
+      run: |
+        pipenv install --dev
+        pipenv run pip freeze
+    - name: Test with pytest
+      run: pipenv run pytest --cov=ldraw
+    - name: Coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.coveralls_repo_token }}
+      run: pipenv run coveralls
+
+  publish:
+    needs:
+      - test
+      - generate
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.6
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.6
+    - uses: dschep/install-pipenv-action@v1
+    - name: Install dependencies
+      run: pipenv --python 3.6 install
+
+    - uses: actions/download-artifact@master
+      with:
+        name: generated-ldraw-library
+        path: ldraw/library
+
+    - name: Build package
+      run: |
+        pipenv run python setup.py sdist bdist_wheel
+    - name: Twine check
+      run: pipenv run twine check dist/*
+    - name: test upload
+      if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.testpypi_password }}
+      run: |
+        pipenv run twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+    - name: Publish package
+      if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.pypi_password }}
+      run: |
+        pipenv run twine upload dist/*
+
+
+  cleanup_job:
+    needs: publish
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - name: call webhook to delete artifacts
+      env:
+        FOR_WEBHOOKS_SECRET: ${{ secrets.FOR_WEBHOOKS_SECRET }}
+      run: |
+        echo "::add-mask::$FOR_WEBHOOKS_SECRET"
+        curl --verbose --fail --show-error --location --request POST "https://api.github.com/repos/$GITHUB_REPOSITORY/dispatches" --header "Authorization: token $FOR_WEBHOOKS_SECRET" --header 'Content-Type: application/json' --header 'Accept: application/vnd.github.everest-preview+json' --data-raw "{ \"event_type\": \"delete_all_artifacts\", \"client_payload\": {\"parent_runid\": \"$GITHUB_RUN_ID\", \"parent_repo\": \"$GITHUB_REPOSITORY\"} }"

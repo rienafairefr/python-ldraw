@@ -1,0 +1,30 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pycodestyle = "*"
+pytest = "*"
+coveralls = "*"
+pytest-cov = "*"
+mock = "*"
+setuptools-scm = "*"
+twine = "*"
+
+[packages]
+appdirs = "*"
+numpy = "*"
+pymklist = "*"
+pystache = "*"
+attrdict = "*"
+progress = "*"
+PyYAML = "*"
+Pillow = "*"
+black = {version= "*", pre="true"}
+
+[requires]
+python_version = "3.6"
+
+[pipenv]
+allow_prereleases = true
