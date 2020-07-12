@@ -15,7 +15,7 @@ jobs:
       - name: Install dependencies
         run: pipenv install --dev --python 3.6
       - name: generate code
-        run: python local_gen.py
+        run: pipenv run python local_gen.py
       - uses: actions/upload-artifact@master
         with:
           name: generated-ldraw-library
