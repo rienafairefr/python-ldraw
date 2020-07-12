@@ -21,7 +21,6 @@ attrdict = "*"
 progress = "*"
 PyYAML = "*"
 Pillow = "*"
-black = {version= "*", pre="true"}
 
 [pipenv]
 allow_prereleases = true
