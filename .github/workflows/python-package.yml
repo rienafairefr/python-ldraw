@@ -13,7 +13,7 @@ jobs:
           python-version: 3.6
       - uses: dschep/install-pipenv-action@v1
       - name: Install dependencies
-        run: pipenv install --python 3.6
+        run: pipenv install --dev --python 3.6
       - name: generate code
         run: python local_gen.py
       - uses: actions/upload-artifact@master
@@ -37,7 +37,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - uses: dschep/install-pipenv-action@v1
     - name: Install dependencies
-      run: pipenv install --python ${{ matrix.python-version }}
+      run: pipenv install --dev --python ${{ matrix.python-version }}
 
     - uses: actions/download-artifact@master
       with:
@@ -68,7 +68,7 @@ jobs:
         python-version: 3.6
     - uses: dschep/install-pipenv-action@v1
     - name: Install dependencies
-      run: pipenv --python 3.6 install
+      run: pipenv --dev --python 3.6 install
 
     - uses: actions/download-artifact@master
       with:
