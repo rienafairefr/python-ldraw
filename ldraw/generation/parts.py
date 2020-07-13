@@ -2,7 +2,6 @@
 """
 Generates the ldraw.library.parts namespace
 """
-from __future__ import print_function
 import codecs
 import os
 import itertools

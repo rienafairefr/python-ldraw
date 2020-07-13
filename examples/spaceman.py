@@ -1,4 +1,3 @@
-from __future__ import print_function
 import random
 
 from ldraw.geometry import Identity, XAxis, YAxis, ZAxis, Vector

@@ -18,25 +18,20 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-from __future__ import print_function
-
 import hashlib
+import imp
+import os
 import shutil
 import sys
-import imp
-
-import os
 import zipfile
 from distutils.dir_util import copy_tree
+from urllib.request import urlretrieve
 
 from mklist.generate import generate_parts_lst
-
-from ldraw.config import get_config, write_config
-from ldraw.compat import urlretrieve, PY2
-from ldraw.dirs import get_data_dir, get_config_dir, get_cache_dir
-
 from pkg_resources import get_distribution, DistributionNotFound
 
+from ldraw.config import get_config, write_config
+from ldraw.dirs import get_data_dir, get_config_dir, get_cache_dir
 from ldraw.generation.colours import gen_colours
 from ldraw.generation.parts import gen_parts
 from ldraw.parts import Parts
@@ -94,7 +89,7 @@ def try_download_generate_lib():
             return data_dir
 
 
-class CustomImporter(object):
+class CustomImporter:
     """ Added to sys.meta_path as an import hook """
     virtual_module = 'ldraw.library'
 
@@ -105,7 +100,7 @@ class CustomImporter(object):
             if not rest or rest.startswith('.'):
                 return True
 
-    def find_module(self, fullname, path=None): # pylint:disable=unused-argument
+    def find_module(self, fullname, path=None):  # pylint:disable=unused-argument
         """
         This method is called by Python if this class
         is on sys.path. fullname is the fully-qualified

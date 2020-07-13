@@ -3,12 +3,13 @@ import glob
 import os
 import sys
 import tempfile
+from io import StringIO
 
 import mock
 import pytest
 
 from ldraw import CustomImporter
-from ldraw.compat import StringIO, do_execfile, PY2
+from ldraw.compat import do_execfile
 
 
 @pytest.fixture(scope='module')
@@ -17,10 +18,10 @@ def mocked_parts_lst():
     library_path = tempfile.mkdtemp()
 
     def get_config(): return {
-            'parts.lst': parts_lst_path,
-            'library': library_path,
-            'others_threshold': 0
-        }
+        'parts.lst': parts_lst_path,
+        'library': library_path,
+        'others_threshold': 0
+    }
 
     with mock.patch('ldraw.parts.get_config', side_effect=get_config):
         CustomImporter().load_module('ldraw.library')
@@ -66,9 +67,6 @@ def exec_example(name, save=False):
         do_execfile(script_file, d, d)
     content = s.getvalue()
     expected_path = os.path.join('tests', 'test_data', 'examples', '%s.ldr' % name)
-    expected_path_py3 = os.path.join('tests', 'test_data', 'examples', '%s.py3.ldr' % name)
-    if not PY2 and os.path.exists(expected_path_py3):
-        expected_path = expected_path_py3
     # uncomment to save
     # open(expected_path, 'w').write(content)
 

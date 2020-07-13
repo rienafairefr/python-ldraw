@@ -4,7 +4,6 @@ apt:
   packages:
   - dos2unix
 python:
-- 2.7
 - 3.5
 - 3.6
 - 3.7
@@ -31,4 +30,4 @@ deploy:
   on:
     tags: true
     distributions: sdist bdist_wheel
-    condition: $TRAVIS_PYTHON_VERSION = "2.7"
+    condition: $TRAVIS_PYTHON_VERSION = "3.7"
