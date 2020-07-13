@@ -1,5 +1,6 @@
 """ Some tools to convert ldr to other formats"""
 import argparse
+import os
 
 import sys
 
@@ -27,7 +28,8 @@ def vector_position(input_str):
 def get_model(ldraw_path):
     """" get model from ldraw path """
     config = get_config()
-    parts = Parts(config['parts.lst'])
+    parts_lst = os.path.join(config['ldrawdir'], 'parts.lst')
+    parts = Parts(parts_lst)
     try:
         model = Part(ldraw_path)
     except PartError:

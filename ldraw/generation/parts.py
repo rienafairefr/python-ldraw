@@ -6,6 +6,7 @@ from __future__ import print_function
 import codecs
 import os
 import itertools
+import sys
 
 from progress.bar import Bar
 import pystache
@@ -58,7 +59,7 @@ def gen_parts(parts, output_dir):
     :param output_dir: where to output the library
     :return:
     """
-    print('generate ldraw.library.parts, this might take a long time...')
+    print('generate ldraw.library.parts, this might take a long time...', file=sys.stderr)
 
     library_path = os.path.join(output_dir, 'library')
     parts_dir = ensure_exists(os.path.join(library_path, 'parts'))

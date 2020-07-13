@@ -44,8 +44,8 @@ def exec_example(name, save=False):
     with stdoutIO() as s:
         do_execfile(script_file, d, d)
     content = s.getvalue()
-    expected_path = os.path.join('tests', 'test_data', 'examples', '%s.ldr' % name)
-    expected_path_py3 = os.path.join('tests', 'test_data', 'examples', '%s.py3.ldr' % name)
+    expected_path = os.path.join('snapshot_tests', 'test_data', 'examples', '%s.ldr' % name)
+    expected_path_py3 = os.path.join('snapshot_tests', 'test_data', 'examples', '%s.py3.ldr' % name)
     if not PY2 and os.path.exists(expected_path_py3):
         expected_path = expected_path_py3
     # uncomment to save
@@ -58,5 +58,5 @@ def exec_example(name, save=False):
 
 
 @pytest.mark.parametrize('example', all_examples, ids=all_examples)
-def test_examples(snapshot_parts_lst, example):
+def test_examples(example):
     exec_example(example)

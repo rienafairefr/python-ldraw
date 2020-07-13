@@ -4,12 +4,12 @@ Common code for all the Writers
 import sys
 
 from ldraw.geometry import Identity, Vector
-from ldraw.library.colours import White, Main_Colour
 from ldraw.lines import Triangle, Quadrilateral, Line
 from ldraw.pieces import Piece
 
 
 def _current_colour(colour, current_colour):
+    from ldraw.library.colours import Main_Colour
     return current_colour if colour == Main_Colour else colour.code
 
 
@@ -38,7 +38,10 @@ class Writer(object):
     def _polygons_from_objects(self,
                                model,
                                top_level_piece=None,
-                               current=Current(Identity(), White.code, Vector(0, 0, 0))):
+                               current=None):
+        from ldraw.library.colours import White
+        if current is None:
+            current = Current(Identity(), White.code, Vector(0, 0, 0))
         # Extract polygons from objects, filtering out those behind the camera.
         polygons = []
 

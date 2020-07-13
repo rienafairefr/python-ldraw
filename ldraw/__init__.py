@@ -73,7 +73,7 @@ def load_lib(library_path, fullname):
 def try_download_generate_lib():
     # Download the library and generate it, if needed
     config = get_config()
-    parts_lst_path = config['parts.lst']
+    parts_lst_path = os.path.join(config['ldrawdir'], 'parts.lst')
     output_dir = os.path.dirname(parts_lst_path)
     if not os.path.exists(output_dir) and not os.path.exists(parts_lst_path):
         download(output_dir)

@@ -5,6 +5,7 @@ Called by ldraw.library_gen to generate the ldraw/library/colours.py file
 from __future__ import print_function
 import codecs
 import os
+import sys
 
 import pystache
 
@@ -27,7 +28,7 @@ def gen_colours(parts, output_dir):
     """
     Generates a colours.py from library data
     """
-    print('generate ldraw.library.colours...')
+    print('generate ldraw.library.colours...', file=sys.stderr)
 
     colours_mustache = get_resource(os.path.join('templates', 'colours.mustache'))
     colours_template_file = codecs.open(colours_mustache, 'r', encoding='utf-8')

@@ -52,7 +52,7 @@ class Parts(object):
     def __init__(self, parts_lst=None, others_threshold=None):
         config = get_config()
         if parts_lst is None:
-            parts_lst = config['parts.lst']
+            parts_lst = os.path.join(config['ldrawdir'], 'parts.lst')
         if others_threshold is None:
             others_threshold = config.get('others_threshold', 5)
         self.path = None

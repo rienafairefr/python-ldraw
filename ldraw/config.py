@@ -20,11 +20,14 @@ def get_config():
     data_dir = get_data_dir()
     try:
         config = yaml.load(open(get_config_file_path(), 'r'), Loader=yaml.SafeLoader)
-        return config
     except (OSError, yaml.YAMLError, IOError, EnvironmentError) as e:
-        return {
-            'parts.lst': join(data_dir, 'ldraw', 'parts.lst')
+        config = {
+            'ldrawdir': join(data_dir, 'ldraw')
         }
+    ldrawdir = os.environ.get('LDRAWDIR')
+    if ldrawdir:
+        config['ldrawdir'] = ldrawdir
+    return config
 
 
 def write_config(config_dict):
