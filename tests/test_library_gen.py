@@ -15,8 +15,10 @@ def mocked_library_path():
     part_lst_path = os.path.join('tests', 'test_ldraw', 'parts.lst')
     library_path = tempfile.mkdtemp()
     generate(part_lst_path, library_path)
+    CustomImporter.clean()
     with mock.patch('ldraw.get_config', side_effect=lambda: {'parts.lst': part_lst_path, 'library': library_path}):
         yield library_path
+    CustomImporter.clean()
 
 
 def test_library_gen_files(mocked_library_path):

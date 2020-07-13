@@ -2,31 +2,10 @@ import contextlib
 import glob
 import os
 import sys
-import tempfile
 
-import mock
 import pytest
 
-from ldraw import CustomImporter
 from ldraw.compat import StringIO, do_execfile, PY2
-
-
-@pytest.fixture(scope='module')
-def mocked_parts_lst():
-    parts_lst_path = os.path.join('tests', 'test_ldraw2', 'parts.lst')
-    library_path = tempfile.mkdtemp()
-
-    def get_config(): return {
-            'parts.lst': parts_lst_path,
-            'library': library_path,
-            'others_threshold': 0
-        }
-
-    with mock.patch('ldraw.parts.get_config', side_effect=get_config):
-        CustomImporter().load_module('ldraw.library')
-        yield parts_lst_path
-
-    CustomImporter.clean()
 
 
 def _unidiff_output(expected, actual):
@@ -79,5 +58,5 @@ def exec_example(name, save=False):
 
 
 @pytest.mark.parametrize('example', all_examples, ids=all_examples)
-def test_examples(mocked_parts_lst, example):
+def test_examples(snapshot_parts_lst, example):
     exec_example(example)

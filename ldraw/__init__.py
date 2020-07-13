@@ -133,7 +133,7 @@ class CustomImporter(object):
     @classmethod
     def clean(cls):
         for fullname in list(sys.modules.keys()):
-            if cls.valid_module(fullname):
+            if fullname.startswith('ldraw'):
                 del sys.modules[fullname]
 
     def get_code(self, fullname):

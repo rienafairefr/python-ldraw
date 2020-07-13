@@ -5,3 +5,4 @@ pytest-cov
 mock
 setuptools_scm
 tox
+tox-pyenv
