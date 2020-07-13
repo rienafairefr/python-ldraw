@@ -2,6 +2,7 @@ import shutil
 
 import pytest
 from PIL import ImageColor
+from xmldiff import main, formatting
 
 from ldraw.tools import widthxheight, vector_position
 from ldraw.writers.png import PNGArgs
@@ -10,6 +11,7 @@ from ldraw.tools.ldr2svg import ldr2svg
 from ldraw.tools.ldr2inv import ldr2inv
 from ldraw.tools.ldr2png import ldr2png
 from ldraw.tools.ldr2pov import ldr2pov
+
 
 INPUT_PATH = 'snapshot_tests/test_data/car.ldr'
 
@@ -31,11 +33,15 @@ INPUT_PATH = 'snapshot_tests/test_data/car.ldr'
     (ldr2inv, '.inv', ())
 ])
 def test_tools(func, suffix, args, tmpdir):
-    output_file = tmpdir.join('output' + suffix)
-    func(INPUT_PATH, output_file, *args)
-    actual_content = open(output_file, 'rb').read()
+    actual_path = tmpdir.join('output' + suffix)
+    func(INPUT_PATH, actual_path, *args)
+    actual_content = open(actual_path, 'rb').read()
     expected_file = 'snapshot_tests/test_data/car' + suffix
     expected_path = tmpdir.join('expected' + suffix)
     shutil.copy(expected_file, expected_path)
     expected_content = open(expected_file, 'rb').read()
+    if suffix =='.svg':
+        diff = main.diff_files(str(expected_path), str(actual_path),
+                               formatter=formatting.XMLFormatter())
+        pass
     assert expected_content == actual_content
