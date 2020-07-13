@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 #pylint: disable=missing-docstring
 from ldraw.geometry import Vector, Identity, XAxis, YAxis, ZAxis
-from ldraw.library.parts.minifig.accessories import Airtanks, HipsAndLegs, Hips
+from ldraw.library.parts.minifig.hips import HipsAndLegs, Hips
+from ldraw.library.parts.minifig.accessories import Airtanks
 from ldraw.library.parts.minifig.arms import ArmLeft, ArmRight
 from ldraw.library.parts.minifig.hands import Hand
 from ldraw.library.parts.minifig.legs import LegLeft, LegRight

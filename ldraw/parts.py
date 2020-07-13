@@ -87,7 +87,7 @@ class Parts(object):
 
         self.minifig_descriptions = {
             'torsos': 'Torso',
-            'hips': 'Hip',
+            'hips': 'Hips',
             'arms': 'Arm',
             'heads': 'Head',
             'accessories': 'Accessory',
