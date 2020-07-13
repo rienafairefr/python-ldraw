@@ -1,0 +1,13 @@
+0 Lo-Res Disc 0.25
+0 Name: 8\1-4disc.dat
+0 Author: Magnus Forsberg [MagFors]
+0 !LDRAW_ORG 8_Primitive UPDATE 2020-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2020-06-28 [PTadmin] Official Update 2020-01
+
+3 16 0 0 0 1 0 0 0.7071 0 0.7071
+3 16 0 0 0 0.7071 0 0.7071 0 0 1
+0 // Build by Primitive Generator 2

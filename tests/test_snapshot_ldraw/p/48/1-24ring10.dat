@@ -1,0 +1,13 @@
+0 Hi-Res Ring 10 x 0.0417
+0 Name: 48\1-24ring10.dat
+0 Author: Kevin Roach [KROACH]
+0 !LDRAW_ORG 48_Primitive UPDATE 2020-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2020-06-28 [PTadmin] Official Update 2020-01
+
+4 16 11 0 0 10.9054 0 1.4355 9.914 0 1.305 10 0 0
+4 16 10.9054 0 1.4355 10.6249 0 2.8468 9.659 0 2.588 9.914 0 1.305
+0 // Build by Primitive Generator 2

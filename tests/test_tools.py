@@ -3,11 +3,9 @@ import tempfile
 
 from PIL import ImageColor
 
-from ldraw.tools import widthxheight, vector_position
+from ldraw.tools.utils import widthxheight, vector_position
 from ldraw.writers.png import PNGArgs
 from ldraw.writers.svg import SVGArgs
-
-from tests.utils import mocked_parts_lst
 
 INPUT_PATH = 'tests/test_data/car.ldr'
 
@@ -56,3 +54,4 @@ def test_ldr2svg(mocked_parts_lst):
                                 vector_position('0,0,0'),
                                 SVGArgs(800, 800, background_colour=ImageColor.getrgb('#123456'))),
               '.svg')
+

@@ -1,0 +1,18 @@
+0 Technic Peg Hole Negative 0.125 without One Edge
+0 Name: npeghol6c.dat
+0 Author: Magnus Forsberg [MagFors]
+0 !LDRAW_ORG Primitive UPDATE 2018-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2018-12-08 [PTadmin] Official Update 2018-02
+
+3 16 6.3599 1 6.3599 6.3599 1 10 3.4443 1 8.3151
+4 16 3.4443 1 8.3151 6.3599 1 10 0 1 10 0 1 8.9943
+1 16 6.3599 0.5 8.17995 0 1 0 0.5 0 0 0 0 -1.82005 rect3.dat
+1 16 0 1 0 0 0 9 0 1 0 9 0 0 1-8edge.dat
+1 16 0 0 0 0 0 9 0 1 0 9 0 0 1-8cyli.dat
+4 16 9 0 10 6.3599 0 10 6.3599 0 6.3599 9 0 9
+1 16 0 0 0 9 0 0 0 1 0 0 0 9 1-8ndis.dat
+1 16 0 0 0 9 0 0 0 1 0 0 0 9 1-8edge.dat

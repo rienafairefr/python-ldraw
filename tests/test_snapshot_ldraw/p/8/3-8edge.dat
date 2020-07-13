@@ -1,0 +1,14 @@
+0 Lo-Res Circle 0.375
+0 Name: 8\3-8edge.dat
+0 Author: Philippe Hurbain [Philo]
+0 !LDRAW_ORG 8_Primitive UPDATE 2020-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2020-06-28 [PTadmin] Official Update 2020-01
+
+2 24 1 0 0 0.7071 0 0.7071
+2 24 0.7071 0 0.7071 0 0 1
+2 24 0 0 1 -0.7071 0 0.7071
+0 // Build by LDPartEditor (PrimGen 2.X)

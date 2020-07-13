@@ -1,0 +1,15 @@
+0 Hi-Res Ring 59 x 0.0833
+0 Name: 48\1-12ring59.dat
+0 Author: Philippe Hurbain [Philo]
+0 !LDRAW_ORG 48_Primitive UPDATE 2020-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2020-06-28 [PTadmin] Official Update 2020-01
+
+4 16 60 0 0 59.484 0 7.83 58.4926 0 7.6995 59 0 0
+4 16 59.484 0 7.83 57.954 0 15.528 56.9881 0 15.2692 58.4926 0 7.6995
+4 16 57.954 0 15.528 55.434 0 22.962 54.5101 0 22.5793 56.9881 0 15.2692
+4 16 55.434 0 22.962 51.96 0 30 51.094 0 29.5 54.5101 0 22.5793
+0 // Build by LDPartEditor (PrimGen 2.X)

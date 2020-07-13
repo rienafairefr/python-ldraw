@@ -1,0 +1,22 @@
+0 Type Swiss721BT Upper Case "H" Bold
+0 Name: type-swiss721bt-bold-uh.dat
+0 Author: Ulrich Röder [UR]
+0 !LDRAW_ORG Primitive UPDATE 2019-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2019-12-27 [PTadmin] Official Update 2019-03
+
+0 // Main
+4 16 .207 0 -.5 .207 0 -.057 -.206 0 -.057 -.206 0 -.5
+4 16 .207 0 .128 .207 0 .5 -.206 0 .5 -.206 0 .128
+
+0 // Black
+4 0 -.413 0 -.5 -.206 0 .128 -.206 0 .5 -.413 0 .5
+3 0 -.413 0 -.5 -.206 0 -.057 -.206 0 .128
+3 0 -.413 0 -.5 -.206 0 -.5 -.206 0 -.057
+4 0 .207 0 .128 .413 0 -.5 .413 0 .5 .207 0 .5
+3 0 .207 0 .128 .207 0 -.057 .413 0 -.5
+3 0 .413 0 -.5 .207 0 -.057 .207 0 -.5
+4 0 .207 0 .128 -.206 0 .128 -.206 0 -.057 .207 0 -.057

@@ -1,0 +1,13 @@
+0 Cylinder 0.5 Junction with Edge Lines
+0 Name: 2-4cylj1x1e.dat
+0 Author: Kevin Roach [KROACH]
+0 !LDRAW_ORG Primitive UPDATE 2019-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2019-06-28 [PTadmin] Official Update 2019-01
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 2-4cylj1x1.dat
+1 16 0 1 0 0 0 -1 0 -1 -1 1 0 0 1-4edge.dat
+1 16 0 1 0 0 0 1 0 -1 -1 1 0 0 1-4edge.dat
