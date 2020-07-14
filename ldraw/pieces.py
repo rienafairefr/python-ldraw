@@ -19,11 +19,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 # pylint: disable=too-many-arguments, too-few-public-methods
-from ldraw.compat import reduce
+from functools import reduce
 from ldraw.geometry import Identity, Vector
 
 
-class Piece(object):
+class Piece:
     """
     a Piece, which is a Part with a certain colour
     at a certain position and rotation
@@ -51,7 +51,7 @@ class Piece(object):
                ("%s.DAT" % self.part)
 
 
-class Group(object):
+class Group:
     """ a Group of Pieces """
     def __init__(self, position=Vector(0, 0, 0), matrix=Identity()):
         self.position = position

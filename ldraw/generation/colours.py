@@ -2,7 +2,6 @@
 """
 Called by ldraw.library_gen to generate the ldraw/library/colours.py file
 """
-from __future__ import print_function
 import codecs
 import os
 

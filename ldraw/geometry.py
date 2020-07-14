@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import copy
 import math
 from numbers import Number
-from ldraw.compat import reduce
+from functools import reduce
 
 
 class MatrixError(Exception):
