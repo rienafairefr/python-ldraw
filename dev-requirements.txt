@@ -4,5 +4,4 @@ coveralls
 pytest-cov
 mock
 setuptools_scm
-tox
-ipdb
+twine

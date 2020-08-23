@@ -1,0 +1,26 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pycodestyle = "*"
+pytest = "*"
+coveralls = "*"
+pytest-cov = "*"
+mock = "*"
+setuptools-scm = "*"
+twine = "*"
+
+[packages]
+appdirs = "*"
+numpy = "*"
+pymklist = "*"
+pystache = "*"
+attrdict = "*"
+progress = "*"
+PyYAML = "*"
+Pillow = "*"
+
+[pipenv]
+allow_prereleases = true

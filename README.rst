@@ -1,8 +1,8 @@
 .. image:: https://coveralls.io/repos/github/rienafairefr/python-ldraw/badge.svg?branch=master
     :target: https://coveralls.io/github/rienafairefr/python-ldraw?branch=master
 
-.. image:: https://travis-ci.org/rienafairefr/python-ldraw.svg?branch=master
-    :target: https://travis-ci.org/rienafairefr/python-ldraw
+.. image:: https://github.com/rienafairefr/python-ldraw/workflows/Python%20package/badge.svg
+    :target: https://github.com/rienafairefr/python-ldraw/actions?query=workflow%3A%22Python+package%22
 
 .. image:: https://img.shields.io/pypi/pyversions/pyldraw.svg   :alt: PyPI - Python Version
     :target: https://pypi.python.org/pypi/pyldraw
