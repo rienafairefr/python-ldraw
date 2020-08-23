@@ -68,7 +68,7 @@ jobs:
         python-version: 3.6
     - uses: dschep/install-pipenv-action@v1
     - name: Install dependencies
-      run: pipenv --dev --python 3.6 install
+      run: pipenv --python 3.6 install --dev
 
     - uses: actions/download-artifact@master
       with:
