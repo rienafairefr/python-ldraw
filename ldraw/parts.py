@@ -144,7 +144,7 @@ class Parts(object):
                 self._load_primitives(obj)
 
         def get_category(part_description):
-            return part_description.strip(' ~=_').split()[0]
+            return part_description.strip(' ~=_|').split()[0]
 
         for code, description in self.parts_by_code_name:
             part = self.part(code=code)
