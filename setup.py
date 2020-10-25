@@ -19,7 +19,7 @@ setup(
     maintainer="Matthieu Berthomé <rienafairefr@gmail.com>",
     author_email="rienairefr@gmail.com, david@boddie.org.uk",
     version=os.environ.get("TAG_NAME", os.environ.get("TRAVIS_TAG", "dev")),
-    python_requires=">=3.5, <3.9",
+    python_requires=">=3.5",
     packages=find_packages(),
     package_data={"ldraw": ["templates/*.mustache"]},
     use_scm_version=True,
