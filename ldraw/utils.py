@@ -3,6 +3,7 @@ Some utils functions
 """
 
 import collections
+import logging
 import re
 import os
 
@@ -27,6 +28,7 @@ def camel(input_string):
 def ensure_exists(path):
     """ makes the directory if it does not exist"""
     try:
+        print(f"ensure_exists {path}")
         os.makedirs(path)
     except OSError:
         pass

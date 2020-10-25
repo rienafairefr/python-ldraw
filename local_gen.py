@@ -7,6 +7,7 @@ from ldraw import generate, download
 # useful for autocompletion in some IDEs
 
 output_dir = os.path.join(get_data_dir(), 'ldraw')
+print(f"output_dir: {output_dir}")
 parts_lst = os.path.join(output_dir, 'parts.lst')
 if not os.path.exists(output_dir):
     download(output_dir)
