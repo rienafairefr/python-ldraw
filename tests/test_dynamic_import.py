@@ -2,7 +2,7 @@ import tempfile
 
 import os
 
-import mock
+from unittest import mock
 import pytest
 
 from ldraw import download, CustomImporter

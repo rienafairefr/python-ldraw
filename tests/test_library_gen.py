@@ -3,7 +3,7 @@ from os.path import join
 
 import shutil
 import tempfile
-import mock
+from unittest import mock
 import pytest
 
 from ldraw import CustomImporter, generate

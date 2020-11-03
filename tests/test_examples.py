@@ -4,8 +4,8 @@ import os
 import sys
 import tempfile
 from io import StringIO
+from unittest import mock
 
-import mock
 import pytest
 
 from ldraw import CustomImporter
