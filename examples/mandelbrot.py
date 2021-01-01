@@ -24,7 +24,7 @@ from ldraw.library.colours import (Blue_Violet, Blue, Light_Blue,
                                    Light_Green, Green, Yellow,
                                    Orange, Red, Magenta, Purple,
                                    Black, White)
-from ldraw.library.parts.others import Brick1X1
+from ldraw.library.parts import Brick1X1
 from ldraw.pieces import *
 
 colours = [Blue_Violet, Blue, Light_Blue, Light_Green, Green, Yellow,

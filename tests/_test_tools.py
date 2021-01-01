@@ -36,14 +36,14 @@ def test_ldr2png(mocked_parts_lst):
     tool_test(lambda f: ldr2png(INPUT_PATH, f,
                                 vector_position('0,0,0'),
                                 vector_position('200,200,200'),
-                                PNGArgs(1, widthxheight('200x200'), ImageColor.getrgb('#FF0000'), ImageColor.getrgb('#123456'))),
+                                PNGArgs(1, widthxheight('800x800'), ImageColor.getrgb('#FF0000'), ImageColor.getrgb('#123456'))),
               '.png')
 
 
 def test_ldr2pov(mocked_parts_lst):
     from ldraw.tools.ldr2pov import ldr2pov
     tool_test(lambda f: ldr2pov(INPUT_PATH, f,
-                                vector_position('100,100,100'),
+                                vector_position('200,200,200'),
                                 vector_position('0,0,0'),
                                 '#123456'),
               '.pov')
@@ -52,7 +52,7 @@ def test_ldr2pov(mocked_parts_lst):
 def test_ldr2svg(mocked_parts_lst):
     from ldraw.tools.ldr2svg import ldr2svg
     tool_test(lambda f: ldr2svg(INPUT_PATH, f,
-                                vector_position('100,100,100'),
+                                vector_position('200,200,200'),
                                 vector_position('0,0,0'),
                                 SVGArgs(800, 800, background_colour=ImageColor.getrgb('#123456'))),
               '.svg')

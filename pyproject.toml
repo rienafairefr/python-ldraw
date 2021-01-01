@@ -22,6 +22,9 @@ attrdict = "^2.0.1"
 progress = "^1.5"
 pyyaml = "^5.3.1"
 pillow = "^7.2.0"
+mock = "^4.0.3"
+requests = "^2.25.1"
+requests-cache = "^0.5.2"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.6.0"

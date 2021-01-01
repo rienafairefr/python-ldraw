@@ -1,12 +1,11 @@
 import os
 from os.path import join
 
-import shutil
 import tempfile
 from unittest import mock
 import pytest
 
-from ldraw import CustomImporter, generate
+from ldraw import generate
 from ldraw.colour import Colour
 
 
@@ -37,14 +36,13 @@ def test_library_gen_files(mocked_library_path):
 def test_library_gen_import(mocked_library_path):
     """ generated library is importable """
     from ldraw import library
+    import ldraw.library
 
     assert library.__all__ == ['colours']
 
-    from ldraw.library.parts import others
+    assert library.parts.__all__ == ['Brick2X4']
 
-    assert library.parts.__all__ == ['others']
-
-    from ldraw.library.parts.others import Brick2X4
+    from ldraw.library.parts import Brick2X4
 
     assert Brick2X4 == "3001"
 

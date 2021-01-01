@@ -43,7 +43,6 @@ except DistributionNotFound:
     # package is not installed
     pass
 
-LDRAW_URL = 'http://www.ldraw.org/library/updates/complete.zip'
 LIBRARY_INIT = """\"\"\" the ldraw.library module, auto-generated \"\"\"
 __all__ = [\'colours\']
 """
@@ -89,72 +88,6 @@ def try_download_generate_lib():
             return data_dir
 
 
-class CustomImporter:
-    """ Added to sys.meta_path as an import hook """
-    virtual_module = 'ldraw.library'
-
-    @classmethod
-    def valid_module(cls, fullname):
-        if fullname.startswith(cls.virtual_module):
-            rest = fullname[len(cls.virtual_module):]
-            if not rest or rest.startswith('.'):
-                return True
-
-    def find_module(self, fullname, path=None):  # pylint:disable=unused-argument
-        """
-        This method is called by Python if this class
-        is on sys.path. fullname is the fully-qualified
-        name of the module to look for, and path is either
-        __path__ (for submodules and subpackages) or None (for
-        a top-level module/package).
-
-        Called every time an import
-        statement is detected (or __import__ is called), before
-        Python's built-in package/module-finding code kicks in.
-        """
-        if self.valid_module(fullname):
-            # As per PEP #302 (which implemented the sys.meta_path protocol),
-            # if fullname is the name of a module/package that we want to
-            # report as found, then we need to return a loader object.
-            # In this simple example, that will just be self.
-
-            return self
-
-        # If we don't provide the requested module, return None, as per
-        # PEP #302.
-
-        return None
-
-    @classmethod
-    def clean(cls):
-        for fullname in list(sys.modules.keys()):
-            if cls.valid_module(fullname):
-                del sys.modules[fullname]
-
-    def get_code(self, fullname):
-        return None
-
-    def load_module(self, fullname):
-        """
-        This method is called by Python if CustomImporter.find_module
-        does not return None. fullname is the fully-qualified name
-        of the module/package that was requested.
-        """
-
-        if not self.valid_module(fullname):
-            # Raise ImportError as per PEP #302 if the requested module/package
-            # couldn't be loaded. This should never be reached in this
-            # simple example, but it's included here for completeness. :)
-            raise ImportError(fullname)
-
-        # if the library already exists and correctly generated,
-        # the __hash__ will prevent re-generation
-        generated_library_path = try_download_generate_lib()
-        mod = load_lib(generated_library_path, fullname)
-        sys.modules[fullname] = mod
-        return mod
-
-
 def generate(parts_lst, output_dir, force=False):
     """ main function for the library generation """
     library_path = os.path.join(output_dir, 'library')
@@ -182,31 +115,3 @@ def generate(parts_lst, output_dir, force=False):
     open(hash_path, 'w').write(md5_parts_lst)
 
 
-def download(output_dir):
-    """ download complete.zip, mklist, main function"""
-    tmp_ldraw = get_cache_dir()
-    parts_lst_path = os.path.join(output_dir, 'parts.lst')
-
-    retrieved = os.path.join(tmp_ldraw, "complete.zip")
-
-    print('retrieve the complete.zip from ldraw.org ...')
-    urlretrieve(LDRAW_URL, filename=retrieved)
-
-    print('unzipping the complete.zip ...')
-    zip_ref = zipfile.ZipFile(retrieved, 'r')
-    zip_ref.extractall(tmp_ldraw)
-    zip_ref.close()
-
-    output_dir = ensure_exists(output_dir)
-
-    copy_tree(os.path.join(tmp_ldraw, 'ldraw'), os.path.join(output_dir))
-
-    print('mklist...')
-    generate_parts_lst('description',
-                       os.path.join(output_dir, 'parts'),
-                       parts_lst_path)
-
-
-if not any(isinstance(o, CustomImporter) for o in sys.meta_path):
-    # Add our import hook to sys.meta_path
-    sys.meta_path.insert(0, CustomImporter())

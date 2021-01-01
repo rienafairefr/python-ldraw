@@ -8,9 +8,6 @@ from unittest import mock
 
 import pytest
 
-from ldraw import CustomImporter
-from ldraw.compat import do_execfile
-
 
 @pytest.fixture(scope='module')
 def mocked_parts_lst():
@@ -24,10 +21,7 @@ def mocked_parts_lst():
     }
 
     with mock.patch('ldraw.parts.get_config', side_effect=get_config):
-        CustomImporter().load_module('ldraw.library')
         yield parts_lst_path
-
-    CustomImporter.clean()
 
 
 def _unidiff_output(expected, actual):
@@ -64,7 +58,9 @@ def exec_example(name, save=False):
     d = dict(locals(), **globals())
 
     with stdoutIO() as s:
-        do_execfile(script_file, d, d)
+        with open(script_file) as f:
+            code = compile(f.read(), script_file, 'exec')
+        exec(code, d, d)
     content = s.getvalue()
     expected_path = os.path.join('tests', 'test_data', 'examples', '%s.ldr' % name)
     # uncomment to save

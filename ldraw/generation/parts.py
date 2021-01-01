@@ -21,7 +21,7 @@ PARTS_TEMPLATE = get_resource(os.path.join('templates', 'parts.mustache'))
 PARTS_TEMPLATE = codecs.open(PARTS_TEMPLATE, 'r', encoding='utf-8')
 PARTS_TEMPLATE = pystache.parse(PARTS_TEMPLATE.read())
 
-SECTION_SEP = '|'
+SECTION_SEP = '#|#'
 
 
 def write_section_file(parts_dir, list_of_parts, mod_path):
@@ -67,7 +67,12 @@ def gen_parts(parts, output_dir):
     packages = _get_packages(sections)
 
     for package_name, modules in packages.items():
-        generate_parts__init__(library_path, modules, package_name)
+        if package_name == '':
+            module_parts = parts.parts_by_category[''].keys()
+        else:
+            module_parts = sections[SECTION_SEP.join((package_name, ''))].keys()
+        modules = filter(lambda m: m['module_name'] != '', modules)
+        generate_parts__init__(parts, library_path, modules, module_parts, package_name)
 
     for section_name, section_parts in sections.items():
         generate_section(parts, parts_dir, section_name, section_parts)
@@ -108,21 +113,26 @@ def generate_section(parts, parts_dir, section_name, section_parts):
         progress_bar.next()
     progress_bar.finish()
     parts_list = [x for x in parts_list if x != {}]
-    if section_name == 'others':
-        parts_list.sort(key=lambda r: r.get('category', 'others'))
-        for name, grouped in itertools.groupby(parts_list, key=lambda r: r.get('category', 'others')):
-            grouped = list(grouped)
-            if name is None:
-                name = 'others'
+    #if section_name == 'others':
+    #    parts_list.sort(key=lambda r: r.get('category', 'others'))
+    #    for name, grouped in itertools.groupby(parts_list, key=lambda r: r.get('category', 'others')):
+    #        grouped = list(grouped)
+    #        if name is None:
+    #            name = 'others'
+#
+    #        write_section_file(parts_dir, grouped, module_path(name))
+    #else:
+    if section_name.split(SECTION_SEP)[-1] == '':
+        return
+    write_section_file(parts_dir, parts_list, module_path(section_name))
 
-            write_section_file(parts_dir, grouped, module_path(name))
-    else:
-        write_section_file(parts_dir, parts_list, module_path(section_name))
 
-
-def generate_parts__init__(library_path, modules, package_name):
+def generate_parts__init__(parts, library_path, modules, module_parts, package_name):
     """ generate the appropriate __init__.py to make submodules in ldraw.library.parts """
-    parts__init__str = pystache.render(PARTS__INIT__TEMPLATE, context={'sections': modules})
+    parts_list = []
+    for description in module_parts:
+        parts_list.append(get_part_dict(parts, description))
+    parts__init__str = pystache.render(PARTS__INIT__TEMPLATE, context={'sections': modules, 'parts': parts_list})
     if package_name == '':
         parts__init__ = os.path.join(library_path, 'parts', '__init__.py')
     else:

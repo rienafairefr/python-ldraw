@@ -24,7 +24,7 @@ from ldraw.library.colours import *
 from ldraw.figure import *
 from ldraw.library.parts.minifig.accessories import HelmetClassicWithThickChinGuardAndVisorDimples as HelmetClassic, Torch, MetalDetector
 from ldraw.library.parts.minifig.torsos import TorsoWithClassicSpacePattern
-from ldraw.library.parts.others import Baseplate16X16, Rock1X1Crystal5Point
+from ldraw.library.parts import Baseplate16X16, Rock1X1Crystal5Point
 from ldraw.pieces import Piece
 
 figure = Person(Vector(0, 0, -10))

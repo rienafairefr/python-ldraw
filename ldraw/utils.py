@@ -6,6 +6,8 @@ import collections
 import logging
 import re
 import os
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
 
 def clean(input_string):
@@ -46,3 +48,13 @@ def flatten(input_dict, parent_key='', sep='.'):
         else:
             items.append((new_key, value))
     return dict(items)
+
+
+def file_exists(location):
+    request = Request(location)
+    request.get_method = lambda : 'HEAD'
+    try:
+        response = urlopen(request)
+        return True
+    except HTTPError:
+        return False

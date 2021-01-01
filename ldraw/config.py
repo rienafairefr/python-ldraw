@@ -1,7 +1,6 @@
 """
 takes care of reading and writing a configuration in config.yml
 """
-import os
 from os.path import join
 
 import sys

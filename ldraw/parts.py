@@ -106,8 +106,8 @@ class Parts(object):
                 self.parts_by_category['others'].update(self.parts_by_category.pop(k))
 
         # reference in others
-        for v in self.parts_by_category.values():
-            self.parts_by_category['others'].update(v)
+        for v in list(self.parts_by_category.values()):
+            self.parts_by_category[''].update(v)
 
         for k in list(self.parts_by_category.keys()):
             split = k.split()
