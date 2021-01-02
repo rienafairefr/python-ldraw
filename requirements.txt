@@ -1,8 +1,0 @@
-appdirs
-numpy
-pymklist
-pystache
-attrdict
-progress
-PyYaml
-Pillow

@@ -1,7 +1,7 @@
 import pytest
 from click.testing import CliRunner
 
-from ldraw.__main__ import download, UPDATES
+from ldraw.cli import download, UPDATES
 
 
 @pytest.mark.integration

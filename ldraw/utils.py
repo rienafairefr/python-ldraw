@@ -6,6 +6,8 @@ import collections
 import logging
 import re
 import os
+import sys
+from distutils.util import strtobool
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -27,10 +29,19 @@ def camel(input_string):
     return ''.join(x for x in input_string.title() if not x.isspace())
 
 
+def prompt(query):
+    print("%s [y/n]: " % query)
+    while True:
+        val = input()
+        try:
+            return strtobool(val)
+        except ValueError:
+            print("Please answer with y/n")
+
+
 def ensure_exists(path):
     """ makes the directory if it does not exist"""
     try:
-        print(f"ensure_exists {path}")
         os.makedirs(path)
     except OSError:
         pass

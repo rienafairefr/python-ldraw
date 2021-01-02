@@ -30,6 +30,7 @@ setup(
             "ldr2png = ldraw.tools.ldr2png:main",
             "ldr2pov = ldraw.tools.ldr2pov:main",
             "ldr2svg = ldraw.tools.ldr2svg:main",
+            "ldraw = ldraw.cli:main"
         ],
     },
     install_requires=[

@@ -6,7 +6,7 @@ from os.path import join
 import sys
 import yaml
 
-from ldraw.dirs import get_config_dir, get_data_dir
+from ldraw.dirs import get_config_dir
 
 
 def get_config_file_path():
@@ -16,13 +16,11 @@ def get_config_file_path():
 
 def get_config():
     """ get the configuration from config.yml, create it if not there """
-    data_dir = get_data_dir()
     try:
         config = yaml.load(open(get_config_file_path(), 'r'), Loader=yaml.SafeLoader)
         return config
     except (OSError, yaml.YAMLError, IOError, EnvironmentError) as e:
         return {
-            'parts.lst': join(data_dir, 'ldraw', 'parts.lst')
         }
 
 
