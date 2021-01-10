@@ -4,7 +4,7 @@ import appdirs
 
 from ldraw.utils import ensure_exists
 
-PYLDRAW = 'pyldraw'
+PYLDRAW = "pyldraw"
 
 
 def get_data_dir():

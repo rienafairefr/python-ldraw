@@ -24,8 +24,13 @@ import argparse
 
 from PIL import ImageColor
 
-from ldraw.tools import (widthxheight, vector_position, get_model,
-                         get_coordinate_system, verify_camera_look_at)
+from ldraw.tools import (
+    widthxheight,
+    vector_position,
+    get_model,
+    get_coordinate_system,
+    verify_camera_look_at,
+)
 from ldraw.writers.png import PNGWriter, PNGArgs
 
 
@@ -48,20 +53,30 @@ The optional sky background and stroke colours are PNG colours, either specified
 """
 
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('ldraw_file')
-    parser.add_argument('png_file')
-    parser.add_argument('image_size', type=widthxheight)
-    parser.add_argument('camera_position', type=vector_position)
-    parser.add_argument('--look_at_position', required=False, default=vector_position('0,0,0'))
-    parser.add_argument('--distance', type=float, default=1.0)
-    parser.add_argument('--stroke-colour', dest='stroke_colour', type=ImageColor.getrgb)
-    parser.add_argument('--sky', default=ImageColor.getrgb('#000000'), type=ImageColor.getrgb)
+    parser.add_argument("ldraw_file")
+    parser.add_argument("png_file")
+    parser.add_argument("image_size", type=widthxheight)
+    parser.add_argument("camera_position", type=vector_position)
+    parser.add_argument(
+        "--look_at_position", required=False, default=vector_position("0,0,0")
+    )
+    parser.add_argument("--distance", type=float, default=1.0)
+    parser.add_argument("--stroke-colour", dest="stroke_colour", type=ImageColor.getrgb)
+    parser.add_argument(
+        "--sky", default=ImageColor.getrgb("#000000"), type=ImageColor.getrgb
+    )
 
     args = parser.parse_args()
 
     png_args = PNGArgs(args.distance, args.image_size, args.stroke_colour, args.sky)
 
-    ldr2png(args.ldraw_file, args.png_file, args.look_at_position, args.camera_position, png_args)
+    ldr2png(
+        args.ldraw_file,
+        args.png_file,
+        args.look_at_position,
+        args.camera_position,
+        png_args,
+    )
 
 
 def ldr2png(ldraw_path, png_path, look_at_position, camera_position, png_args):

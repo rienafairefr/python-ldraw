@@ -31,7 +31,9 @@ from ldraw.writers.geometry import Z_MAX, Edge
 class PNGArgs(object):
     """ Args to pass to a PNG writer"""
 
-    def __init__(self, distance, image_size, stroke_colour=None, background_colour=None):
+    def __init__(
+        self, distance, image_size, stroke_colour=None, background_colour=None
+    ):
         """
         :param distance: distance of the camera
         :param image_size: size of the image as a string (e.g. '800x800')
@@ -40,7 +42,7 @@ class PNGArgs(object):
         """
         self.distance = distance
         self.image_size = image_size
-        self.stroke_colour = stroke_colour + (255, )
+        self.stroke_colour = stroke_colour + (255,)
         self.background_colour = background_colour
 
 
@@ -66,7 +68,7 @@ class PNGWriter(Writer):
         image_size = png_args.image_size
         stroke_colour = png_args.stroke_colour
         background_colour = png_args.background_colour
-        args = ('RGBA', tuple(image_size))
+        args = ("RGBA", tuple(image_size))
         if background_colour is not None:
             args += (background_colour,)
         image = Image.new(*args)
@@ -114,8 +116,11 @@ class Polygon(object):
         """
         for point in self.points:
             self.projected.append(
-                Vector((distance * point.x) / (distance + -point.z),
-                       (distance * point.y) / (distance + -point.z), -point.z)
+                Vector(
+                    (distance * point.x) / (distance + -point.z),
+                    (distance * point.y) / (distance + -point.z),
+                    -point.z,
+                )
             )
 
     def render(self, image, depth, viewport_scale, stroke_colour):
@@ -190,14 +195,17 @@ class Polygon(object):
                 int_edge1_y1 += 1
                 continue
 
-            int_edge1_y1 = self.draw_span(depth,
-                                          end_sx,
-                                          image,
-                                          int_edge1_y1,
-                                          start_1,
-                                          start_2,
-                                          start_x,
-                                          stroke_colour, width)
+            int_edge1_y1 = self.draw_span(
+                depth,
+                end_sx,
+                image,
+                int_edge1_y1,
+                start_1,
+                start_2,
+                start_x,
+                stroke_colour,
+                width,
+            )
 
     def get_edges(self, image, viewport_scale):
         """
@@ -226,12 +234,18 @@ class Polygon(object):
         return edges
 
     # pylint: disable=too-many-arguments
-    def draw_span(self,
-                  depth, end_sx,
-                  image, int_edge1_y1,
-                  start_1, start_2,
-                  start_x, stroke_colour,
-                  width):
+    def draw_span(
+        self,
+        depth,
+        end_sx,
+        image,
+        int_edge1_y1,
+        start_1,
+        start_2,
+        start_x,
+        stroke_colour,
+        width,
+    ):
         """ draw a span """
         if start_1.x != start_2.x:
             start_dz_dx = (start_2.y - start_1.y) / (start_2.x - start_1.x)
@@ -247,18 +261,27 @@ class Polygon(object):
             if 0 < start_z <= depth[int(start_x)][int(int_edge1_y1)]:
                 if self.alpha < 1.0:
                     pixel = image.getpixel((start_x, int_edge1_y1))
-                    rgb = int((1 - self.alpha) * pixel[0] + self.alpha * self.rgb[0]), \
-                          int((1 - self.alpha) * pixel[1] + self.alpha * self.rgb[1]), \
-                          int((1 - self.alpha) * pixel[2] + self.alpha * self.rgb[2]), 255
+                    rgb = (
+                        int((1 - self.alpha) * pixel[0] + self.alpha * self.rgb[0]),
+                        int((1 - self.alpha) * pixel[1] + self.alpha * self.rgb[1]),
+                        int((1 - self.alpha) * pixel[2] + self.alpha * self.rgb[2]),
+                        255,
+                    )
                     image.putpixel((start_x, int_edge1_y1), rgb)
                 else:
                     depth[int(start_x)][int(int_edge1_y1)] = start_z
                     image.putpixel((start_x, int_edge1_y1), self.rgba)
             start_x += 1
         if stroke_colour:
-            if 0 <= start_1.x < width and 0 < start_1.y <= depth[int(start_1.x)][int(int_edge1_y1)]:
+            if (
+                0 <= start_1.x < width
+                and 0 < start_1.y <= depth[int(start_1.x)][int(int_edge1_y1)]
+            ):
                 image.putpixel((int(start_1.x), int_edge1_y1), stroke_colour)
-            if 0 <= start_2.x < width and 0 < start_2.y <= depth[int(start_2.x)][int(int_edge1_y1)]:
+            if (
+                0 <= start_2.x < width
+                and 0 < start_2.y <= depth[int(start_2.x)][int(int_edge1_y1)]
+            ):
                 image.putpixel((int(start_2.x), int_edge1_y1), stroke_colour)
         int_edge1_y1 += 1
         return int_edge1_y1

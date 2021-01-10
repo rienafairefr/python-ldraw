@@ -58,15 +58,23 @@ class Degrees(AngleUnits):
 
 
 def _rows_multiplication(r1, r2):
-    rows = [[r1[0][0] * r2[0][0] + r1[0][1] * r2[1][0] + r1[0][2] * r2[2][0],
-             r1[0][0] * r2[0][1] + r1[0][1] * r2[1][1] + r1[0][2] * r2[2][1],
-             r1[0][0] * r2[0][2] + r1[0][1] * r2[1][2] + r1[0][2] * r2[2][2]],
-            [r1[1][0] * r2[0][0] + r1[1][1] * r2[1][0] + r1[1][2] * r2[2][0],
-             r1[1][0] * r2[0][1] + r1[1][1] * r2[1][1] + r1[1][2] * r2[2][1],
-             r1[1][0] * r2[0][2] + r1[1][1] * r2[1][2] + r1[1][2] * r2[2][2]],
-            [r1[2][0] * r2[0][0] + r1[2][1] * r2[1][0] + r1[2][2] * r2[2][0],
-             r1[2][0] * r2[0][1] + r1[2][1] * r2[1][1] + r1[2][2] * r2[2][1],
-             r1[2][0] * r2[0][2] + r1[2][1] * r2[1][2] + r1[2][2] * r2[2][2]]]
+    rows = [
+        [
+            r1[0][0] * r2[0][0] + r1[0][1] * r2[1][0] + r1[0][2] * r2[2][0],
+            r1[0][0] * r2[0][1] + r1[0][1] * r2[1][1] + r1[0][2] * r2[2][1],
+            r1[0][0] * r2[0][2] + r1[0][1] * r2[1][2] + r1[0][2] * r2[2][2],
+        ],
+        [
+            r1[1][0] * r2[0][0] + r1[1][1] * r2[1][0] + r1[1][2] * r2[2][0],
+            r1[1][0] * r2[0][1] + r1[1][1] * r2[1][1] + r1[1][2] * r2[2][1],
+            r1[1][0] * r2[0][2] + r1[1][1] * r2[1][2] + r1[1][2] * r2[2][2],
+        ],
+        [
+            r1[2][0] * r2[0][0] + r1[2][1] * r2[1][0] + r1[2][2] * r2[2][0],
+            r1[2][0] * r2[0][1] + r1[2][1] * r2[1][1] + r1[2][2] * r2[2][1],
+            r1[2][0] * r2[0][2] + r1[2][1] * r2[1][2] + r1[2][2] * r2[2][2],
+        ],
+    ]
     return rows
 
 
@@ -78,9 +86,7 @@ class Matrix(object):
 
     def __repr__(self):
         values = reduce(lambda x, y: x + y, self.rows)
-        format_string = ("((%f, %f, %f),\n"
-                         " (%f, %f, %f),\n"
-                         " (%f, %f, %f))")
+        format_string = "((%f, %f, %f),\n" " (%f, %f, %f),\n" " (%f, %f, %f))"
         return format_string % tuple(values)
 
     def __mul__(self, other):
@@ -91,9 +97,11 @@ class Matrix(object):
         elif isinstance(other, Vector):
             r = self.rows
             x, y, z = other.x, other.y, other.z
-            return Vector(r[0][0] * x + r[0][1] * y + r[0][2] * z,
-                          r[1][0] * x + r[1][1] * y + r[1][2] * z,
-                          r[2][0] * x + r[2][1] * y + r[2][2] * z)
+            return Vector(
+                r[0][0] * x + r[0][1] * y + r[0][2] * z,
+                r[1][0] * x + r[1][1] * y + r[1][2] * z,
+                r[2][0] * x + r[2][1] * y + r[2][2] * z,
+            )
         else:
             raise MatrixError
 
@@ -105,9 +113,11 @@ class Matrix(object):
         elif isinstance(other, Vector):
             r = self.rows
             x, y, z = other.x, other.y, other.z
-            return Vector(x * r[0][0] + y * r[1][0] + z * r[2][0],
-                          x * r[0][1] + y * r[1][1] + z * r[2][1],
-                          x * r[0][2] + y * r[1][2] + z * r[2][2])
+            return Vector(
+                x * r[0][0] + y * r[1][0] + z * r[2][0],
+                x * r[0][1] + y * r[1][1] + z * r[2][1],
+                x * r[0][2] + y * r[1][2] + z * r[2][2],
+            )
         else:
             raise MatrixError
 
@@ -140,16 +150,22 @@ class Matrix(object):
     def transpose(self):
         """ transpose """
         r = self.rows
-        return Matrix([[r[0][0], r[1][0], r[2][0]],
-                       [r[0][1], r[1][1], r[2][1]],
-                       [r[0][2], r[1][2], r[2][2]]])
+        return Matrix(
+            [
+                [r[0][0], r[1][0], r[2][0]],
+                [r[0][1], r[1][1], r[2][1]],
+                [r[0][2], r[1][2], r[2][2]],
+            ]
+        )
 
     def det(self):
         """ determinant of the matrix """
         r = self.rows
-        terms = [r[0][0] * (r[1][1] * r[2][2] - r[1][2] * r[2][1]),
-                 r[0][1] * (r[1][2] * r[2][0] - r[1][0] * r[2][2]),
-                 r[0][2] * (r[1][0] * r[2][1] - r[1][1] * r[2][0])]
+        terms = [
+            r[0][0] * (r[1][1] * r[2][2] - r[1][2] * r[2][1]),
+            r[0][1] * (r[1][2] * r[2][0] - r[1][0] * r[2][2]),
+            r[0][2] * (r[1][0] * r[2][1] - r[1][1] * r[2][0]),
+        ]
         return sum(terms)
 
     def flatten(self):
@@ -247,9 +263,11 @@ class Vector(object):
 
     def cross(self, other):
         """ cross product """
-        return Vector(self.y * other.z - self.z * other.y,
-                      self.z * other.x - self.x * other.z,
-                      self.x * other.y - self.y * other.x)
+        return Vector(
+            self.y * other.z - self.z * other.y,
+            self.z * other.x - self.x * other.z,
+            self.x * other.y - self.y * other.x,
+        )
 
     def dot(self, other):
         """ dot product"""
@@ -327,9 +345,9 @@ class Vector2D(object):
 
 
 class CoordinateSystem(object):
-    def __init__(self, x=Vector(1.0, 0.0, 0.0),
-                 y=Vector(0.0, 1.0, 0.0),
-                 z=Vector(0.0, 0.0, 1.0)):
+    def __init__(
+        self, x=Vector(1.0, 0.0, 0.0), y=Vector(0.0, 1.0, 0.0), z=Vector(0.0, 0.0, 1.0)
+    ):
         self.x = x
         self.y = y
         self.z = z

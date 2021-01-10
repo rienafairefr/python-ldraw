@@ -74,21 +74,29 @@ each component should be specified as a floating point number between
 
 """
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('ldraw_file')
-    parser.add_argument('pov_file')
-    parser.add_argument('camera_position', type=vector_position)
-    parser.add_argument('--look_at_position', type=vector_position, required=False,
-                        default=vector_position("0,0,0"))
-    parser.add_argument('--sky')
+    parser.add_argument("ldraw_file")
+    parser.add_argument("pov_file")
+    parser.add_argument("camera_position", type=vector_position)
+    parser.add_argument(
+        "--look_at_position",
+        type=vector_position,
+        required=False,
+        default=vector_position("0,0,0"),
+    )
+    parser.add_argument("--sky")
 
     args = parser.parse_args()
 
-    ldr2pov(args.ldraw_file, args.pov_file,
-            args.camera_position, args.look_at_position, args.sky)
+    ldr2pov(
+        args.ldraw_file,
+        args.pov_file,
+        args.camera_position,
+        args.look_at_position,
+        args.sky,
+    )
 
 
-def ldr2pov(ldraw_path, pov_path,
-            camera_position, look_at_position, sky):
+def ldr2pov(ldraw_path, pov_path, camera_position, look_at_position, sky):
     """ actual ldr2pov implementation """
     model, parts = get_model(ldraw_path)
 
@@ -98,15 +106,24 @@ def ldr2pov(ldraw_path, pov_path,
         writer.write(model)
 
         if not writer.lights:
-            lights = (writer.minimum.x - 50.0, writer.maximum.y + 100.0, writer.minimum.z - 50.0,
-                      writer.maximum.x + 50.0, writer.maximum.y + 100.0, writer.minimum.z - 50.0,
-                      writer.minimum.x - 50.0, writer.maximum.y + 100.0, writer.maximum.z + 50.0,
-                      writer.maximum.x + 50.0, writer.maximum.y + 100.0, writer.maximum.z + 50.0)
+            lights = (
+                writer.minimum.x - 50.0,
+                writer.maximum.y + 100.0,
+                writer.minimum.z - 50.0,
+                writer.maximum.x + 50.0,
+                writer.maximum.y + 100.0,
+                writer.minimum.z - 50.0,
+                writer.minimum.x - 50.0,
+                writer.maximum.y + 100.0,
+                writer.maximum.z + 50.0,
+                writer.maximum.x + 50.0,
+                writer.maximum.y + 100.0,
+                writer.maximum.z + 50.0,
+            )
             pov_file.write(LIGHT_FORMAT_STRING % lights)
 
         pov_file.write(
-            CAMERA_FORMAT_STRING % (camera_position.repr,
-                                    look_at_position.repr)
+            CAMERA_FORMAT_STRING % (camera_position.repr, look_at_position.repr)
         )
 
         if sky:

@@ -1,0 +1,2 @@
+class NoLibrarySelected(Exception):
+    pass

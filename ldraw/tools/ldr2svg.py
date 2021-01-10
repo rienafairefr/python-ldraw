@@ -22,9 +22,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import argparse
 
-from ldraw.tools import (widthxheight, vector_position,
-                         get_model, get_coordinate_system,
-                         verify_camera_look_at)
+from ldraw.tools import (
+    widthxheight,
+    vector_position,
+    get_model,
+    get_coordinate_system,
+    verify_camera_look_at,
+)
 from ldraw.writers.svg import SVGArgs
 
 
@@ -43,24 +47,37 @@ The optional sky background colour is an SVG colour, either specified as
 
 """
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('ldraw_file')
-    parser.add_argument('svg_file')
-    parser.add_argument('viewport_size', type=widthxheight)
-    parser.add_argument('camera_position', type=vector_position)
-    parser.add_argument('--look_at_position', type=vector_position,
-                        required=False, default=vector_position("0,0,0"))
-    parser.add_argument('--sky')
+    parser.add_argument("ldraw_file")
+    parser.add_argument("svg_file")
+    parser.add_argument("viewport_size", type=widthxheight)
+    parser.add_argument("camera_position", type=vector_position)
+    parser.add_argument(
+        "--look_at_position",
+        type=vector_position,
+        required=False,
+        default=vector_position("0,0,0"),
+    )
+    parser.add_argument("--sky")
 
     args = parser.parse_args()
-    svg_args = SVGArgs(args.viewport_size[0],
-                       args.viewport_size[1],
-                       background_colour=args.background_colour)
+    svg_args = SVGArgs(
+        args.viewport_size[0],
+        args.viewport_size[1],
+        background_colour=args.background_colour,
+    )
 
-    ldr2svg(args.ldraw_file, args.svg_file,
-            args.camera_position, args.look_at_position, svg_args)
+    ldr2svg(
+        args.ldraw_file,
+        args.svg_file,
+        args.camera_position,
+        args.look_at_position,
+        svg_args,
+    )
 
 
-def ldr2svg(ldraw_path, svg_path, camera_position, look_at_position, svg_args): # pylint: disable=too-many-arguments
+def ldr2svg(
+    ldraw_path, svg_path, camera_position, look_at_position, svg_args
+):  # pylint: disable=too-many-arguments
     """ ldr2svg actual implementation """
     verify_camera_look_at(camera_position, look_at_position)
 
@@ -70,6 +87,7 @@ def ldr2svg(ldraw_path, svg_path, camera_position, look_at_position, svg_args): 
 
     with open(svg_path, "w") as svg_file:
         from ldraw.writers.svg import SVGWriter
+
         writer = SVGWriter(camera_position, system, parts)
         writer.write(model, svg_file, svg_args)
 

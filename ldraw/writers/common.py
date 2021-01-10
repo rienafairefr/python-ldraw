@@ -14,6 +14,7 @@ def _current_colour(colour, current_colour):
 
 class Current(object):
     """ an instance of this is passed around during rendering """
+
     # pylint: disable=too-few-public-methods
 
     def __init__(self, matrix, colour, position):
@@ -34,10 +35,12 @@ class Writer(object):
     def _opacity_from_colour(self, colour):
         return self.parts.alpha_values.get(colour, 255) / 255.0
 
-    def _polygons_from_objects(self,
-                               model,
-                               top_level_piece=None,
-                               current=Current(Identity(), White.code, Vector(0, 0, 0))):
+    def _polygons_from_objects(
+        self,
+        model,
+        top_level_piece=None,
+        current=Current(Identity(), White.code, Vector(0, 0, 0)),
+    ):
         # Extract polygons from objects, filtering out those behind the camera.
         polygons = []
 
@@ -52,9 +55,7 @@ class Writer(object):
             if isinstance(obj, Piece) and obj.part == "LIGHT":
                 continue
             try:
-                args = (obj,
-                        top_level_piece or obj,
-                        current)
+                args = (obj, top_level_piece or obj, current)
                 poly = poly_handlers[type(obj)](*args)
             except KeyError:
                 continue
@@ -65,46 +66,35 @@ class Writer(object):
 
         return polygons
 
-    def _line_get_poly(self,
-                       obj,
-                       top_level_piece,
-                       current):
+    def _line_get_poly(self, obj, top_level_piece, current):
         pass
 
-    def _subpart_get_poly(self,
-                          obj,
-                          top_level_piece,
-                          current):
+    def _subpart_get_poly(self, obj, top_level_piece, current):
         colour = _current_colour(obj.colour, current.colour)
         part = self.parts.part(code=obj.part)
         if part:
             matrix = obj.matrix
-            new_current = Current(current.matrix * matrix,
-                                  colour,
-                                  current.position + current.matrix * obj.position)
-            return self._polygons_from_objects(part,
-                                               top_level_piece,
-                                               new_current)
+            new_current = Current(
+                current.matrix * matrix,
+                colour,
+                current.position + current.matrix * obj.position,
+            )
+            return self._polygons_from_objects(part, top_level_piece, new_current)
         sys.stderr.write("Part not found: %s\n" % obj.part)
         return False
 
-    def _triangle_get_poly(self,
-                           obj,
-                           top_level_piece,
-                           current):
+    def _triangle_get_poly(self, obj, top_level_piece, current):
         camera_position = self.camera_position
 
-        points = [current.matrix * p + current.position - camera_position for p in obj.points]
+        points = [
+            current.matrix * p + current.position - camera_position for p in obj.points
+        ]
         if abs((points[2] - points[0]).cross(points[1] - points[0])) == 0:
             return False
 
         return self._common_get_poly(obj, top_level_piece, current.colour, points)
 
-    def _common_get_poly(self,
-                         obj,
-                         top_level_piece,
-                         current_colour,
-                         points):
+    def _common_get_poly(self, obj, top_level_piece, current_colour, points):
         projections = [self.system.project(p) for p in points]
         if any(p.z >= 0 for p in projections):
             return False
@@ -112,13 +102,12 @@ class Writer(object):
 
         return self._get_polygon(top_level_piece, colour, projections)
 
-    def _quadrilateral_get_poly(self,
-                                obj,
-                                top_level_piece,
-                                current):
+    def _quadrilateral_get_poly(self, obj, top_level_piece, current):
         camera_position = self.camera_position
 
-        points = [current.matrix * p + current.position - camera_position for p in obj.points]
+        points = [
+            current.matrix * p + current.position - camera_position for p in obj.points
+        ]
 
         if abs((points[2] - points[0]).cross(points[1] - points[0])) == 0:
             return False

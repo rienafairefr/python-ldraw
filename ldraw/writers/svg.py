@@ -62,7 +62,9 @@ stroke-width="{stroke_width}" \
 opacity="{opacity:.6f}" \
 points=\""""
 
-POLYGON_FORMAT = '<polygon fill="%s" points="%.6f,%.6f %.6f,%.6f %.6f,%.6f %.6f,%.6f" />\n'
+POLYGON_FORMAT = (
+    '<polygon fill="%s" points="%.6f,%.6f %.6f,%.6f %.6f,%.6f %.6f,%.6f" />\n'
+)
 
 
 class SVGArgs(object):
@@ -70,8 +72,14 @@ class SVGArgs(object):
 
     # pylint: disable=too-few-public-methods
 
-    def __init__(self, width, height, stroke_colour=None,
-                 stroke_width=None, background_colour=None):
+    def __init__(
+        self,
+        width,
+        height,
+        stroke_colour=None,
+        stroke_width=None,
+        background_colour=None,
+    ):
         # pylint: disable=too-many-arguments
         self.width = width
         self.height = height
@@ -103,9 +111,17 @@ def write_preamble(args, svg_file):
     """ write the preamble and polygon def """
     svg_file.write(SVG_PREAMBLE.format(view1=0.0, view2=0.0, svg_args=args))
     if args.background_colour is not None:
-        arguments = (args.background_colour,
-                     0.0, 0.0, args.width, 0.0,
-                     args.width, args.height, 0.0, args.height)
+        arguments = (
+            args.background_colour,
+            0.0,
+            0.0,
+            args.width,
+            0.0,
+            args.width,
+            args.height,
+            0.0,
+            args.height,
+        )
         svg_file.write(POLYGON_FORMAT % arguments)
 
 
@@ -129,34 +145,38 @@ class SVGWriter(Writer):
         for points, polygon in shapes:
             rgb = self.parts.colours.get(polygon.colour, "#ffffff")
             stroke_colour = args.stroke_colour if args.stroke_colour else rgb
-            context = dict(rgb=rgb,
-                           stroke_width=stroke_width,
-                           stroke_colour=stroke_colour,
-                           opacity=self._opacity_from_colour(polygon.colour))
+            context = dict(
+                rgb=rgb,
+                stroke_width=stroke_width,
+                stroke_colour=stroke_colour,
+                opacity=self._opacity_from_colour(polygon.colour),
+            )
             if len(points) == 2:
-                context['point1'] = Vector2D(points[0].x, -points[0].y) + shift
-                context['point2'] = Vector2D(points[1].x, -points[1].y) + shift
+                context["point1"] = Vector2D(points[0].x, -points[0].y) + shift
+                context["point2"] = Vector2D(points[1].x, -points[1].y) + shift
 
                 svg_file.write(SVG_LINE.format(**context))
             else:
                 svg_file.write(SVG_POLYGON_PREAMBLE.format(**context))
                 for point in points:
                     dpoint = Vector2D(point.x, -point.y) + shift
-                    svg_file.write('{point.x:.6f},{point.y:.6f} '.format(point=dpoint))
+                    svg_file.write("{point.x:.6f},{point.y:.6f} ".format(point=dpoint))
                 svg_file.write('" />\n')
         svg_file.write("</svg>\n")
         svg_file.close()
 
-    def _line_get_poly(self, obj,
-                       top_level_piece,
-                       current):
+    def _line_get_poly(self, obj, top_level_piece, current):
         camera_position = self.camera_position
 
-        points = [current.matrix * p + current.position - camera_position for p in obj.points]
+        points = [
+            current.matrix * p + current.position - camera_position for p in obj.points
+        ]
 
         return self._common_get_poly(obj, top_level_piece, current.colour, points)
 
-    def _get_polygon(self, top_level_piece, colour, projections):  # pylint: disable=no-self-use
-        return [Polygon(min(p.z for p in projections),
-                        projections,
-                        colour, top_level_piece)]
+    def _get_polygon(
+        self, top_level_piece, colour, projections
+    ):  # pylint: disable=no-self-use
+        return [
+            Polygon(min(p.z for p in projections), projections, colour, top_level_piece)
+        ]

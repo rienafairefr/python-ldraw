@@ -3,10 +3,8 @@ Some utils functions
 """
 
 import collections
-import logging
 import re
 import os
-import sys
 from distutils.util import strtobool
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
@@ -19,14 +17,14 @@ def clean(input_string):
     :param input_string:
     :return:
     """
-    input_string = re.sub(r'\W+', '_', input_string)
-    input_string = re.sub(r'_x_', 'x', input_string)
+    input_string = re.sub(r"\W+", "_", input_string)
+    input_string = re.sub(r"_x_", "x", input_string)
     return input_string
 
 
 def camel(input_string):
     """ Returns a CamelCase string """
-    return ''.join(x for x in input_string.title() if not x.isspace())
+    return "".join(x for x in input_string.title() if not x.isspace())
 
 
 def prompt(query):
@@ -41,10 +39,7 @@ def prompt(query):
 
 def ensure_exists(path):
     """ makes the directory if it does not exist"""
-    try:
-        os.makedirs(path)
-    except OSError:
-        pass
+    os.makedirs(path, exist_ok=True)
     return path
 
 
@@ -61,9 +56,22 @@ def flatten(input_dict, parent_key='', sep='.'):
     return dict(items)
 
 
+# https://stackoverflow.com/a/6027615
+def flatten2(input_dict, parent_key=None):
+    """ flatten a dictionary """
+    items = []
+    for key, value in input_dict.items():
+        new_key = parent_key + (key,) if parent_key is not None else (key, )
+        if isinstance(value, collections.MutableMapping):
+            items.extend(flatten2(value, new_key).items())
+        else:
+            items.append((new_key, value))
+    return dict(items)
+
+
 def file_exists(location):
     request = Request(location)
-    request.get_method = lambda : 'HEAD'
+    request.get_method = lambda: "HEAD"
     try:
         response = urlopen(request)
         return True

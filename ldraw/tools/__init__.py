@@ -20,14 +20,16 @@ def vector_position(input_str):
     """ a type for comma separated vector """
     position = input_str.split(",")
     if len(position) != 3:
-        raise argparse.ArgumentTypeError("Expecting comma-separated elements for the position")
+        raise argparse.ArgumentTypeError(
+            "Expecting comma-separated elements for the position"
+        )
     return Vector(*map(float, position))
 
 
 def get_model(ldraw_path):
     """" get model from ldraw path """
     config = get_config()
-    parts = Parts(config['parts.lst'])
+    parts = Parts(config["parts.lst"])
     try:
         model = Part(ldraw_path)
     except PartError:
@@ -42,7 +44,7 @@ UP_DIRECTION = Vector(0, -1.0, 0)
 def get_coordinate_system(camera_position, look_at_position):
     """" get coordinate system of the view """
     system = CoordinateSystem()
-    system.z = (camera_position - look_at_position)
+    system.z = camera_position - look_at_position
     system.z.norm()
     system.x = UP_DIRECTION.cross(system.z)
     if abs(system.x) == 0.0:

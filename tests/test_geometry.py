@@ -2,7 +2,17 @@ import math
 import pytest
 import random
 
-from ldraw.geometry import Identity, Vector, MatrixError, Matrix, XAxis, YAxis, ZAxis, _rows_multiplication, Radians
+from ldraw.geometry import (
+    Identity,
+    Vector,
+    MatrixError,
+    Matrix,
+    XAxis,
+    YAxis,
+    ZAxis,
+    _rows_multiplication,
+    Radians,
+)
 
 
 def test_matrix_rmul():
@@ -35,7 +45,7 @@ def test_copy(random_matrix):
     assert random_matrix.copy() == random_matrix
 
 
-@pytest.mark.parametrize('axis', [XAxis, YAxis, ZAxis])
+@pytest.mark.parametrize("axis", [XAxis, YAxis, ZAxis])
 def test_rotate_radians(random_matrix, axis):
     original = random_matrix.copy()
     rotated = original.rotate(90, axis=axis)

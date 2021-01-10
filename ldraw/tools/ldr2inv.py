@@ -32,8 +32,8 @@ from ldraw.tools import get_model
 def main():
     """ Main function for ldr2inv """
     parser = argparse.ArgumentParser()
-    parser.add_argument('ldraw_file')
-    parser.add_argument('output')
+    parser.add_argument("ldraw_file")
+    parser.add_argument("output")
 
     args = parser.parse_args()
 
@@ -64,10 +64,10 @@ def ldr2inv(ldraw_path, inventory_path):
             inventory[name] = inventory.get(name, 0) + 1
             length = max(len(name), length)
 
-    length += (4 - (length % 4))
+    length += 4 - (length % 4)
 
     try:
-        with codecs.open(inventory_path, 'w', encoding='utf-8') as inv_file:
+        with codecs.open(inventory_path, "w", encoding="utf-8") as inv_file:
             items = list(inventory.items())
             items.sort()
 
@@ -78,9 +78,6 @@ def ldr2inv(ldraw_path, inventory_path):
     except IOError:
         sys.stderr.write("Failed to write inventory file: %s\n" % inventory_path)
         sys.exit(1)
-
-
-
 
 
 if __name__ == "__main__":

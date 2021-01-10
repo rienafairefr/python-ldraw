@@ -24,9 +24,14 @@ class Edge(object):
     @property
     def sort_key(self):
         """ used for sorting the edges before rendering """
-        return (self.point1.y, self.point2.y,
-                self.point1.x, self.dx_dy,
-                self.point1.z, self.dz_dy)
+        return (
+            self.point1.y,
+            self.point2.y,
+            self.point1.x,
+            self.dx_dy,
+            self.point1.z,
+            self.dz_dy,
+        )
 
 
 Z_MAX = 1 << 16

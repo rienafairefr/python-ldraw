@@ -36,10 +36,10 @@ POV_OBJECT = """  object {
 POV_DECLARE = """#declare %%s = %s {
 """
 
-POV_DECLARE_OBJECT = POV_DECLARE % 'object'
-POV_DECLARE_UNION = POV_DECLARE % 'union'
+POV_DECLARE_OBJECT = POV_DECLARE % "object"
+POV_DECLARE_UNION = POV_DECLARE % "union"
 
-POV_PREAMBLE = POV_DECLARE_UNION % 'scene'
+POV_PREAMBLE = POV_DECLARE_UNION % "scene"
 
 POV_LIGHTSOURCE = """light_source {
   <%1.3f, %1.3f, %1.3f>, %s
@@ -57,9 +57,9 @@ object {
 }
 """
 
-POV_FORMAT_STRING_TRIANGLE = "  <%1.3f, %1.3f, %1.3f>, " \
-                             "<%1.3f, %1.3f, %1.3f>, " \
-                             "<%1.3f, %1.3f, %1.3f>\n"
+POV_FORMAT_STRING_TRIANGLE = (
+    "  <%1.3f, %1.3f, %1.3f>, " "<%1.3f, %1.3f, %1.3f>, " "<%1.3f, %1.3f, %1.3f>\n"
+)
 
 POV_FORMAT_STRING = """matrix <%1.3f, %1.3f, %1.3f,
 %1.3f, %1.3f, %1.3f,
@@ -89,7 +89,7 @@ class POVRayWriter(object):
         "PEARLESCENT": ("diffuse 0.7", "specular 0.8"),
         "RUBBER": ("diffuse 1.0",),
         "MATTE_METALLIC": ("metallic 0.5", "roughness 0.2"),
-        "METAL": ("metallic 0.8", "specular 0.8", "reflection 0.5")
+        "METAL": ("metallic 0.8", "specular 0.8", "reflection 0.5"),
     }
 
     def __init__(self, parts, pov_file):
@@ -188,16 +188,26 @@ class POVRayWriter(object):
     def _write_triangle(self, colour, *vectors):
         indent = 2
         assert len(vectors) == 3
-        self.minimum = Vector(min(self.minimum.x, vectors[0].x, vectors[1].x, vectors[2].x),
-                              min(self.minimum.y, -vectors[0].y, -vectors[1].y, -vectors[2].y),
-                              min(self.minimum.z, vectors[0].z, vectors[1].z, vectors[2].z))
-        self.maximum = Vector(max(self.maximum.x, vectors[0].x, vectors[1].x, vectors[2].x),
-                              max(self.maximum.y, -vectors[0].y, -vectors[1].y, -vectors[2].y),
-                              max(self.maximum.z, vectors[0].z, vectors[1].z, vectors[2].z))
+        self.minimum = Vector(
+            min(self.minimum.x, vectors[0].x, vectors[1].x, vectors[2].x),
+            min(self.minimum.y, -vectors[0].y, -vectors[1].y, -vectors[2].y),
+            min(self.minimum.z, vectors[0].z, vectors[1].z, vectors[2].z),
+        )
+        self.maximum = Vector(
+            max(self.maximum.x, vectors[0].x, vectors[1].x, vectors[2].x),
+            max(self.maximum.y, -vectors[0].y, -vectors[1].y, -vectors[2].y),
+            max(self.maximum.z, vectors[0].z, vectors[1].z, vectors[2].z),
+        )
         triangle = (
-            vectors[0].x, vectors[0].y, vectors[0].z,
-            vectors[1].x, vectors[1].y, vectors[1].z,
-            vectors[2].x, vectors[2].y, vectors[2].z
+            vectors[0].x,
+            vectors[0].y,
+            vectors[0].z,
+            vectors[1].x,
+            vectors[1].y,
+            vectors[1].z,
+            vectors[2].x,
+            vectors[2].y,
+            vectors[2].z,
         )
         lines = ["triangle", "{", POV_FORMAT_STRING_TRIANGLE % triangle]
         self.pov_file.write("\n".join(indent * " " + x for x in lines))
@@ -217,7 +227,9 @@ class POVRayWriter(object):
                 self.warnings.append(("Discarding reference to %s", obj.part))
                 continue
             if obj.matrix.fix_diagonal():
-                self.warnings.append(("Correcting diagonal matrix elements for %s.", obj.part))
+                self.warnings.append(
+                    ("Correcting diagonal matrix elements for %s.", obj.part)
+                )
             if obj.matrix.det() == 0.0:
                 self.warnings.append(("Discarding %s with singular matrix.", obj.part))
                 continue
@@ -260,7 +272,9 @@ class POVRayWriter(object):
         for obj in part.objects:
             if isinstance(obj, Piece):
                 # Define this piece, too.
-                ordered_objects = ordered_objects + self._create_piece_objects(obj, objects)
+                ordered_objects = ordered_objects + self._create_piece_objects(
+                    obj, objects
+                )
                 # Record the object as part of the piece's definition.
                 definition.append(obj)
             elif isinstance(obj, Triangle):
