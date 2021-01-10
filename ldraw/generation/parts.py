@@ -63,7 +63,6 @@ def gen_parts(parts, library_path):
     for key, value in flatten(parts.parts, sep=SECTION_SEP).items():
         rsplitted = key.rsplit(SECTION_SEP, 1)
         description = rsplitted[-1]
-        print(rsplitted[0])
         sections.setdefault(rsplitted[0], {})[description] = value
 
     for key, value in flatten2(parts.parts).items():

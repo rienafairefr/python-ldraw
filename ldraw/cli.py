@@ -4,7 +4,7 @@ from pprint import pprint
 
 import click
 import inquirer
-from ldraw.config import select_library_version, get_config
+from ldraw.config import select_library_version, get_config, write_config
 from ldraw.dirs import get_data_dir
 from ldraw.download import do_download, cache_ldraw, UPDATES
 from ldraw.generation.generation import do_generate
@@ -65,31 +65,49 @@ def use(version):
 
 @main.command()
 @click.option(
-    "--in-tree",
-    help="write where the ldraw module is",
-    required=False,
-    is_flag=True,
-)
-@click.option(
     "--force",
     help="re-generate even if it's apparently not needed",
     required=False,
     is_flag=True,
 )
-def generate(in_tree, force):
-    if in_tree:
-        library_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'library'))
-    else:
-        library_path = ensure_exists(get_config().get('generated_library_path', os.path.join(get_data_dir(), "ldraw", "library")))
+@click.option(
+    "--destination",
+    help="generate in another dir. ldraw/library folder will be created below that if needed. If not specified, "
+         "uses inside OS-dependent data dir (usually $HOME/.local/share)",
+    required=False
+)
+def generate(destination, force):
+    if destination is None:
+        destination = get_data_dir()
+    library_path = os.path.join(os.path.abspath(destination), "ldraw", "library")
+
     try:
         do_generate(library_path, force, True)
     except UnwritableOutput as e:
         print(f"{library_path} is unwritable, select another output directory")
 
 
-@main.command()
-def config():
-    pprint(get_config())
+@main.group(invoke_without_command=True)
+@click.pass_context
+def config(ctx):
+    if ctx.invoked_subcommand is None:
+        pprint(get_config())
+
+
+@config.command(name="get")
+@click.argument("key")
+def get_config(key):
+    config_dict = get_config()
+    return config_dict.get(key)
+
+
+@config.command(name="set")
+@click.argument("key")
+@click.argument("value")
+def set_config(key, value):
+    config_dict = get_config()
+    config_dict[key] = value
+    write_config(config_dict)
 
 
 @main.command()

@@ -15,11 +15,14 @@ jobs:
       - name: Install dependencies
         run: poetry install
       - name: generate code
-        run: python local_gen.py
+        run: |
+          poetry run ldraw download --version 2018-02 --yes
+          poetry run ldraw generate --destination .generated-cache
       - uses: actions/upload-artifact@master
+        CACHE_DIR:
         with:
           name: generated-ldraw-library
-          path: ldraw/library
+          path: .generated-cache
 
   test:
     needs: generate
@@ -42,8 +45,10 @@ jobs:
     - uses: actions/download-artifact@master
       with:
         name: generated-ldraw-library
-        path: ldraw/library
+        path: .generated-cache
 
+    - name: configuration
+      run: ldraw config set generated_path .generated-cache
     - name: Test with pytest
       run: pytest --cov=ldraw
     - name: Coveralls
@@ -69,7 +74,7 @@ jobs:
     - uses: actions/download-artifact@master
       with:
         name: generated-ldraw-library
-        path: ldraw/library
+        path: .generated-cache
 
     - name: Build package
       run: |

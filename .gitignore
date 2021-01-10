@@ -10,3 +10,5 @@ tmp/
 ldraw/library/
 dist/
 poetry.lock
+/.cached-generate/
+

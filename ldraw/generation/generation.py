@@ -28,6 +28,7 @@ def do_generate(library_output_path, force=False, cli=False):
             library_path = config["ldraw_library_path"]
         except KeyError:
             raise NoLibrarySelected()
+        config['generated_path'] = library_output_path
 
         parts_lst = os.path.join(library_path, "parts.lst")
         md5_parts_lst = hashlib.md5(open(parts_lst, "rb").read()).hexdigest()
