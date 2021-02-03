@@ -1,9 +1,10 @@
 """ Some tools to convert ldr to other formats"""
 import argparse
+import os
 
 import sys
 
-from ldraw.config import get_config
+from ldraw.config import Config
 from ldraw.parts import Part, Parts, PartError
 from ldraw.geometry import Vector, CoordinateSystem
 
@@ -28,8 +29,10 @@ def vector_position(input_str):
 
 def get_model(ldraw_path):
     """" get model from ldraw path """
-    config = get_config()
-    parts = Parts(config["parts.lst"])
+    config = Config.get()
+    ldraw_library_path = config.ldraw_library_path
+    parts_lst = os.path.join(ldraw_library_path, "ldraw", "parts.lst")
+    parts = Parts(parts_lst)
     try:
         model = Part(ldraw_path)
     except PartError:

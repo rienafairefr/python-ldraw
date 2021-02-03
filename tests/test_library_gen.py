@@ -1,23 +1,23 @@
 import os
+import tempfile
 from os.path import join
 
-import tempfile
-from unittest import mock
 import pytest
 
-from ldraw.generation.generation import do_generate
+from ldraw import generate, LibraryImporter
 from ldraw.colour import Colour
+from ldraw.config import Config
 
 
 @pytest.fixture
-def mocked_library_path():
-    ldraw_library_output_path = tempfile.mkdtemp()
-    do_generate(ldraw_library_output_path)
-    with mock.patch(
-        "ldraw.get_config",
-        side_effect=lambda: {"ldraw_library_path": ldraw_library_output_path},
-    ):
-        yield ldraw_library_output_path
+def test_ldraw_library():
+    config = Config.get()
+    config.generated_path = tempfile.mkdtemp()
+    config.ldraw_library_path = os.path.join("tests", "test_ldraw")
+    generate(config, warn=False)
+    yield
+    Config.reset()
+    LibraryImporter.clean()
 
 
 def test_library_gen_files(mocked_library_path):
@@ -40,16 +40,19 @@ def test_library_gen_files(mocked_library_path):
     assert content == {join("library", el) for el in library}
 
 
-def test_library_gen_import(mocked_library_path):
+def test_library_gen_import(test_ldraw_library):
     """ generated library is importable """
     from ldraw import library
-    import ldraw.library
 
-    assert library.__all__ == ["colours"]
+    assert set(library.__all__) == {'parts', 'colours'}
 
-    assert library.parts.__all__ == ["Brick2X4"]
+    assert dir(library.parts).__all__ == ["Brick2X4"]
 
     from ldraw.library.parts import Brick2X4
+
+    assert Brick2X4 == "3001"
+
+    from ldraw.library.parts.bricks import Brick2X4
 
     assert Brick2X4 == "3001"
 

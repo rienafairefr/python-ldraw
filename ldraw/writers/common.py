@@ -6,6 +6,7 @@ import sys
 from ldraw.geometry import Identity, Vector
 from ldraw.lines import Triangle, Quadrilateral, Line
 from ldraw.pieces import Piece
+from ldraw.library.colours import White, Main_Colour
 
 
 def _current_colour(colour, current_colour):

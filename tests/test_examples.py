@@ -4,19 +4,22 @@ import os
 import sys
 import tempfile
 from io import StringIO
-from unittest import mock
 
 import pytest
+from ldraw import generate, LibraryImporter
 
-from ldraw.utils import ensure_exists
+from ldraw.config import Config
 
 
 @pytest.fixture(scope="module")
-def mocked_config():
-    CFG = {"ldraw_library_path": os.path.join("tests", "test_ldraw2")}
-
-    with mock.patch("ldraw.imports.get_config", side_effect=lambda: CFG):
-        yield CFG
+def test_ldraw2_config():
+    config = Config.get()
+    config.ldraw_library_path = os.path.join("tests", "test_ldraw2")
+    config.generated_path = tempfile.mkdtemp()
+    generate(config)
+    yield
+    Config.reset()
+    LibraryImporter.clean()
 
 
 def _unidiff_output(expected, actual):
@@ -26,8 +29,8 @@ def _unidiff_output(expected, actual):
 
     import difflib
 
-    expected = expected.splitlines(keepends=False)
-    actual = actual.splitlines(keepends=False)
+    expected = expected.splitlines()
+    actual = actual.splitlines()
 
     diff = difflib.unified_diff(expected, actual)
 
@@ -72,5 +75,5 @@ def exec_example(name, save=False):
 
 
 @pytest.mark.parametrize("example", all_examples, ids=all_examples)
-def test_examples(mocked_config, example):
+def test_examples(test_ldraw2_config, example):
     exec_example(example)

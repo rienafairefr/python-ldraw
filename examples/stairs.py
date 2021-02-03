@@ -23,13 +23,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from ldraw.figure import *
 from ldraw.geometry import Identity
 from ldraw.library.colours import *
-from ldraw.library.parts.arch import Arch1X6
-from ldraw.library.parts.brick import Brick2X3, Brick1X1
+from ldraw.library.parts import Arch1X6
+from ldraw.library.parts import Brick2X3, Brick1X1
 from ldraw.library.parts.minifig.accessories import ToolMagnifyingGlass
 from ldraw.library.parts.minifig.hats import TopHat
 from ldraw.library.parts.minifig.heads import HeadWithMonocle_Scar_AndMoustachePattern
 from ldraw.library.parts.minifig.torsos import TorsoWithBlackSuit_RedShirt_GoldClaspsPattern
-from ldraw.library.parts.plate import Plate6X6
+from ldraw.library.parts import Plate6X6
 from ldraw.pieces import Group, Piece
 
 group = Group(Vector(0, 0, -40), Identity())

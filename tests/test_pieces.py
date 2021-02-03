@@ -5,6 +5,7 @@ from ldraw.figure import Person
 from ldraw.geometry import Vector, Identity
 from ldraw.pieces import Piece, Group
 
+
 White = Colour(15, "White", "#FFFFFF", 255, [])
 Yellow = Colour(14, "Yellow", "#F2CD37", 255, [])
 Light_Grey = Colour(7, "Light_Grey", "#9BA19D", 255, [])

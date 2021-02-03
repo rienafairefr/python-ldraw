@@ -22,7 +22,14 @@ import sys
 
 from pkg_resources import get_distribution, DistributionNotFound
 
-from ldraw.imports import CustomImporter
+from ldraw.downloads import download
+from ldraw.config import use
+from ldraw.generation import generate
+from ldraw.imports import LibraryImporter
+
+__all__ = [
+    download, generate, use
+]
 
 try:
     __version__ = get_distribution(__name__).version
@@ -30,6 +37,7 @@ except DistributionNotFound:
     # package is not installed
     pass
 
-if not any(isinstance(o, CustomImporter) for o in sys.meta_path):
+
+if LibraryImporter not in sys.meta_path:
     # Add our import hook to sys.meta_path
-    sys.meta_path.insert(0, CustomImporter())
+    sys.meta_path.insert(0, LibraryImporter)

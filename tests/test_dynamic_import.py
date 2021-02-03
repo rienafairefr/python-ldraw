@@ -1,15 +1,17 @@
+import os
 import tempfile
 
-import os
-
-from unittest import mock
 import pytest
+
+from ldraw.config import Config
 
 
 @pytest.fixture
 def mocked_library():
-    with mock.patch(
-        "ldraw.get_config",
-        side_effect=lambda: { "library_path": os.path.join("tests", "test_ldraw"), "generated_library_path": tempfile.mkdtemp() },
-    ):
-        yield
+    config = Config.get()
+    config.ldraw_library_path = os.path.join("tests", "test_ldraw")
+    config.generated_path = tempfile.mkdtemp()
+
+    yield
+    Config.reset()
+    LibraryImporter.clean()

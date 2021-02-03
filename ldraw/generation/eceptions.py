@@ -1,2 +1,0 @@
-class UnwritableOutput(Exception):
-    pass

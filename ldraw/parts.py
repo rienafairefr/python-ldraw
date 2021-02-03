@@ -19,6 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 # pylint: disable=too-few-public-methods
+import hashlib
 import logging
 import inflect
 import os
@@ -29,7 +30,7 @@ from collections import defaultdict
 from attrdict import AttrDict
 
 from ldraw.colour import Colour
-from ldraw.config import get_config
+from ldraw.config import Config
 from ldraw.geometry import Matrix, Vector
 from ldraw.lines import (
     OptionalLine,
@@ -55,15 +56,26 @@ logger = logging.getLogger(__name__)
 
 p = inflect.engine()
 
+MEMOIZED = {}
 
-class Parts(object):
+
+class Parts:
     # pylint: disable=too-many-instance-attributes
     """ Part class """
     ColourAttributes = ("CHROME", "PEARLESCENT", "RUBBER", "MATTE_METALLIC", "METAL")
 
-    def __init__(self, parts_lst=None, other_threshold=10):
+    @classmethod
+    def get(cls, parts_lst, *args, **kwargs):
+        md5_parts_lst = hashlib.md5(open(parts_lst, "rb").read()).hexdigest()
+        if md5_parts_lst in MEMOIZED:
+            return MEMOIZED[md5_parts_lst]
+        instance = Parts(parts_lst, *args, **kwargs)
+        MEMOIZED[md5_parts_lst] = instance
+        return instance
+
+    def __init__(self, parts_lst, other_threshold=10):
         logger.debug(f"reading parts.lst {parts_lst}")
-        config = get_config()
+        config = Config.get()
         if parts_lst is None:
             parts_lst = config["parts.lst"]
         self.path = None
@@ -134,6 +146,8 @@ class Parts(object):
 
     def load(self, parts_lst):
         """ load parts from a path """
+
+
         try:
             self.try_load(parts_lst)
         except IOError:
@@ -170,6 +184,7 @@ class Parts(object):
             self.parts_by_category[category_from_description.lower()][description] = code
             if category:
                 self.parts_by_category[category.lower()][description] = code
+
 
     def try_load(self, parts_lst):
         """ try loading parts from a parts.lst file """

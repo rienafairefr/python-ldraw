@@ -21,19 +21,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from ldraw.figure import *
-from ldraw.library.colours import *
-from ldraw.library.parts.antenna import Antenna4HWithRoundedTop
-from ldraw.library.parts.baseplate import Baseplate32X32WithCraters
-from ldraw.library.parts.brick import Brick1X2WithClassicSpaceLogoPattern, Brick1X1RoundWithSolidStud
-from ldraw.library.parts.car import CarSteeringStandAndWheel_Complete_
+from ldraw.library.colours import Yellow, White, Light_Grey, Black, Trans_Green, Green, Red
+from ldraw.library.parts import Antenna4HWithRoundedTop
+from ldraw.library.parts import Baseplate32X32WithCraters
+from ldraw.library.parts import Brick1X2WithClassicSpaceLogoPattern, Brick1X1RoundWithSolidStud
+from ldraw.library.parts import CarSteeringStandAndWheel_Complete_
 from ldraw.library.parts.minifig.accessories import HelmetClassicWithThickChinGuardAndVisorDimples as HelmetClassic, \
     Torch, Seat2X2
 from ldraw.library.parts.minifig.torsos import TorsoWithClassicSpacePattern
-from ldraw.library.parts.plate import Plate2X2WithRedWheels_Complete_, Plate2X2
+from ldraw.library.parts import Plate2X2WithRedWheels_Complete_, Plate2X2
 
-from ldraw.library.parts.slope import SlopeBrick452X2
-from ldraw.library.parts.tyre import Tyre6_50X8OffsetTread
+from ldraw.library.parts import SlopeBrick452X2
+from ldraw.library.parts import Tyre6_50X8OffsetTread
 from ldraw.pieces import Group, Piece
+
 
 figure = Person(Vector(0, 0, -10))
 print(figure.head(Yellow, 30))

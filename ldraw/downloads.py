@@ -63,7 +63,7 @@ def download_version(version):
     return retrieved
 
 
-def do_download(version):
+def download(version):
     release_id = version
     if version == "latest":
         for el in PTRELEASES:

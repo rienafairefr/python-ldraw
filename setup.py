@@ -3,7 +3,6 @@
 import codecs
 from distutils.core import setup
 
-import os
 from setuptools import find_packages
 
 
@@ -18,7 +17,7 @@ setup(
     author=" David Boddie <david@boddie.org.uk>",
     maintainer="Matthieu Berthomé <rienafairefr@gmail.com>",
     author_email="rienairefr@gmail.com, david@boddie.org.uk",
-    version=os.environ.get("TAG_NAME", os.environ.get("TRAVIS_TAG", "dev")),
+    version="0.0.0",
     python_requires=">=3.5",
     packages=find_packages(),
     package_data={"ldraw": ["templates/*.mustache"]},

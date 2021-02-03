@@ -1,54 +1,68 @@
 import imp
-import importlib
 import os
 import sys
-from contextlib import contextmanager
-from importlib.machinery import FileFinder
-from importlib.util import spec_from_file_location
 
-from ldraw.config import get_config
-from ldraw.generation.generation import do_generate
-from ldraw.utils import ensure_exists
+from ldraw import download, generate
+from ldraw.config import Config
+from ldraw.dirs import get_data_dir
+from ldraw.downloads import cache_ldraw
+from ldraw.generation import NoLibrarySelected
 
-
-def add_sys_path(path_to_add):
-    @contextmanager
-    def inner():
-        _path = sys.path
-        sys.path.insert(0, path_to_add)
-        yield
-        sys.path = _path
-    yield inner
+VIRTUAL_MODULE = 'ldraw.library'
 
 
-class AddSysPath:
-    def __init__(self, path):
-        self.path = path
+def load_lib(library_path, fullname):
+    # Use importlib if python 3.4+, else imp
+    #if sys.version_info[0] > 3 or (sys.version_info[0] == 3 and sys.version_info[1] >= 4):
+    #    # submodule_name = fullname[len("ldraw") + 1:]
+    #    from importlib.machinery import FileFinder, SourceFileLoader, SOURCE_SUFFIXES
+    #    file_finder = FileFinder(library_path, (SourceFileLoader, SOURCE_SUFFIXES))
+#
+    #    result = file_finder.find_spec(fullname)
+    #    return result.loader.load_module(fullname)
+    #else:
+    dot_split = fullname.split('.')
+    dot_split.pop(0)
+    lib_name = dot_split[-1]
+    lib_dir = os.path.join(library_path, *tuple(dot_split[:-1]))
+    info = imp.find_module(lib_name, [lib_dir])
+    library_module = imp.load_module(lib_name, *info)
 
-    def __enter__(self):
-        sys.path.insert(0, self.path)
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        try:
-            sys.path.remove(self.path)
-        except ValueError:
-            pass
+    return library_module
 
 
+def try_download_generate_lib():
+    # Download the library and generate it, if needed
+    config = Config.get()
+    if config is None:
+        config = Config.load()
 
-class CustomImporter:
+    ldraw_library_path = config.ldraw_library_path
+    if ldraw_library_path is None:
+        download("latest")
+        config.ldraw_library_path = os.path.join(cache_ldraw, "latest")
+
+    generated_path = config.generated_path
+    if generated_path is None:
+        generated_path = os.path.join(get_data_dir(), 'generated')
+    if "LDRAW_GENERATED_PATH" in os.environ:
+        generated_path = os.environ['LDRAW_GENERATED_PATH']
+    generate(config)
+    return generated_path
+
+
+class LibraryImporter:
     """ Added to sys.meta_path as an import hook """
-
-    virtual_module = "ldraw.library"
 
     @classmethod
     def valid_module(cls, fullname):
-        if fullname.startswith(cls.virtual_module):
-            rest = fullname[len(cls.virtual_module) :]
-            if not rest or rest.startswith("."):
+        if fullname.startswith(VIRTUAL_MODULE):
+            rest = fullname[len(VIRTUAL_MODULE):]
+            if not rest or rest.startswith('.'):
                 return True
 
-    def find_module(self, fullname, path=None):  # pylint:disable=unused-argument
+    @classmethod
+    def find_module(cls, fullname, path=None):  # pylint:disable=unused-argument
         """
         This method is called by Python if this class
         is on sys.path. fullname is the fully-qualified
@@ -60,13 +74,13 @@ class CustomImporter:
         statement is detected (or __import__ is called), before
         Python's built-in package/module-finding code kicks in.
         """
-        if self.valid_module(fullname):
+        if cls.valid_module(fullname):
             # As per PEP #302 (which implemented the sys.meta_path protocol),
             # if fullname is the name of a module/package that we want to
             # report as found, then we need to return a loader object.
             # In this simple example, that will just be self.
 
-            return self
+            return cls()
 
         # If we don't provide the requested module, return None, as per
         # PEP #302.
@@ -78,6 +92,8 @@ class CustomImporter:
         for fullname in list(sys.modules.keys()):
             if cls.valid_module(fullname):
                 del sys.modules[fullname]
+        if 'ldraw' in sys.modules and 'library' in sys.modules['ldraw'].__dict__:
+            del sys.modules['ldraw'].library
 
     def get_code(self, fullname):
         return None
@@ -97,16 +113,9 @@ class CustomImporter:
 
         # if the library already exists and correctly generated,
         # the __hash__ will prevent re-generation
-        # JIT generate the library if needed
-        config = get_config()
-        ldraw_library_path = config.get("ldraw_library_path")
-        generated_library_path = config.get("generated_path")
-        if generated_library_path is None:
-            generated_library_path = ensure_exists(
-                os.path.join(ldraw_library_path, "..", "__generated")
-            )
-        do_generate(generated_library_path)
+        generated_library_path = try_download_generate_lib()
+        mod = load_lib(generated_library_path, fullname)
+        sys.modules[fullname] = mod
+        return mod
 
-        with add_sys_path(generated_library_path):
-            return importlib.import_module(fullname)
 

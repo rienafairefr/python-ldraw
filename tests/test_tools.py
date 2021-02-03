@@ -3,9 +3,8 @@ import tempfile
 
 from PIL import ImageColor
 
-from ldraw.tools import widthxheight, vector_position
-from ldraw.writers.png import PNGArgs
-from ldraw.writers.svg import SVGArgs
+# ! no ldraw.* imports up here
+
 
 INPUT_PATH = "tests/test_data/car.ldr"
 
@@ -24,14 +23,16 @@ def tool_test(func, suffix):
     assert expected == content
 
 
-def test_ldr2inv(mocked_library):
+def test_ldr2inv(library_version):
     from ldraw.tools.ldr2inv import ldr2inv
 
     tool_test(lambda f: ldr2inv(INPUT_PATH, f), ".inv")
 
 
-def test_ldr2png(mocked_parts_lst):
+def test_ldr2png(library_version):
     from ldraw.tools.ldr2png import ldr2png
+    from ldraw.tools import widthxheight, vector_position
+    from ldraw.writers.png import PNGArgs
 
     tool_test(
         lambda f: ldr2png(
@@ -50,8 +51,9 @@ def test_ldr2png(mocked_parts_lst):
     )
 
 
-def test_ldr2pov(mocked_parts_lst):
+def test_ldr2pov(library_version):
     from ldraw.tools.ldr2pov import ldr2pov
+    from ldraw.tools import vector_position
 
     tool_test(
         lambda f: ldr2pov(
@@ -65,8 +67,10 @@ def test_ldr2pov(mocked_parts_lst):
     )
 
 
-def test_ldr2svg(mocked_parts_lst):
+def test_ldr2svg(library_version):
     from ldraw.tools.ldr2svg import ldr2svg
+    from ldraw.tools import vector_position
+    from ldraw.writers.svg import SVGArgs
 
     tool_test(
         lambda f: ldr2svg(

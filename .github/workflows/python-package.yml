@@ -27,6 +27,8 @@ jobs:
   test:
     needs: generate
     runs-on: ubuntu-latest
+    env:
+      LDRAW_GENERATED_PATH: .generated-cache
     strategy:
       max-parallel: 4
       matrix:
@@ -47,8 +49,6 @@ jobs:
         name: generated-ldraw-library
         path: .generated-cache
 
-    - name: configuration
-      run: ldraw config set generated_path .generated-cache
     - name: Test with pytest
       run: pytest --cov=ldraw
     - name: Coveralls

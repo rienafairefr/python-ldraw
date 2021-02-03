@@ -3,7 +3,7 @@
 """ classes for lines in parts path """
 
 
-class OptionalLine(object):
+class OptionalLine:
     """ an optional Line """
 
     def __init__(self, colour, point1, point2, point3, point4):
@@ -14,7 +14,7 @@ class OptionalLine(object):
         self.point4 = point4
 
 
-class Quadrilateral(object):
+class Quadrilateral:
     """ a quadrilateral """
 
     def __init__(self, colour, point1, point2, point3, point4):
@@ -30,7 +30,7 @@ class Quadrilateral(object):
         return [self.point1, self.point2, self.point3, self.point4]
 
 
-class Line(object):
+class Line:
     """ a 3D line """
 
     def __init__(self, colour, point1, point2):
@@ -44,7 +44,7 @@ class Line(object):
         return [self.point1, self.point2]
 
 
-class Triangle(object):
+class Triangle:
     """ a triangle """
 
     def __init__(self, colour, point1, point2, point3):
@@ -59,7 +59,7 @@ class Triangle(object):
         return [self.point1, self.point2, self.point3]
 
 
-class MetaCommand(object):
+class MetaCommand:
     """ a metacommand """
 
     def __init__(self, type, text):
@@ -67,7 +67,7 @@ class MetaCommand(object):
         self.text = text
 
 
-class Comment(object):
+class Comment:
     """ a comment """
 
     def __init__(self, text):
