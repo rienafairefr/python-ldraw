@@ -26,7 +26,7 @@ def load_lib(library_path, fullname):
     lib_name = dot_split[-1]
     lib_dir = os.path.join(library_path, *tuple(dot_split[:-1]))
     info = imp.find_module(lib_name, [lib_dir])
-    library_module = imp.load_module(lib_name, *info)
+    library_module = imp.load_module(fullname, *info)
 
     return library_module
 
