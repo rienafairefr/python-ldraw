@@ -3,6 +3,7 @@ import glob
 import os
 import sys
 import tempfile
+from datetime import datetime
 from io import StringIO
 
 import pytest
@@ -13,12 +14,15 @@ from ldraw.config import Config
 
 @pytest.fixture(scope="module")
 def test_ldraw2_config():
-    config = Config.get()
-    config.ldraw_library_path = os.path.join("tests", "test_ldraw2")
-    config.generated_path = tempfile.mkdtemp()
+    generated_path = tempfile.mkdtemp(prefix=datetime.utcnow().isoformat())
+    print(f'{generated_path=}')
+    config = Config(
+        ldraw_library_path=os.path.join("tests", "test_ldraw2"),
+        generated_path=generated_path
+    )
+    LibraryImporter.set_config(config)
     generate(config)
     yield
-    Config.reset()
     LibraryImporter.clean()
 
 
@@ -34,7 +38,7 @@ def _unidiff_output(expected, actual):
 
     diff = difflib.unified_diff(expected, actual)
 
-    return "".join(diff)
+    return "\n".join(diff)
 
 
 @contextlib.contextmanager

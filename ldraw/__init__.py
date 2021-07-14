@@ -41,3 +41,7 @@ except DistributionNotFound:
 if LibraryImporter not in sys.meta_path:
     # Add our import hook to sys.meta_path
     sys.meta_path.insert(0, LibraryImporter)
+
+if __name__ == '__main__':
+    from ldraw import cli
+    cli.main()

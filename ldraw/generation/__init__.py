@@ -5,6 +5,7 @@ import hashlib
 import os
 import shutil
 import sys
+import traceback
 
 import typing
 
@@ -35,13 +36,7 @@ def generate(config: typing.Optional[Config] = None, force=False, warn=True):
         if os.path.exists(hash_path):
             md5 = open(hash_path, "r").read()
             if md5 == md5_parts_lst and not force:
-                if warn:
-                    sys.stderr.write("already generated, add --force to re-generate")
                 return
-
-        if warn:
-            sys.stderr.write("Warning, using ldraw.library without running `ldraw generate`"
-                             "beforehand, this will be a slow first run")
 
         shutil.rmtree(generated_library_path)
         ensure_exists(generated_library_path)
@@ -63,6 +58,7 @@ def generate(config: typing.Optional[Config] = None, force=False, warn=True):
 
         open(hash_path, "w").write(md5_parts_lst)
     except OSError as exc:
+        traceback.print_exc(exc)
         raise UnwritableOutput(
             f"can't write the output directory {generated_library_path}"
         ) from exc

@@ -16,7 +16,7 @@ def gen_colours(parts, library_path):
     """
     Generates a colours.py from library data
     """
-    sys.stderr.write("generate ldraw.library.colours...")
+    print("generate ldraw.library.colours...")
 
     colours_str = colours_module_content(parts)
     colours_py = os.path.join(library_path, "colours.py")

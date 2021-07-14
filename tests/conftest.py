@@ -1,4 +1,5 @@
 import os
+import tempfile
 
 import pytest
 from _pytest.main import Session
@@ -27,16 +28,16 @@ def pytest_runtest_setup(item):
 
 
 @pytest.fixture(scope="module")
-def library_version(tmp_path):
-
+def library_version():
+    config = Config()
+    LibraryImporter.set_config(config=config)
     use("2018-01")
     cached_generated = ".cached-generated"
+    config.generated_path = cached_generated
+
     if not os.path.exists(cached_generated):
         ensure_exists(cached_generated)
-        generate(cached_generated)
+        generate(config)
 
-    config = Config.get()
-    config.generated_path = cached_generated
     yield
-    Config.reset()
     LibraryImporter.clean()

@@ -18,7 +18,7 @@ SECTION_SEP = '#|#'
 
 
 def gen_parts(parts, library_path):
-    sys.stderr.write("generate ldraw.library.parts, this might take a long time...")
+    print("generate ldraw.library.parts, this might take a long time...")
     parts_dir = ensure_exists(os.path.join(library_path, "parts"))
 
     recursive_gen_parts(parts.parts, parts_dir)

@@ -1,14 +1,13 @@
 import imp
+import logging
 import os
 import sys
 
-from ldraw import download, generate
 from ldraw.config import Config
-from ldraw.dirs import get_data_dir
-from ldraw.downloads import cache_ldraw
-from ldraw.generation import NoLibrarySelected
 
 VIRTUAL_MODULE = 'ldraw.library'
+
+logger = logging.getLogger('ldraw')
 
 
 def load_lib(library_path, fullname):
@@ -31,26 +30,6 @@ def load_lib(library_path, fullname):
     return library_module
 
 
-def try_download_generate_lib():
-    # Download the library and generate it, if needed
-    config = Config.get()
-    if config is None:
-        config = Config.load()
-
-    ldraw_library_path = config.ldraw_library_path
-    if ldraw_library_path is None:
-        download("latest")
-        config.ldraw_library_path = os.path.join(cache_ldraw, "latest")
-
-    generated_path = config.generated_path
-    if generated_path is None:
-        generated_path = os.path.join(get_data_dir(), 'generated')
-    if "LDRAW_GENERATED_PATH" in os.environ:
-        generated_path = os.environ['LDRAW_GENERATED_PATH']
-    generate(config)
-    return generated_path
-
-
 class LibraryImporter:
     """ Added to sys.meta_path as an import hook """
 
@@ -60,6 +39,13 @@ class LibraryImporter:
             rest = fullname[len(VIRTUAL_MODULE):]
             if not rest or rest.startswith('.'):
                 return True
+
+    config = Config()
+
+    @classmethod
+    def set_config(cls, config):
+        cls.config = config
+        cls.clean()
 
     @classmethod
     def find_module(cls, fullname, path=None):  # pylint:disable=unused-argument
@@ -113,8 +99,9 @@ class LibraryImporter:
 
         # if the library already exists and correctly generated,
         # the __hash__ will prevent re-generation
-        generated_library_path = try_download_generate_lib()
-        mod = load_lib(generated_library_path, fullname)
+        config = self.config if self.config is not None else Config.load()
+        logger.debug(f'loading {fullname} from {config.generated_path}')
+        mod = load_lib(config.generated_path, fullname)
         sys.modules[fullname] = mod
         return mod
 

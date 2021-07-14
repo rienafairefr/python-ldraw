@@ -18,7 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-#pylint: disable=missing-docstring
+# pylint: disable=missing-docstring
 from ldraw.geometry import Vector, Identity, XAxis, YAxis, ZAxis
 from ldraw.pieces import Piece
 
@@ -31,18 +31,26 @@ def dependent_piece(dep):
                 return fn(self, dependent_object, *args, **kwargs)
             except KeyError:
                 return None
+
         return wrapped
+
     return decorator
 
 
-class Person(object):
-    from ldraw.library.parts.minifig.accessories import Airtanks, HipsAndLegs, Hips
-    from ldraw.library.parts.minifig.arms import ArmLeft, ArmRight
-    from ldraw.library.parts.minifig.hands import Hand
-    from ldraw.library.parts.minifig.legs import LegLeft, LegRight
-    from ldraw.library.parts.minifig.torsos import Torso
-    from ldraw.library.parts.minifig.heads import HeadWithSwSmirkAndBrownEyebrowsPattern as Head
+# hardcoded
+Airtanks = "3838"
+HipsAndLegs = "3815c01"
+Hips = "3815b"
+ArmLeft = "3819"
+ArmRight = "3818"
+Hand = "3820"
+LegLeft = "3817b"
+LegRight = "3816b"
+Torso = "973"
+Head = HeadWithSwSmirkAndBrownEyebrowsPattern = "3626bps5"
 
+
+class Person(object):
     def __init__(self, position=Vector(0, 0, 0), matrix=Identity(),
                  group=None):
         self.position = position

@@ -4,6 +4,7 @@ import os
 
 import sys
 
+from ldraw import LibraryImporter
 from ldraw.config import Config
 from ldraw.parts import Part, Parts, PartError
 from ldraw.geometry import Vector, CoordinateSystem
@@ -29,7 +30,7 @@ def vector_position(input_str):
 
 def get_model(ldraw_path):
     """" get model from ldraw path """
-    config = Config.get()
+    config = LibraryImporter.config
     ldraw_library_path = config.ldraw_library_path
     parts_lst = os.path.join(ldraw_library_path, "ldraw", "parts.lst")
     parts = Parts(parts_lst)

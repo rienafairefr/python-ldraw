@@ -14,38 +14,20 @@ from ldraw.dirs import get_cache_dir, get_config_dir
 CONFIG_FILE = os.path.join(get_config_dir(), 'config.yml')
 
 
-class Singleton(type):
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-            cls.instance = cls._instances[cls]
-        return cls._instances[cls]
-
-
-class Config(metaclass=Singleton):
-    ldraw_library_path: typing.Optional[str] = None
-    generated_path: typing.Optional[str] = None
+class Config:
+    ldraw_library_path: typing.Optional[str]
+    generated_path: typing.Optional[str]
 
     def __init__(self, ldraw_library_path=None, generated_path=None):
         self.ldraw_library_path = ldraw_library_path
         self.generated_path = generated_path
 
     @classmethod
-    def get(cls):
-        return getattr(cls, "instance", None)
-
-    @classmethod
-    def reset(cls):
-        pass
-
-    @classmethod
     def load(cls, config_file=None):
         if config_file is None:
             config_file = CONFIG_FILE
         with open(config_file, "r") as config_file:
-            cfg = yaml.load(config_file)
+            cfg = yaml.load(config_file, Loader=yaml.SafeLoader)
             return cls(
                 ldraw_library_path=cfg.get('ldraw_library_path'),
                 generated_path=cfg.get('generated_path')
@@ -62,13 +44,13 @@ class Config(metaclass=Singleton):
             yaml.dump(written, config_file)
 
 
-def select_library_version(ldraw_library_path):
-    config = Config.get()
+def select_library_version(ldraw_library_path, config: Config):
     config.ldraw_library_path = ldraw_library_path
     config.write()
 
 
 def use(version):
+    from ldraw import LibraryImporter
     cache_ldraw = get_cache_dir()
     if version is not None:
         ldraw_library_path = os.path.join(cache_ldraw, version)
@@ -104,4 +86,5 @@ def use(version):
             cache_ldraw, choices[result["Ldraw library Version"]], "ldraw"
         )
 
-    select_library_version(ldraw_library_path)
+    config = LibraryImporter.config
+    config.ldraw_library_path = ldraw_library_path

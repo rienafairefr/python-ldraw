@@ -18,45 +18,96 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+import codecs
 # pylint: disable=too-few-public-methods
 import hashlib
 import logging
-import inflect
 import os
 import re
-import codecs
 from collections import defaultdict
 
+import inflect
 from attrdict import AttrDict
 
 from ldraw.colour import Colour
 from ldraw.config import Config
-from ldraw.geometry import Matrix, Vector
+from ldraw.errors import PartError
 from ldraw.lines import (
-    OptionalLine,
-    Quadrilateral,
-    Line,
-    Triangle,
     MetaCommand,
-    Comment,
 )
-from ldraw.pieces import Piece
-
-
-class PartError(Exception):
-    """ An exception happening during Part file processing """
-
-    pass
+from ldraw.part import Part
 
 
 DOT_DAT = re.compile(r"\.DAT", flags=re.IGNORECASE)
-ENDS_DOT_DAT = re.compile(r"\.DAT$", flags=re.IGNORECASE)
 logger = logging.getLogger(__name__)
 
 
 p = inflect.engine()
 
 MEMOIZED = {}
+
+
+CATEGORIES = {
+    'Animal',
+    'Antenna',
+    'Arch',
+    'Arm',
+    'Bar',
+    'Baseplate',
+    'Belville',
+    'Boat',
+    'Brick',
+    'Canvas',
+    'Car',
+    'Cone',
+    'Constraction',
+    'Container',
+    'Crane',
+    'Cylinder',
+    'Dish',
+    'Door',
+    'Electric',
+    'Fence',
+    'Figure',
+    'Figure Accessory',
+    'Freestyle',
+    'Hinge',
+    'Homemaker',
+    'Hose',
+    'Magnet',
+    'Minifig',
+    'Minifig Accessory',
+    'Minifig Footwear',
+    'Minifig Headwear',
+    'Minifig Hipwear',
+    'Minifig Neckwear',
+    'Plane',
+    'Plant',
+    'Plate',
+    'Propellor',
+    'Roadsign',
+    'Screw',
+    'Sheet Cardboard',
+    'Sheet Fabric',
+    'Sheet Plastic',
+    'Slope',
+    'Sphere',
+    'Staircase',
+    'Sticker',
+    'Support',
+    'Tap',
+    'Technic',
+    'Tile',
+    'Train',
+    'Turntable',
+    'Tyre',
+    'Vehicle',
+    'Wheel',
+    'Winch',
+    'Window',
+    'Windscreen',
+    'Wing'
+    }
 
 
 class Parts:
@@ -73,17 +124,15 @@ class Parts:
         MEMOIZED[md5_parts_lst] = instance
         return instance
 
-    def __init__(self, parts_lst, other_threshold=10):
-        logger.debug(f"reading parts.lst {parts_lst}")
-        config = Config.get()
-        if parts_lst is None:
-            parts_lst = config["parts.lst"]
+    def __init__(self, parts_lst):
+        logger.debug(f"reading parts {parts_lst}")
         self.path = None
         self.parts_dirs = []
         self.parts_subdirs = {}
-        self.parts_by_name = {}
-        self.parts_by_code = {}
-        self.parts_by_code_name = {}
+        self.by_name = {}
+        self.by_code = {}
+        self.by_code_name = {}
+        self.by_category = defaultdict(lambda: {})
 
         self.primitives_by_name = {}
         self.primitives_by_code = {}
@@ -119,34 +168,41 @@ class Parts:
             "legs": "Leg",
         }
 
-        self.parts_by_category = defaultdict(lambda: {})
-
         self.load(parts_lst)
 
         # relatively useless categories
-        for k in list(self.parts_by_category.keys()):
-            if len(self.parts_by_category.get(k)) < other_threshold:
-                self.parts_by_category["other"].update(self.parts_by_category.pop(k))
+        # for k in list(self.by_category.keys()):
+        #     if len(self.by_category.get(k)) < other_threshold:
+        #         self.by_category["other"].update(self.by_category.pop(k))
 
         # reference in others
-        for v in list(self.parts_by_category.values()):
-            self.parts_by_category[""].update(v)
+        for v in list(self.by_category.values()):
+            self.by_category[""].update(v)
 
-        for k in list(self.parts_by_category.keys()):
+        for k in list(self.by_category.keys()):
             split = k.split()
             if len(split) == 1:
-                value = self.parts_by_category.pop(k)
+                value = self.by_category.pop(k)
                 if k in self.parts:
                     self.parts[k][""] = value
                 else:
                     key = p.plural(k)
-                    if k == 'car' or k == 'train' or k =='technic':
+                    if k == 'car' or k == 'train' or k == 'technic':
                         key = k
                     self.parts[key] = value
 
+    def get_category(self, part_description):
+        split = part_description.strip(" ~=_|").split()
+
+        if (split[0].lower() == "space" or split[0].lower() == "castle") and len(split) >= 2:
+            potential = split[1]
+        else:
+            potential = split[0]
+        if potential in CATEGORIES:
+            return potential
+
     def load(self, parts_lst):
         """ load parts from a path """
-
 
         try:
             self.try_load(parts_lst)
@@ -170,21 +226,18 @@ class Parts:
             elif item.lower() == "p" + os.extsep + "lst" and os.path.isfile(obj):
                 self._load_primitives(obj)
 
-        def get_category(part_description):
-            split = part_description.strip(" ~=_|").split()
-            if (split[0].lower() == "space" or split[0].lower() == "castle") and len(split) >= 2:
-                return split[1]
-            return split[0]
-
-        for code, description in self.parts_by_code_name:
+        for code, description in self.by_code_name:
             part = self.part(code=code)
-            self.parts_by_code_name[(code, description)] = part
-            category_from_description = get_category(description)
+            self.by_code_name[(code, description)] = part
+            # read from the part, meta comment CATEGORY
             category = part.category
-            self.parts_by_category[category_from_description.lower()][description] = code
-            if category:
-                self.parts_by_category[category.lower()][description] = code
-
+            if category is None:
+                # try to infer from the description
+                category = self.get_category(description)
+            if category is None:
+                self.by_category['other'][description] = code
+            else:
+                self.by_category[category.lower()][description] = code
 
     def try_load(self, parts_lst):
         """ try loading parts from a parts.lst file """
@@ -195,9 +248,9 @@ class Parts:
                 break
 
             code, description = self.section_find(pieces)
-            self.parts_by_name[description] = code
-            self.parts_by_code[code] = description
-            self.parts_by_code_name[(code, description)] = None
+            self.by_name[description] = code
+            self.by_code[code] = description
+            self.by_code_name[(code, description)] = None
 
     def section_find(self, pieces):
         """ returns code, description from a pieces element """
@@ -238,7 +291,7 @@ class Parts:
             return None
         if description:
             try:
-                code = self.parts_by_name[description]
+                code = self.by_name[description]
             except KeyError:
                 pass
         elif not code:
@@ -336,157 +389,3 @@ class Parts:
             raise PartError("Failed to load primitives file: %s" % path)
 
 
-def colour_from_str(colour_str):
-    """ gets a Colour from a string """
-    try:
-        return int(colour_str)
-    except ValueError:
-        if colour_str.startswith("0x2"):
-            return Colour(rgb="#" + colour_str[3:], alpha=255)
-
-
-def _comment_or_meta(pieces):
-    if not pieces:
-        return Comment("")
-    elif pieces[0][:1] == "!":
-        return MetaCommand(pieces[0][1:], " ".join(pieces[1:]))
-    return Comment(" ".join(pieces))
-
-
-def _sub_file(pieces):
-    if len(pieces) != 14:
-        raise PartError("Invalid part data")
-    colour = colour_from_str(pieces[0])
-    position = list(map(float, pieces[1:4]))
-    rows = [
-        list(map(float, pieces[4:7])),
-        list(map(float, pieces[7:10])),
-        list(map(float, pieces[10:13])),
-    ]
-    part = pieces[13].upper()
-    if re.search(ENDS_DOT_DAT, part):
-        part = part[:-4]
-    return Piece(Colour(colour), Vector(*position), Matrix(rows), part)
-
-
-def _line(pieces):
-    if len(pieces) != 7:
-        raise PartError("Invalid line data")
-    colour = colour_from_str(pieces[0])
-    point1 = map(float, pieces[1:4])
-    point2 = map(float, pieces[4:7])
-    return Line(Colour(colour), Vector(*point1), Vector(*point2))
-
-
-def _triangle(pieces):
-    if len(pieces) != 10:
-        raise PartError("Invalid triangle data")
-    colour = colour_from_str(pieces[0])
-    point1 = map(float, pieces[1:4])
-    point2 = map(float, pieces[4:7])
-    point3 = map(float, pieces[7:10])
-    return Triangle(Colour(colour), Vector(*point1), Vector(*point2), Vector(*point3))
-
-
-def _quadrilateral(pieces):
-    if len(pieces) != 13:
-        raise PartError("Invalid quadrilateral data")
-    colour = colour_from_str(pieces[0])
-    point1 = map(float, pieces[1:4])
-    point2 = map(float, pieces[4:7])
-    point3 = map(float, pieces[7:10])
-    point4 = map(float, pieces[10:13])
-    return Quadrilateral(
-        Colour(colour),
-        Vector(*point1),
-        Vector(*point2),
-        Vector(*point3),
-        Vector(*point4),
-    )
-
-
-def _optional_line(pieces):
-    if len(pieces) != 13:
-        raise PartError("Invalid line data")
-    colour = colour_from_str(pieces[0])
-    point1 = map(float, pieces[1:4])
-    point2 = map(float, pieces[4:7])
-    point3 = map(float, pieces[7:10])
-    point4 = map(float, pieces[10:13])
-    return OptionalLine(
-        Colour(colour),
-        Vector(*point1),
-        Vector(*point2),
-        Vector(*point3),
-        Vector(*point4),
-    )
-
-
-HANDLERS = {
-    "0": _comment_or_meta,
-    "1": _sub_file,
-    "2": _line,
-    "3": _triangle,
-    "4": _quadrilateral,
-    "5": _optional_line,
-}
-
-
-class Part(object):
-    """
-    Contains data from a LDraw part file
-    """
-
-    def __init__(self, path):
-        self.path = path
-        self._category = None
-        self._description = None
-
-    @property
-    def lines(self):
-        try:
-            for line in codecs.open(self.path, "r", encoding="utf-8"):
-                yield line
-        except IOError:
-            raise PartError("Failed to read part file: %s" % self.path)
-
-    @property
-    def objects(self):
-        """ Load the Part from its path """
-        for number, line in enumerate(self.lines):
-            pieces = line.split()
-            if not pieces:
-                # self.objects.append(BlankLine)
-                continue
-            try:
-                handler = HANDLERS[pieces[0]]
-            except KeyError:
-                raise PartError(
-                    "Unknown command (%s) in %s at line %i"
-                    % (self.path, pieces[0], number)
-                )
-            try:
-                yield handler(pieces[1:])
-            except PartError as parse_error:
-                raise PartError(
-                    parse_error.message + " in %s at line %i" % (self.path, number)
-                )
-
-    @property
-    def description(self):
-        if self._description is None:
-            self._description = " ".join(next(self.lines).split()[1:])
-        return self._description
-
-    @property
-    def category(self):
-        if self._category is None:
-            for obj in self.objects:
-                if not isinstance(obj, Comment) and not isinstance(obj, MetaCommand):
-                    self._category = None
-                    break
-                elif isinstance(obj, MetaCommand) and obj.type == "CATEGORY":
-                    self._category = obj.text
-                    break
-
-        return self._category

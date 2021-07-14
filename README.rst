@@ -38,7 +38,9 @@ to you through normal Python imports, like::
   from ldraw.library.parts import Brick1X2WithClassicSpaceLogoPattern
 
 The actual parts library hierarchy (in which subpackage each brick is, etc...),
-is still a work in progress. You can always specify parts by their LDraw code::
+depends on categories specified in the LDRAW library, so is subject to change.
+
+You can always specify parts by their LDraw code::
 
   rover = group()
   Piece(Light_Grey, Vector(-10, -32, -90),
@@ -58,30 +60,30 @@ The simplest way is through pip::
   pip install pyldraw
 
 
-Auto-generation of the ldraw.library.* package
+Generation of the ldraw.library.* package
 ----------------------------------------------
 
 The ldraw.library.* package is kind of special, it is generated from a LDraw parts library
 with the parts.lst itself auto-generated using pymklist_.
 
-Before running code that needs something in the ldraw.library, it is recommend to
+Before running code that needs something in the ldraw.library, it is necessary to
 * download a parts library
 This is done through the CLI: `ldraw download`
-You can select a given, down to the first LDRAW version (beta 0.27, almost from last century), though it's not sure how compatible it
+You can select a given version, down to the first LDRAW version (beta 0.27, almost from last century), though it's not sure how compatible it
 is with pyldraw. Use `--version 2020-01` to have the parts library for update 2020-01
 If you've downloaded multiple versions, use `ldraw use` to select which one you want to use
 * generate the ldraw.library package
 Use `ldraw generate`
 
-Afterwards, when running code that needs something in the ldraw.library, pyldraw will know (through a ``sys.meta_path`` hook)
-and use the generated code. It also attempts to auto-generate it on-the-fly.
+Afterwards, when running code that needs something in the ldraw.library module, pyldraw will know (through a ``sys.meta_path`` hook)
+and use the generated code. It previously attempted to auto-generate it on-the-fly, but this was not reliable/easy to test
+so was removed.
 
 Considering that the toolchain download, generation, python code generation takes
 quite some time, and we don't want to re-download anyway,
 the generated library is locally written, and reused on subsequent import or python scripts run.
 
-If you change version or modify it (e.g., adding unofficial partsà, the library should be re-generated (either manually
-or on-the-fly).
+If you change version or modify it (e.g., adding unofficial parts), the library should be re-generated.
 
 The cached generated library is stored in an OS-dependent cache directory (somewhere in ``~/.local`` for Linux)
 

@@ -8,7 +8,7 @@ from ldraw.config import select_library_version, use as do_use, Config
 from ldraw.dirs import get_data_dir, get_cache_dir
 from ldraw.downloads import download as do_download, UPDATES
 from ldraw.generation.exceptions import UnwritableOutput
-from ldraw import generate as do_generate
+from ldraw import generate as do_generate, LibraryImporter
 from ldraw.utils import prompt
 
 
@@ -43,19 +43,19 @@ def use(version):
 def generate(destination, force):
     if destination is None:
         destination = os.path.join(get_data_dir(), "generated")
-    rw_config = Config.get()
+    rw_config = Config.load()
     rw_config.generated_path = destination
     rw_config.write()
 
     try:
-        do_generate(destination, force, False)
+        do_generate(rw_config, force, False)
     except UnwritableOutput:
         print(f"{destination} is unwritable, select another output directory")
 
 
 @main.command()
 def config():
-    pprint(Config.get())
+    pprint(LibraryImporter.config)
 
 
 @main.command()

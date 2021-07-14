@@ -20,6 +20,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+import traceback
+
 from ldraw.figure import *
 from ldraw.library.colours import Yellow, White, Light_Grey, Black, Trans_Green, Green, Red
 from ldraw.library.parts import Antenna4HWithRoundedTop

@@ -1,6 +1,8 @@
+import difflib
 import shutil
 import tempfile
 
+import pytest
 from PIL import ImageColor
 
 # ! no ldraw.* imports up here
@@ -10,15 +12,15 @@ INPUT_PATH = "tests/test_data/car.ldr"
 
 
 def tool_test(func, suffix):
-    fd, file = tempfile.mkstemp(prefix="pyldraw-", suffix=suffix)
-    fde, filee = tempfile.mkstemp(prefix="pyldraw-", suffix=suffix)
+    fd, file = tempfile.mkstemp(prefix="pyldraw-result-", suffix=suffix)
+    fde, tmp_expected_file = tempfile.mkstemp(prefix="pyldraw-expected-", suffix=suffix)
     func(file)
     content = open(file, "rb").read()
     # uncomment to save content to expected
     # open('tests/test_data/car' + suffix, 'wb').write(content)
 
     expected_file = "tests/test_data/car" + suffix
-    shutil.copy(expected_file, filee)
+    shutil.copy(expected_file, tmp_expected_file)
     expected = open(expected_file, "rb").read()
     assert expected == content
 
