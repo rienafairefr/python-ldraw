@@ -19,7 +19,6 @@ jobs:
           poetry run ldraw download --version 2018-02 --yes
           poetry run ldraw generate --destination .generated-cache
       - uses: actions/upload-artifact@master
-        CACHE_DIR:
         with:
           name: generated-ldraw-library
           path: .generated-cache
