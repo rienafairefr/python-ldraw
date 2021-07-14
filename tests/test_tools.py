@@ -22,6 +22,8 @@ def tool_test(func, suffix):
     expected_file = "tests/test_data/car" + suffix
     shutil.copy(expected_file, tmp_expected_file)
     expected = open(expected_file, "rb").read()
+    if expected != content:
+        pass
     assert expected == content
 
 
@@ -61,7 +63,7 @@ def test_ldr2pov(library_version):
         lambda f: ldr2pov(
             INPUT_PATH,
             f,
-            vector_position("200,200,200"),
+            vector_position("200,-200,200"),
             vector_position("0,0,0"),
             "#123456",
         ),

@@ -127,7 +127,14 @@ def ldr2pov(ldraw_path, pov_path, camera_position, look_at_position, sky):
         )
 
         if sky:
-            pov_file.write(SKY_SPHERE_FORMAT_STRING % sky)
+            if sky.startswith('#') and len(sky) == 7:
+                h = sky.lstrip('#')
+                rgb = tuple(int(h[i:i + 2], 16)/256 for i in (0, 2, 4))
+                sky = f"<{','.join(str(round(s, 4)) for s in rgb)}>"
+                pov_file.write(SKY_SPHERE_FORMAT_STRING % sky)
+            else:
+                print('need sky in hex: #RRGGBB')
+                sys.exit(-1)
 
     for message, part in writer.warnings:
         sys.stderr.write((message + "\n") % part)
