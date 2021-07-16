@@ -55,7 +55,7 @@ def generate(destination, force):
 
 @main.command()
 def config():
-    pprint(LibraryImporter.config)
+    print(yaml.dump(LibraryImporter.config.__dict__))
 
 
 @main.command()
@@ -66,7 +66,10 @@ def download(version, yes):
     do_download(version)
 
     if yes or prompt("use as the version for subsequent uses of pyLdraw ?"):
-        select_library_version(os.path.join(get_cache_dir(), version, "ldraw"))
+        ldraw_library_path = os.path.join(get_cache_dir(), version, "ldraw")
+        rw_config = Config.load()
+        rw_config.ldraw_library_path = ldraw_library_path
+        rw_config.write()
 
 
 if __name__ == "__main__":
