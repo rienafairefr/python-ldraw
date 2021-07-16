@@ -3,6 +3,7 @@ import os
 from pprint import pprint
 
 import click
+import yaml
 
 from ldraw.config import select_library_version, use as do_use, Config
 from ldraw.dirs import get_data_dir, get_cache_dir

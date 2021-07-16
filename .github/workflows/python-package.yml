@@ -8,10 +8,10 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Set up Python 3.6
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: 3.6
-      - uses: snok/install-poetry@v1.1.1
+      - uses: snok/install-poetry@v1
       - name: Install dependencies
         run: poetry install
       - name: generate code
@@ -37,10 +37,10 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - uses: snok/install-poetry@v1.1.1
+    - uses: snok/install-poetry@v1
     - name: Install dependencies
       run: poetry install
 
@@ -64,10 +64,10 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python 3.6
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: 3.6
-    - uses: dschep/install-poetry-action@v1.3
+    - uses: snok/install-poetry@v1
     - name: Install dependencies
       run: poetry install
 
