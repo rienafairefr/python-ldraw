@@ -17,7 +17,6 @@ jobs:
       - name: generate code
         run: |
           poetry run ldraw download --version 2018-02 --yes
-          ls -al ~/.cache/pyldraw/2018-02
           poetry run ldraw generate --destination .generated-cache
       - uses: actions/upload-artifact@master
         with:

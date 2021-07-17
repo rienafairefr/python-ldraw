@@ -53,12 +53,15 @@ class Config:
     def load(cls, config_file=None):
         config_path = get_config(config_file=config_file)
 
-        with open(config_path, "r") as config_file:
-            cfg = yaml.load(config_file, Loader=yaml.SafeLoader)
-            return cls(
-                ldraw_library_path=cfg.get('ldraw_library_path'),
-                generated_path=cfg.get('generated_path')
-            )
+        try:
+            with open(config_path, "r") as config_file:
+                cfg = yaml.load(config_file, Loader=yaml.SafeLoader)
+                return cls(
+                    ldraw_library_path=cfg.get('ldraw_library_path'),
+                    generated_path=cfg.get('generated_path')
+                )
+        except FileNotFoundError:
+            return cls()
 
     def write(self, config_file=None):
         """ write the config to config.yml """
@@ -66,8 +69,10 @@ class Config:
 
         with open(config_path, "w") as config_file:
             written = {}
-            if self.ldraw_library_path is not None: written['ldraw_library_path'] = self.ldraw_library_path
-            if self.generated_path is not None: written['generated_path'] = self.generated_path
+            if self.ldraw_library_path is not None:
+                written['ldraw_library_path'] = self.ldraw_library_path
+            if self.generated_path is not None:
+                written['generated_path'] = self.generated_path
             yaml.dump(written, config_file)
 
 

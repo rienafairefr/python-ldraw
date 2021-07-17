@@ -1,4 +1,3 @@
-import glob
 import logging
 import os
 import shutil
@@ -83,9 +82,6 @@ def download(version):
     # shutil.rmtree(os.path.join(version_dir, 'ldraw'))
 
     version_dir = os.path.join(cache_ldraw, version)
-
-    print(glob.glob(os.path.join(version_dir, '*')))
-    print(glob.glob(version_dir))
 
     print("mklist...")
     generate_parts_lst(
