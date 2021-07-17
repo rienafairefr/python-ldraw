@@ -1,6 +1,7 @@
 """
 takes care of reading and writing a configuration in config.yml
 """
+import argparse
 import os
 import typing
 
@@ -9,9 +10,35 @@ import yaml
 
 from ldraw import download
 from ldraw.dirs import get_cache_dir, get_config_dir
+import sys
 
 
 CONFIG_FILE = os.path.join(get_config_dir(), 'config.yml')
+
+
+def is_valid_config_file(parser, arg):
+    if not os.path.exists(arg):
+        parser.error("The file %s does not exist!" % arg)
+    else:
+        try:
+            with open(arg, 'r') as f:
+                result = yaml.load(f)
+                assert result is not None
+            return arg
+        except:
+            parser.error("%s Doesn't look like a YAML file" % arg)
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--config', type=lambda x: is_valid_config_file(parser, x))
+
+
+def get_config(config_file=None):
+    if config_file is None:
+        args, unknown = parser.parse_known_args()
+        return args.config if args.config is not None else CONFIG_FILE
+    else:
+        return config_file
 
 
 class Config:
@@ -24,9 +51,9 @@ class Config:
 
     @classmethod
     def load(cls, config_file=None):
-        if config_file is None:
-            config_file = CONFIG_FILE
-        with open(config_file, "r") as config_file:
+        config_path = get_config(config_file=config_file)
+
+        with open(config_path, "r") as config_file:
             cfg = yaml.load(config_file, Loader=yaml.SafeLoader)
             return cls(
                 ldraw_library_path=cfg.get('ldraw_library_path'),
@@ -35,9 +62,9 @@ class Config:
 
     def write(self, config_file=None):
         """ write the config to config.yml """
-        if config_file is None:
-            config_file = CONFIG_FILE
-        with open(config_file, "w") as config_file:
+        config_path = get_config(config_file=config_file)
+
+        with open(config_path, "w") as config_file:
             written = {}
             if self.ldraw_library_path is not None: written['ldraw_library_path'] = self.ldraw_library_path
             if self.generated_path is not None: written['generated_path'] = self.generated_path
@@ -86,5 +113,5 @@ def use(version):
             cache_ldraw, choices[result["Ldraw library Version"]], "ldraw"
         )
 
-    config = LibraryImporter.config
     config.ldraw_library_path = ldraw_library_path
+    config.write()
