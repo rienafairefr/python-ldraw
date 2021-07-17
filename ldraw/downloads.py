@@ -12,6 +12,7 @@ import requests_cache
 from mklist.generate import generate_parts_lst
 
 from ldraw.dirs import get_cache_dir
+from ldraw.utils import path_insensitive
 
 logger = logging.getLogger(__name__)
 
@@ -89,8 +90,8 @@ def download(version):
     print("mklist...")
     generate_parts_lst(
         "description",
-        os.path.join(version_dir, "ldraw", "parts"),
-        os.path.join(version_dir, "ldraw", "parts.lst"),
+        path_insensitive(os.path.join(version_dir, "ldraw", "parts")),
+        path_insensitive(os.path.join(version_dir, "ldraw", "parts.lst")),
     )
     with open(os.path.join(version_dir, "release_id"), "w") as release_id_file:
         release_id_file.write(release_id)
