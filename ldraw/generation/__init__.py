@@ -15,7 +15,7 @@ from ldraw.generation.exceptions import NoLibrarySelected, UnwritableOutput
 from ldraw.generation.parts import gen_parts
 from ldraw.parts import Parts
 from ldraw.resources import get_resource, get_resource_content
-from ldraw.utils import ensure_exists
+from ldraw.utils import ensure_exists, path_insensitive
 
 memoized = {}
 
@@ -30,7 +30,7 @@ def generate(config: typing.Optional[Config] = None, force=False, warn=True):
 
         library_path = config.ldraw_library_path
 
-        parts_lst = os.path.join(library_path, "ldraw", "parts.lst")
+        parts_lst = path_insensitive(os.path.join(library_path, "ldraw", "parts.lst"))
         md5_parts_lst = hashlib.md5(open(parts_lst, "rb").read()).hexdigest()
 
         if os.path.exists(hash_path):
