@@ -30,6 +30,7 @@ jobs:
       LDRAW_GENERATED_PATH: .generated-cache
     strategy:
       max-parallel: 4
+      fail-fast: false
       matrix:
         python-version: [3.6, 3.7, 3.8, 3.9]
 
