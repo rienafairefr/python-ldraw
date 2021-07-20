@@ -1,8 +1,6 @@
 import os
-import tempfile
 
 import pytest
-from _pytest.main import Session
 
 from ldraw import download, generate, LibraryImporter
 from ldraw.config import Config, use

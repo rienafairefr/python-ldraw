@@ -1,15 +1,15 @@
 import logging
 import os
-from pprint import pprint
 
 import click
+import inquirer
 import yaml
 
-from ldraw.config import select_library_version, use as do_use, Config
+from ldraw import generate as do_generate, LibraryImporter
+from ldraw.config import use as do_use, Config
 from ldraw.dirs import get_data_dir, get_cache_dir
 from ldraw.downloads import download as do_download, UPDATES
 from ldraw.generation.exceptions import UnwritableOutput
-from ldraw import generate as do_generate, LibraryImporter
 from ldraw.utils import prompt
 
 
@@ -25,6 +25,34 @@ def main(debug=False):
 @main.command()
 @click.option("--version", type=click.Choice(choices=UPDATES))
 def use(version):
+    if version is None:
+        cache_ldraw = get_cache_dir()
+
+        def get_choice(file):
+            abs_ = os.path.join(cache_ldraw, file)
+            if file == "latest":
+                release_id = str(open(os.path.join(abs_, "release_id")).read())
+                return f"latest ({release_id})"
+            else:
+                return file
+
+        choices = {
+            get_choice(file): file
+            for file in os.listdir(cache_ldraw)
+            if os.path.isdir(os.path.join(cache_ldraw, file))
+        }
+        questions = [
+            inquirer.List(
+                "Ldraw library Version",
+                message="What version do you want to use?",
+                choices=choices,
+                carousel=True,
+            ),
+        ]
+        result = inquirer.prompt(questions)
+        if result is None:
+            raise click.Abort('no option selected')
+        version = choices[result["Ldraw library Version"]]
     return do_use(version)
 
 

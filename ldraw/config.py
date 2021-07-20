@@ -10,7 +10,6 @@ import yaml
 
 from ldraw import download
 from ldraw.dirs import get_cache_dir, get_config_dir
-import sys
 
 
 CONFIG_FILE = os.path.join(get_config_dir(), 'config.yml')
@@ -82,42 +81,12 @@ def select_library_version(ldraw_library_path, config: Config):
 
 
 def use(version):
-    from ldraw import LibraryImporter
     cache_ldraw = get_cache_dir()
-    if version is not None:
-        ldraw_library_path = os.path.join(cache_ldraw, version)
-        if not os.path.exists(ldraw_library_path):
-            print("downloading that version to use...")
-            download(version)
-    else:
-        def get_choice(file):
-            abs_ = os.path.join(cache_ldraw, file)
-            if file == "latest":
-                release_id = str(open(os.path.join(abs_, "release_id")).read())
-                return f"latest ({release_id})"
-            else:
-                return file
+    ldraw_library_path = os.path.join(cache_ldraw, version)
+    if not os.path.exists(ldraw_library_path):
+        print("downloading that version to use...")
+        download(version)
 
-        choices = {
-            get_choice(file): file
-            for file in os.listdir(cache_ldraw)
-            if os.path.isdir(os.path.join(cache_ldraw, file))
-        }
-        questions = [
-            inquirer.List(
-                "Ldraw library Version",
-                message="What version do you want to use?",
-                choices=choices,
-                carousel=True,
-            ),
-        ]
-        result = inquirer.prompt(questions)
-        if result is None:
-            return
-        ldraw_library_path = os.path.join(
-            cache_ldraw, choices[result["Ldraw library Version"]], "ldraw"
-        )
-
-    config = LibraryImporter.config
+    config = Config.load()
     config.ldraw_library_path = ldraw_library_path
     config.write()
