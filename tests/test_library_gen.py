@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 @pytest.fixture(scope="function")
 def test_ldraw_library():
     generated_path = tempfile.mkdtemp(prefix=datetime.utcnow().isoformat())
-    logger.debug(f'{generated_path=}')
+    logger.debug(f'generated_path={generated_path}')
     config = Config(
         ldraw_library_path=os.path.join("tests", "test_ldraw"),
         generated_path=generated_path,
