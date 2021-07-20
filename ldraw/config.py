@@ -118,5 +118,6 @@ def use(version):
             cache_ldraw, choices[result["Ldraw library Version"]], "ldraw"
         )
 
+    config = LibraryImporter.config
     config.ldraw_library_path = ldraw_library_path
     config.write()
