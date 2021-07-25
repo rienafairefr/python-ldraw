@@ -28,16 +28,15 @@ def vector_position(input_str):
     return Vector(*map(float, position))
 
 
-def get_model(ldraw_path):
+def get_model(config, ldraw_model_path):
     """" get model from ldraw path """
-    config = LibraryImporter.config
     ldraw_library_path = config.ldraw_library_path
     parts_lst = os.path.join(ldraw_library_path, "ldraw", "parts.lst")
     parts = Parts(parts_lst)
     try:
-        model = Part(ldraw_path)
+        model = Part(ldraw_model_path)
     except PartError:
-        sys.stderr.write("Failed to read LDraw file: %s\n" % ldraw_path)
+        sys.stderr.write("Failed to read LDraw file: %s\n" % ldraw_model_path)
         sys.exit(1)
     return model, parts
 

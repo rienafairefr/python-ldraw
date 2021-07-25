@@ -24,6 +24,7 @@ import codecs
 import sys
 import argparse
 
+from ldraw.config import Config
 from ldraw.lines import Comment
 from ldraw.pieces import Piece
 from ldraw.tools import get_model
@@ -37,12 +38,13 @@ def main():
 
     args = parser.parse_args()
 
-    ldr2inv(args.ldraw_file, args.output)
+    config = Config.load()
+    ldr2inv(config, args.ldraw_file, args.output)
 
 
-def ldr2inv(ldraw_path, inventory_path):
+def ldr2inv(config, ldraw_path, inventory_path):
     """ Actual ldr2inv implementation """
-    model, parts = get_model(ldraw_path)
+    model, parts = get_model(config, ldraw_path)
 
     inventory = {}
     length = 0

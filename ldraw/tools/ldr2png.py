@@ -24,6 +24,7 @@ import argparse
 
 from PIL import ImageColor
 
+from ldraw.config import Config
 from ldraw.tools import (
     widthxheight,
     vector_position,
@@ -69,8 +70,10 @@ The optional sky background and stroke colours are PNG colours, either specified
     args = parser.parse_args()
 
     png_args = PNGArgs(args.distance, args.image_size, args.stroke_colour, args.sky)
+    config = Config.load()
 
     ldr2png(
+        config,
         args.ldraw_file,
         args.png_file,
         args.look_at_position,
@@ -79,11 +82,11 @@ The optional sky background and stroke colours are PNG colours, either specified
     )
 
 
-def ldr2png(ldraw_path, png_path, look_at_position, camera_position, png_args):
+def ldr2png(config, ldraw_path, png_path, look_at_position, camera_position, png_args):
     """ Implementation of ldr2png """
     verify_camera_look_at(camera_position, look_at_position)
 
-    model, parts = get_model(ldraw_path)
+    model, parts = get_model(config, ldraw_path)
 
     system = get_coordinate_system(camera_position, look_at_position)
 

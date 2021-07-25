@@ -75,18 +75,13 @@ class Config:
             yaml.dump(written, config_file)
 
 
-def select_library_version(ldraw_library_path, config: Config):
-    config.ldraw_library_path = ldraw_library_path
-    config.write()
-
-
-def use(version):
+def use(version, config=None):
     cache_ldraw = get_cache_dir()
     ldraw_library_path = os.path.join(cache_ldraw, version)
     if not os.path.exists(ldraw_library_path):
         print("downloading that version to use...")
         download(version)
-
-    config = Config.load()
+    if config is None:
+        config = Config.load()
     config.ldraw_library_path = ldraw_library_path
-    config.write()
+    return config

@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import argparse
 
+from ldraw.config import Config
 from ldraw.tools import (
     widthxheight,
     vector_position,
@@ -66,7 +67,10 @@ The optional sky background colour is an SVG colour, either specified as
         background_colour=args.background_colour,
     )
 
+    config = Config.load()
+
     ldr2svg(
+        config,
         args.ldraw_file,
         args.svg_file,
         args.camera_position,
@@ -76,12 +80,12 @@ The optional sky background colour is an SVG colour, either specified as
 
 
 def ldr2svg(
-    ldraw_path, svg_path, camera_position, look_at_position, svg_args
+    config, ldraw_path, svg_path, camera_position, look_at_position, svg_args
 ):  # pylint: disable=too-many-arguments
     """ ldr2svg actual implementation """
     verify_camera_look_at(camera_position, look_at_position)
 
-    model, parts = get_model(ldraw_path)
+    model, parts = get_model(config, ldraw_path)
 
     system = get_coordinate_system(camera_position, look_at_position)
 

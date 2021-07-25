@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import argparse
 import sys
 
+from ldraw.config import Config
 from ldraw.tools import vector_position, get_model
 from ldraw.writers.povray import POVRayWriter
 
@@ -86,8 +87,10 @@ each component should be specified as a floating point number between
     parser.add_argument("--sky")
 
     args = parser.parse_args()
+    config = Config.load()
 
     ldr2pov(
+        config,
         args.ldraw_file,
         args.pov_file,
         args.camera_position,
@@ -96,9 +99,9 @@ each component should be specified as a floating point number between
     )
 
 
-def ldr2pov(ldraw_path, pov_path, camera_position, look_at_position, sky):
+def ldr2pov(config, ldraw_path, pov_path, camera_position, look_at_position, sky):
     """ actual ldr2pov implementation """
-    model, parts = get_model(ldraw_path)
+    model, parts = get_model(config, ldraw_path)
 
     with open(pov_path, "w") as pov_file:
         pov_file.write('#include "colors.inc"\n\n')
@@ -130,7 +133,7 @@ def ldr2pov(ldraw_path, pov_path, camera_position, look_at_position, sky):
             if sky.startswith('#') and len(sky) == 7:
                 h = sky.lstrip('#')
                 rgb = tuple(int(h[i:i + 2], 16)/256 for i in (0, 2, 4))
-                sky = f"<{','.join(str(round(s, 4)) for s in rgb)}>"
+                sky = ','.join(str(round(s, 4)) for s in rgb)
                 pov_file.write(SKY_SPHERE_FORMAT_STRING % sky)
             else:
                 print('need sky in hex: #RRGGBB')

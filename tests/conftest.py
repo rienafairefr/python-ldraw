@@ -27,9 +27,7 @@ def pytest_runtest_setup(item):
 
 @pytest.fixture(scope="module")
 def library_version():
-    config = Config()
-    LibraryImporter.set_config(config=config)
-    use("2018-01")
+    config = use("2018-01")
     cached_generated = ".cached-generated"
     config.generated_path = cached_generated
 
@@ -37,5 +35,7 @@ def library_version():
         ensure_exists(cached_generated)
         generate(config)
 
-    yield
+    LibraryImporter.set_config(config=config)
+
+    yield config
     LibraryImporter.clean()
