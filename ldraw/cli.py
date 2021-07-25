@@ -84,7 +84,8 @@ def generate(destination, force):
 
 @main.command()
 def config():
-    print(yaml.dump(LibraryImporter.config.__dict__))
+    config = Config.load()
+    print(yaml.dump(config.__dict__))
 
 
 @main.command()
