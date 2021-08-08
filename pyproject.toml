@@ -43,7 +43,6 @@ pytest-random-order = "^1.0.4"
 pytest-xdist = "^2.2.1"
 coveralls = "^3.2.0"
 
-[tool.setuptools_scm]
 [tool.pytest.ini_options]
 markers = [
     "integration: marks tests as integration tests (run with '--integration')",
@@ -51,9 +50,8 @@ markers = [
 
 [build-system]
 requires = [
-    "poetry>=0.12",
+    "poetry>=1.0.2",
     "setuptools>=42",
     "wheel",
-    "setuptools_scm[toml]>=3.4",
 ]
 build-backend = "poetry.masonry.api"
