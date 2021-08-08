@@ -122,10 +122,9 @@ class Part(object):
     def __init__(self, path=None, file=None):
         if path is None and file is None:
             raise ValueError('Part loading: needs path or file')
-
         if path is not None:
             self.path = path
-            self.file = codecs.open(self.path, "r", encoding="utf-8")
+            self.file = None
         elif file is not None:
             self.file = file
             self.path ='%file-like object%'
@@ -135,9 +134,14 @@ class Part(object):
     @property
     def lines(self):
         try:
-            for line in self.file:
-                yield line
-            self.file.seek(0)
+            if self.file is None:
+                with codecs.open(self.path, "r", encoding="utf-8") as file:
+                    for line in file:
+                        yield line
+            else:
+                for line in self.file:
+                    yield line
+                self.file.seek(0)
         except IOError:
             raise PartError("Failed to read part file: %s" % self.path)
 
