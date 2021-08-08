@@ -3,31 +3,8 @@ name: Python package
 on: [push, pull_request]
 
 jobs:
-  generate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Set up Python 3.6
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.6
-      - uses: snok/install-poetry@v1
-      - name: Install dependencies
-        run: poetry install
-      - name: generate code
-        run: |
-          poetry run ldraw download --version 2018-02 --yes
-          poetry run ldraw generate --destination .generated-cache
-      - uses: actions/upload-artifact@master
-        with:
-          name: generated-ldraw-library
-          path: .generated-cache
-
   test:
-    needs: generate
     runs-on: ubuntu-latest
-    env:
-      LDRAW_GENERATED_PATH: .generated-cache
     strategy:
       max-parallel: 4
       fail-fast: false
@@ -43,12 +20,10 @@ jobs:
     - uses: snok/install-poetry@v1
     - name: Install dependencies
       run: poetry install
-
-    - uses: actions/download-artifact@master
-      with:
-        name: generated-ldraw-library
-        path: .generated-cache
-
+    - name: generate ldraw.library
+      run: |
+        poetry run ldraw download --version 2018-02 --yes
+        poetry run ldraw generate
     - name: Test with pytest
       run: poetry run pytest --cov=ldraw
     - name: Coveralls
@@ -59,7 +34,6 @@ jobs:
   publish:
     needs:
       - test
-      - generate
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -70,16 +44,9 @@ jobs:
     - uses: snok/install-poetry@v1
     - name: Install dependencies
       run: poetry install
-
-    - uses: actions/download-artifact@master
-      with:
-        name: generated-ldraw-library
-        path: .generated-cache
-
     - name: Set version from tag
       run: |
         poetry version $(echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}")
-
     - name: Build package
       run: |
         poetry build -vv
