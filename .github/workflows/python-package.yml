@@ -23,7 +23,7 @@ jobs:
     - name: generate ldraw.library
       run: |
         poetry run ldraw download --version 2018-02 --yes
-        poetry run ldraw generate
+        poetry run ldraw generate --yes
     - name: Test with pytest
       run: poetry run pytest --cov=ldraw
     - name: Coveralls

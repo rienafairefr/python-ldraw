@@ -66,13 +66,14 @@ def use(version):
          "uses inside OS-dependent data dir (usually $HOME/.local/share/pyldraw)",
     required=False
 )
-def generate(destination, force):
+@click.option("--yes", is_flag=True, help="use as the ldraw.library location for subsequent uses of pyLdraw")
+def generate(destination, force, yes):
     if destination is None:
         destination = os.path.join(get_data_dir(), "generated")
     destination = os.path.abspath(destination)
     rw_config = Config.load()
     if rw_config.generated_path != destination:
-        if prompt("use that generated library for subsequent uses of pyldraw ldraw.library ?"):
+        if yes or prompt("use that generated library for subsequent uses of pyldraw ldraw.library ?"):
             rw_config.generated_path = destination
             rw_config.write()
 
@@ -94,7 +95,7 @@ def config():
     help="download LDraw library files"
 )
 @click.option("--version", default="latest", type=click.Choice(choices=UPDATES))
-@click.option("--yes", is_flag=True, help="use as the library for subsequent uses of pyLdraw ")
+@click.option("--yes", is_flag=True, help="use as the library for subsequent uses of pyLdraw")
 def download(version, yes):
     release_id = do_download(version)
 
