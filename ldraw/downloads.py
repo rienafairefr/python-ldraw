@@ -73,15 +73,18 @@ def download(version):
                 break
 
     if os.path.exists(os.path.join(cache_ldraw, version)):
-        print(f'{version} already downloaded')
-        return
-    unpack_version(download_version(version), version)
+        if version == "latest":
+            print(f'latest({release_id}) already downloaded')
+        else:
+            print(f'{version} already downloaded')
+        return release_id
+    unpack_version(download_version(release_id), release_id)
 
     # copy_tree(os.path.join(version_dir, 'ldraw', 'p'), os.path.join(version_dir, 'p'))
     # copy_tree(os.path.join(version_dir, 'ldraw', 'parts'), os.path.join(version_dir, 'parts'))
     # shutil.rmtree(os.path.join(version_dir, 'ldraw'))
 
-    version_dir = os.path.join(cache_ldraw, version)
+    version_dir = os.path.join(cache_ldraw, release_id)
 
     print("mklist...")
     generate_parts_lst(
@@ -89,5 +92,4 @@ def download(version):
         path_insensitive(os.path.join(version_dir, "ldraw", "parts")),
         path_insensitive(os.path.join(version_dir, "ldraw", "parts.lst")),
     )
-    with open(os.path.join(version_dir, "release_id"), "w") as release_id_file:
-        release_id_file.write(release_id)
+    return release_id

@@ -22,22 +22,17 @@ def main(debug=False):
         logging.basicConfig(level=logging.INFO)
 
 
-@main.command()
+@main.command(
+    help="specify which LDraw library version to use"
+)
 @click.option("--version", type=click.Choice(choices=UPDATES))
 def use(version):
+
     if version is None:
         cache_ldraw = get_cache_dir()
 
-        def get_choice(file):
-            abs_ = os.path.join(cache_ldraw, file)
-            if file == "latest":
-                release_id = str(open(os.path.join(abs_, "release_id")).read())
-                return f"latest ({release_id})"
-            else:
-                return file
-
         choices = {
-            get_choice(file): file
+            file: file
             for file in os.listdir(cache_ldraw)
             if os.path.isdir(os.path.join(cache_ldraw, file))
         }
@@ -56,7 +51,9 @@ def use(version):
     return do_use(version)
 
 
-@main.command()
+@main.command(
+    help="generate the ldraw.library modules"
+)
 @click.option(
     "--force",
     help="re-generate even if it's apparently not needed",
@@ -82,21 +79,24 @@ def generate(destination, force):
         print(f"{destination} is unwritable, select another output directory")
 
 
-@main.command()
+@main.command(
+    help="show pyldraw current config"
+)
 def config():
     config = Config.load()
     print(yaml.dump(config.__dict__))
 
 
-@main.command()
+@main.command(
+    help="download LDraw library files"
+)
 @click.option("--version", default="latest", type=click.Choice(choices=UPDATES))
 @click.option("--yes", is_flag=True, help="use as the library for subsequent uses of pyLdraw ")
 def download(version, yes):
-    """ download zip/exe, mklist, main function"""
-    do_download(version)
+    release_id = do_download(version)
 
     if yes or prompt("use as the version for subsequent uses of pyLdraw ?"):
-        ldraw_library_path = os.path.join(get_cache_dir(), version)
+        ldraw_library_path = os.path.join(get_cache_dir(), release_id)
         rw_config = Config.load()
         rw_config.ldraw_library_path = ldraw_library_path
         rw_config.write()

@@ -19,8 +19,6 @@ setup(
     python_requires=">=3.5",
     packages=find_packages(),
     package_data={"ldraw": ["templates/*.mustache"]},
-    use_scm_version=True,
-    setup_requires=["setuptools_scm"],
     entry_points={
         "console_scripts": [
             "ldr2inv = ldraw.tools.ldr2inv:main",

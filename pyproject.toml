@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "python-ldraw"
-version = "0.0.0"
+version = "0.10.0"
 description = "Python wrapper for LDraw library."
 authors = ["David Boddie <david@boddie.org.uk>", "Matthieu Berthomé <rienafairefr@gmail.com>"]
 packages = [ { include = "ldraw" } ]
+exclude = ["ldraw/library/**/*"]
 
 [tool.poetry.scripts]
 ldr2inv = "ldraw.tools.ldr2inv:main"

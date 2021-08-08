@@ -241,16 +241,16 @@ class Parts:
 
     def try_load(self, parts_lst):
         """ try loading parts from a parts.lst file """
-        parts_lst_file = codecs.open(parts_lst, "r", encoding="utf-8")
-        for line in parts_lst_file.readlines():
-            pieces = re.split(DOT_DAT, line)
-            if len(pieces) != 2:
-                break
+        with codecs.open(parts_lst, "r", encoding="utf-8") as parts_lst_file:
+            for line in parts_lst_file.readlines():
+                pieces = re.split(DOT_DAT, line)
+                if len(pieces) != 2:
+                    break
 
-            code, description = self.section_find(pieces)
-            self.by_name[description] = code
-            self.by_code[code] = description
-            self.by_code_name[(code, description)] = None
+                code, description = self.section_find(pieces)
+                self.by_name[description] = code
+                self.by_code[code] = description
+                self.by_code_name[(code, description)] = None
 
     def section_find(self, pieces):
         """ returns code, description from a pieces element """

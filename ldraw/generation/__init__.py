@@ -58,6 +58,7 @@ def generate(config: typing.Optional[Config] = None, force=False, warn=True):
 
         open(hash_path, "w").write(md5_parts_lst)
     except OSError as exc:
+        print(exc)
         traceback.print_exc(exc)
         raise UnwritableOutput(
             f"can't write the output directory {generated_library_path}"
