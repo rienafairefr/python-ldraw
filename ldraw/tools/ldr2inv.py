@@ -33,8 +33,8 @@ from ldraw.tools import get_model
 def main():
     """ Main function for ldr2inv """
     parser = argparse.ArgumentParser()
-    parser.add_argument("ldraw_file")
-    parser.add_argument("output")
+    parser.add_argument("ldraw_file", type=argparse.FileType(mode='r'))
+    parser.add_argument("output", type=argparse.FileType(mode='w'))
 
     args = parser.parse_args()
 
@@ -42,9 +42,9 @@ def main():
     ldr2inv(config, args.ldraw_file, args.output)
 
 
-def ldr2inv(config, ldraw_path, inventory_path):
+def ldr2inv(config, ldraw_model_file, inventory_path):
     """ Actual ldr2inv implementation """
-    model, parts = get_model(config, ldraw_path)
+    model, parts = get_model(config, ldraw_model_file)
 
     inventory = {}
     length = 0

@@ -32,7 +32,7 @@ from ldraw.tools import (
     get_coordinate_system,
     verify_camera_look_at,
 )
-from ldraw.writers.png import PNGWriter, PNGArgs
+from ldraw.writers.png import PNGWriter
 
 
 def main():
@@ -54,21 +54,22 @@ The optional sky background and stroke colours are PNG colours, either specified
 """
 
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument("ldraw_file")
-    parser.add_argument("png_file")
+    parser.add_argument("ldraw_file", type=argparse.FileType(mode='r'))
+    parser.add_argument("png_file", type=argparse.FileType(mode='w'))
     parser.add_argument("image_size", type=widthxheight)
     parser.add_argument("camera_position", type=vector_position)
     parser.add_argument(
-        "--look_at_position", required=False, default=vector_position("0,0,0")
+        "--look_at_position", required=False, default=vector_position("0,0,0"), type=vector_position
     )
     parser.add_argument("--distance", type=float, default=1.0)
-    parser.add_argument("--stroke-colour", dest="stroke_colour", type=ImageColor.getrgb)
+    parser.add_argument("--stroke-colour", dest="stroke_colour", type=ImageColor.getrgb, required=True)
     parser.add_argument(
         "--sky", default=ImageColor.getrgb("#000000"), type=ImageColor.getrgb
     )
 
     args = parser.parse_args()
 
+    from ldraw.writers.png import PNGArgs
     png_args = PNGArgs(args.distance, args.image_size, args.stroke_colour, args.sky)
     config = Config.load()
 
@@ -82,16 +83,16 @@ The optional sky background and stroke colours are PNG colours, either specified
     )
 
 
-def ldr2png(config, ldraw_path, png_path, look_at_position, camera_position, png_args):
+def ldr2png(config, ldraw_file, png_file, look_at_position, camera_position, png_args):
     """ Implementation of ldr2png """
     verify_camera_look_at(camera_position, look_at_position)
 
-    model, parts = get_model(config, ldraw_path)
+    model, parts = get_model(config, ldraw_file)
 
     system = get_coordinate_system(camera_position, look_at_position)
 
     writer = PNGWriter(camera_position, system, parts)
-    writer.write(model, png_path, png_args)
+    writer.write(model, png_file, png_args)
 
 
 if __name__ == "__main__":

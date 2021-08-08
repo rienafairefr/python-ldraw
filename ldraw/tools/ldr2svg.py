@@ -30,7 +30,6 @@ from ldraw.tools import (
     get_coordinate_system,
     verify_camera_look_at,
 )
-from ldraw.writers.svg import SVGArgs
 
 
 def main():
@@ -48,8 +47,8 @@ The optional sky background colour is an SVG colour, either specified as
 
 """
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument("ldraw_file")
-    parser.add_argument("svg_file")
+    parser.add_argument("ldraw_file", type=argparse.FileType(mode='r'))
+    parser.add_argument("svg_file", type=argparse.FileType(mode='w'))
     parser.add_argument("viewport_size", type=widthxheight)
     parser.add_argument("camera_position", type=vector_position)
     parser.add_argument(
@@ -61,6 +60,8 @@ The optional sky background colour is an SVG colour, either specified as
     parser.add_argument("--sky")
 
     args = parser.parse_args()
+    from ldraw.writers.svg import SVGArgs
+
     svg_args = SVGArgs(
         args.viewport_size[0],
         args.viewport_size[1],
@@ -80,12 +81,12 @@ The optional sky background colour is an SVG colour, either specified as
 
 
 def ldr2svg(
-    config, ldraw_path, svg_path, camera_position, look_at_position, svg_args
+    config, ldraw_model_file, svg_path, camera_position, look_at_position, svg_args
 ):  # pylint: disable=too-many-arguments
     """ ldr2svg actual implementation """
     verify_camera_look_at(camera_position, look_at_position)
 
-    model, parts = get_model(config, ldraw_path)
+    model, parts = get_model(config, ldraw_model_file)
 
     system = get_coordinate_system(camera_position, look_at_position)
 

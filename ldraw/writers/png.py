@@ -52,13 +52,13 @@ class PNGWriter(Writer):
     """
 
     # pylint: disable=too-few-public-methods
-    def write(self, model, png_path, png_args):
+    def write(self, model_file, png_file, png_args):
         """
         Writes the model's polygons to the provided PNG file
 
-        :param model: LDR model
-        :type model: Part
-        :param png_path: where to output the PNG
+        :param model_file: LDR model (file-like object)
+        :type model_file: Part
+        :param png_file: where to output the PNG (file-like object)
         :param png_args: Arguments for the rendering (distance, etc.)
         :type png_args: PNGArgs
 
@@ -75,7 +75,7 @@ class PNGWriter(Writer):
 
         depth = numpy.empty((image_size[0], image_size[1]), "f")
         depth[:] = 1 << 32 - 1
-        polygons = self._polygons_from_objects(model)
+        polygons = self._polygons_from_objects(model_file)
 
         viewport_scale = min(float(image_size[0]), float(image_size[1]))
         # Draw opaque polygons first.
@@ -88,7 +88,7 @@ class PNGWriter(Writer):
             if polygon.alpha < 1.0:
                 polygon.project(distance)
                 polygon.render(image, depth, viewport_scale, stroke_colour)
-        image.save(png_path)
+        image.save(png_file)
 
     def _get_polygon(self, top_level_piece, colour, projections):
         rgb = self.parts.colours.get(colour, "#ffffff")

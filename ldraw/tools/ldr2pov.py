@@ -25,7 +25,7 @@ import sys
 
 from ldraw.config import Config
 from ldraw.tools import vector_position, get_model
-from ldraw.writers.povray import POVRayWriter
+
 
 SKY_SPHERE_FORMAT_STRING = """sky_sphere {
   pigment
@@ -75,8 +75,8 @@ each component should be specified as a floating point number between
 
 """
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument("ldraw_file")
-    parser.add_argument("pov_file")
+    parser.add_argument("ldraw_file", type=argparse.FileType(mode='r'))
+    parser.add_argument("pov_file", type=argparse.FileType(mode='w'))
     parser.add_argument("camera_position", type=vector_position)
     parser.add_argument(
         "--look_at_position",
@@ -99,12 +99,13 @@ each component should be specified as a floating point number between
     )
 
 
-def ldr2pov(config, ldraw_path, pov_path, camera_position, look_at_position, sky):
+def ldr2pov(config, ldraw_model_file, pov_path, camera_position, look_at_position, sky):
     """ actual ldr2pov implementation """
-    model, parts = get_model(config, ldraw_path)
+    model, parts = get_model(config, ldraw_model_file)
 
     with open(pov_path, "w") as pov_file:
         pov_file.write('#include "colors.inc"\n\n')
+        from ldraw.writers.povray import POVRayWriter
         writer = POVRayWriter(parts, pov_file)
         writer.write(model)
 

@@ -40,7 +40,7 @@ class LibraryImporter:
             if not rest or rest.startswith('.'):
                 return True
 
-    config = Config()
+    config = None
 
     @classmethod
     def set_config(cls, config):

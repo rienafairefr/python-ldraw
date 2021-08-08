@@ -119,16 +119,25 @@ class Part(object):
     Contains data from a LDraw part file
     """
 
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, path=None, file=None):
+        if path is None and file is None:
+            raise ValueError('Part loading: needs path or file')
+
+        if path is not None:
+            self.path = path
+            self.file = codecs.open(self.path, "r", encoding="utf-8")
+        elif file is not None:
+            self.file = file
+            self.path ='%file-like object%'
         self._category = None
         self._description = None
 
     @property
     def lines(self):
         try:
-            for line in codecs.open(self.path, "r", encoding="utf-8"):
+            for line in self.file:
                 yield line
+            self.file.seek(0)
         except IOError:
             raise PartError("Failed to read part file: %s" % self.path)
 
@@ -145,7 +154,7 @@ class Part(object):
             except KeyError:
                 raise PartError(
                     "Unknown command (%s) in %s at line %i"
-                    % (self.path, pieces[0], number)
+                    % (pieces[0], self.path, number)
                 )
             try:
                 yield handler(pieces[1:])
