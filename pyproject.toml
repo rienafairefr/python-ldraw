@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-ldraw"
-version = "0.8.2"
+version = "0.0.0"
 description = "Python wrapper for LDraw library."
 authors = ["David Boddie <david@boddie.org.uk>", "Matthieu Berthomé <rienafairefr@gmail.com>"]
 packages = [ { include = "ldraw" } ]
@@ -43,11 +43,17 @@ pytest-random-order = "^1.0.4"
 pytest-xdist = "^2.2.1"
 coveralls = "^3.2.0"
 
+[tool.setuptools_scm]
 [tool.pytest.ini_options]
 markers = [
     "integration: marks tests as integration tests (run with '--integration')",
 ]
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = [
+    "poetry>=0.12",
+    "setuptools>=42",
+    "wheel",
+    "setuptools_scm[toml]>=3.4",
+]
 build-backend = "poetry.masonry.api"
