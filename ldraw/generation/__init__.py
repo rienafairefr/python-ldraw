@@ -36,6 +36,7 @@ def generate(config: typing.Optional[Config] = None, force=False, warn=True):
         if os.path.exists(hash_path):
             md5 = open(hash_path, "r").read()
             if md5 == md5_parts_lst and not force:
+                print("already generated there")
                 return
 
         shutil.rmtree(generated_library_path)

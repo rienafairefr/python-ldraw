@@ -69,9 +69,12 @@ def use(version):
 def generate(destination, force):
     if destination is None:
         destination = os.path.join(get_data_dir(), "generated")
+    destination = os.path.abspath(destination)
     rw_config = Config.load()
-    rw_config.generated_path = destination
-    rw_config.write()
+    if rw_config.generated_path != destination:
+        if prompt("use that generated library for subsequent uses of pyldraw ldraw.library ?"):
+            rw_config.generated_path = destination
+            rw_config.write()
 
     try:
         do_generate(rw_config, force, False)
@@ -95,11 +98,12 @@ def config():
 def download(version, yes):
     release_id = do_download(version)
 
-    if yes or prompt("use as the version for subsequent uses of pyLdraw ?"):
-        ldraw_library_path = os.path.join(get_cache_dir(), release_id)
-        rw_config = Config.load()
-        rw_config.ldraw_library_path = ldraw_library_path
-        rw_config.write()
+    rw_config = Config.load()
+    ldraw_library_path = os.path.join(get_cache_dir(), release_id)
+    if rw_config.ldraw_library_path != ldraw_library_path:
+        if yes or prompt("use as the version for subsequent uses of pyLdraw ?"):
+            rw_config.ldraw_library_path = ldraw_library_path
+            rw_config.write()
 
 
 if __name__ == "__main__":
